@@ -21,8 +21,8 @@ pub(crate) unsafe fn encode_string_unchecked<E>(
     data: &[u8],
     target: &mut String,
 ) -> Result<usize, Error>
-    where
-        E: Encoder,
+where
+    E: Encoder,
 {
     encoder.encode_vec(data, target.as_mut_vec())
 }
