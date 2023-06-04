@@ -12,3 +12,5 @@ mod validator;
 
 #[cfg(feature = "hex")]
 pub mod hex;
+#[cfg(feature = "percent")]
+pub mod percent;
