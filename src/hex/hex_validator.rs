@@ -54,7 +54,7 @@ impl HexValidator {
     /// Checks if the hex char is valid.
     #[inline(always)]
     pub const fn is_valid_char(&self, c: char) -> bool {
-        self.is_valid_byte(c as u8)
+        c.is_ascii() && self.is_valid_byte(c as u8)
     }
 }
 
