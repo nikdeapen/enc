@@ -11,4 +11,5 @@ license = "MIT"
 
 [features]
 hex = []
-full = ["hex"]
+percent = ["hex"]
+full = ["hex", "percent"]
