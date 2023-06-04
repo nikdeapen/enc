@@ -8,6 +8,9 @@ pub enum Error {
 
     /// The target had insufficient space for the operation.
     InsufficientTargetSpace,
+
+    /// The encoded data was invalid.
+    InvalidEncodedData,
 }
 
 impl Error {
@@ -18,6 +21,7 @@ impl Error {
         match self {
             Self::IntegerOverflow => "integer overflow",
             Self::InsufficientTargetSpace => "insufficient target space",
+            Self::InvalidEncodedData => "invalid encoded data",
         }
     }
 }
