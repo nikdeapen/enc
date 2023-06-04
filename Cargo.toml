@@ -9,4 +9,6 @@ authors = ["Nik Deapen <nik@deapen.com>"]
 edition = "2021"
 license = "MIT"
 
-[dependencies]
+[features]
+hex = []
+full = ["hex"]
