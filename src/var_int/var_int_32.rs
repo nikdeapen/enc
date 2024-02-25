@@ -24,12 +24,12 @@ impl VarInt32 {
     //! Constants
 
     /// The maximum length of an encoded `u32` value.
-    pub const MAX_ENCODED_LEN: usize = 5;
+    pub const MAX_ENCODED_LEN: usize = ((u32::BITS + 6) / 7) as usize;
 }
 
 impl EncodedLen for VarInt32 {
     fn encoded_len(&self) -> usize {
-        let bits: u32 = 32 - self.value.leading_zeros();
+        let bits: u32 = u32::BITS - self.value.leading_zeros();
         if bits == 0 {
             1
         } else {

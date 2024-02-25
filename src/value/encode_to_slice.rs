@@ -5,6 +5,11 @@ use crate::Error::InsufficientTargetSpace;
 pub trait EncodeToSlice: EncodedLen {
     /// Encodes the value to the target slice. Returns the length of the encoded value.
     ///
+    /// # Implementations
+    /// Implementations must not modify the target slice outside of the range [0, encoded_len).
+    /// The data within this range is assumed to be garbage and the implementation should overwrite
+    /// the entire range without reading it.
+    ///
     /// # Unsafe
     /// This function is unsafe so implementations can assume the target slice has sufficient space
     /// for the encoded value. Clients must ensure this invariant always holds true.
