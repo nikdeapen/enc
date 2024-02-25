@@ -3,7 +3,7 @@ use std::io::ErrorKind::UnexpectedEof;
 
 /// Reads a single byte from the `Read`.
 #[inline(always)]
-pub fn read_single_byte<R>(r: &mut R) -> Result<u8, io::Error>
+pub(crate) fn read_single_byte<R>(r: &mut R) -> Result<u8, io::Error>
 where
     R: io::Read,
 {
@@ -16,7 +16,7 @@ where
 
 /// Reads an optional byte from the `Read`.
 #[inline(always)]
-pub fn read_optional_byte<R>(r: &mut R) -> Result<Option<u8>, io::Error>
+pub(crate) fn read_optional_byte<R>(r: &mut R) -> Result<Option<u8>, io::Error>
 where
     R: io::Read,
 {

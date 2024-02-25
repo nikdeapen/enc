@@ -23,8 +23,7 @@ pub trait DecodeFromReadPrefix: Sized {
     where
         R: io::Read;
 
-    /// Decodes an optional value from the `Read` prefix.
-    /// Returns `None` if the `Read` has no more data.
+    /// Decodes an optional value from the `Read` prefix. Returns `None` if the `Read` is empty.
     fn decode_from_read_prefix_optional<R>(r: &mut R) -> Result<Option<Self>, io::Error>
     where
         R: io::Read,

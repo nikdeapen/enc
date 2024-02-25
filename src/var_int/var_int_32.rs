@@ -1,9 +1,8 @@
 use std::fmt::{Display, Formatter};
 use std::io;
 use std::io::ErrorKind::InvalidData;
-use std::io::{Error, Read};
 
-use crate::value::read_single_byte;
+use crate::value::util::read_single_byte;
 use crate::Error::InvalidEncodedData;
 use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen};
 
@@ -30,14 +29,17 @@ impl VarInt32 {
 
     /// The maximum length of an encoded `u32` value.
     pub const MAX_ENCODED_LEN: usize = ((u32::BITS + 6) / 7) as usize;
+
+    /// The last decoded byte mask. (ensures the decoded value does not overflow)
+    const LAST_DECODING_BYTE_MASK: u8 = 0xFF << (u32::BITS % 7);
 }
 
 impl EncodedLen for VarInt32 {
     fn encoded_len(&self) -> usize {
-        let bits: u32 = u32::BITS - self.value.leading_zeros();
-        if bits == 0 {
+        if self.value == 0 {
             1
         } else {
+            let bits: u32 = u32::BITS - self.value.leading_zeros();
             ((bits + 6) / 7) as usize
         }
     }
@@ -76,32 +78,30 @@ impl EncodeToWrite for VarInt32 {
 }
 
 impl DecodeFromReadPrefix for VarInt32 {
-    fn decode_from_read_prefix_with_first_byte<R>(first: u8, r: &mut R) -> Result<Self, Error>
+    fn decode_from_read_prefix_with_first_byte<R>(first: u8, r: &mut R) -> Result<Self, io::Error>
     where
-        R: Read,
+        R: io::Read,
     {
         let mut result: u32 = (first & 0x7F) as u32;
         if first & 0x80 == 0 {
-            Ok(result.into())
+            Ok(Self { value: result })
         } else {
             let mut shift: usize = 7;
             for _ in 0..(Self::MAX_ENCODED_LEN - 2) {
                 let b: u8 = read_single_byte(r)?;
                 if b & 0x80 == 0 {
                     result |= (b as u32) << shift;
-                    return Ok(result.into());
+                    return Ok(Self { value: result });
                 } else {
                     result |= ((b & 0x7F) as u32) << shift;
                     shift += 7;
                 }
             }
             let b: u8 = read_single_byte(r)?;
-
-            // max of 4 more bits
-            if b & 0xF0 != 0 {
+            if b & Self::LAST_DECODING_BYTE_MASK != 0 {
                 Err(io::Error::new(InvalidData, InvalidEncodedData))
             } else {
-                result |= (b as u32) << shift;
+                result |= (b as u32) << (7 * (Self::MAX_ENCODED_LEN - 1));
                 Ok(result.into())
             }
         }
