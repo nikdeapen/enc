@@ -16,13 +16,13 @@ impl HexValidator {
         allow_uppercase: true,
     };
 
-    /// The lowercase only hex validator.
+    /// The lowercase-only hex validator.
     pub const LOWER_ONLY: Self = Self {
         allow_lowercase: true,
         allow_uppercase: false,
     };
 
-    /// The uppercase only hex validator.
+    /// The uppercase-only hex validator.
     pub const UPPER_ONLY: Self = Self {
         allow_lowercase: false,
         allow_uppercase: true,

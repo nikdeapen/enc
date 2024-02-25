@@ -18,9 +18,9 @@ pub trait Encoder {
             .ok_or(IntegerOverflow)?;
         target.resize(expanded_len, 0u8);
         match self.encode_to_slice(data, &mut target.as_mut_slice()[original_len..]) {
-            Ok(len) => {
-                debug_assert_eq!(len, encoded_len);
-                Ok(len)
+            Ok(also_encoded_len) => {
+                debug_assert_eq!(encoded_len, also_encoded_len);
+                Ok(also_encoded_len)
             }
             Err(error) => {
                 target.truncate(original_len);

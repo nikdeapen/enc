@@ -1,6 +1,8 @@
 use std::io;
 use std::io::ErrorKind::UnexpectedEof;
 
+use crate::Error::InvalidEncodedData;
+
 /// Reads a single byte from the `Read`.
 #[inline(always)]
 pub(crate) fn read_single_byte<R>(r: &mut R) -> Result<u8, io::Error>
@@ -10,7 +12,7 @@ where
     if let Some(b) = read_optional_byte(r)? {
         Ok(b)
     } else {
-        Err(io::Error::new(UnexpectedEof, "no bytes to read"))
+        Err(io::Error::new(UnexpectedEof, InvalidEncodedData))
     }
 }
 

@@ -12,3 +12,4 @@ license = "MIT"
 [features]
 hex = []
 var-int = []
+full = ["hex", "var-int"]
