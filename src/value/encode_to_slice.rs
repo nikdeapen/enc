@@ -5,10 +5,10 @@ use crate::Error::InsufficientTargetSpace;
 pub trait EncodeToSlice: EncodedLen {
     /// Encodes the value to the target slice. Returns the length of the encoded value.
     ///
-    /// # Implementations
-    /// Implementations must not modify the target slice outside of the range [0, encoded_len).
-    /// The data within this range is assumed to be garbage and the implementation should overwrite
-    /// the entire range without reading it.
+    /// Note:
+    /// - The implementation must not read from the target slice.
+    /// - The implementation must not modify the target slice outside of the range [0, encoded_len).
+    /// - The implementation should overwrite the entire range.
     ///
     /// # Unsafe
     /// This function is unsafe so implementations can assume the target slice has sufficient space
@@ -16,6 +16,7 @@ pub trait EncodeToSlice: EncodedLen {
     unsafe fn encode_to_slice_unchecked(&self, target: &mut [u8]) -> usize;
 
     /// Encodes the value to the target slice. Returns the length of the encoded value.
+    /// See `encode_to_slice_unchecked`.
     fn encode_to_slice(&self, target: &mut [u8]) -> Result<usize, crate::Error> {
         let encoded_len: usize = self.encoded_len();
         if encoded_len > target.len() {
