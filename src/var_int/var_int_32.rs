@@ -1,6 +1,7 @@
 use std::fmt::{Display, Formatter};
+use std::io;
 
-use crate::{EncodeToSlice, EncodedLen};
+use crate::{EncodeToSlice, EncodeToWrite, EncodedLen};
 
 /// A variable-length encoded `u32` value.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
@@ -58,6 +59,18 @@ impl EncodeToSlice for VarInt32 {
     }
 }
 
+impl EncodeToWrite for VarInt32 {
+    fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, io::Error>
+    where
+        W: io::Write,
+    {
+        let mut buffer: [u8; Self::MAX_ENCODED_LEN] = [0u8; Self::MAX_ENCODED_LEN];
+        let encoded_len: usize = unsafe { self.encode_to_slice_unchecked(&mut buffer) };
+        w.write_all(&mut buffer[..encoded_len])?;
+        Ok(encoded_len)
+    }
+}
+
 impl Display for VarInt32 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.value)
@@ -66,8 +79,11 @@ impl Display for VarInt32 {
 
 #[cfg(test)]
 mod tests {
+    use std::io;
+    use std::io::Cursor;
+
     use crate::var_int::VarInt32;
-    use crate::{EncodeToSlice, EncodedLen};
+    use crate::{EncodeToSlice, EncodeToWrite, EncodedLen};
 
     #[test]
     fn max_encoded_len() {
@@ -78,7 +94,7 @@ mod tests {
     }
 
     #[test]
-    fn encode() {
+    fn encode() -> Result<(), io::Error> {
         let test_cases: &[(u32, &[u8])] = &[
             (0x00, b"\x00"),                     // 0 bits
             (0x01, b"\x01"),                     // 1 bit
@@ -95,6 +111,11 @@ mod tests {
 
             let encoded: Vec<u8> = value.encode_as_vec();
             assert_eq!(encoded, *expected, "value={}", value);
+
+            let mut output: Cursor<Vec<u8>> = Cursor::default();
+            value.encode_to_write(&mut output)?;
+            assert_eq!(output.into_inner(), *expected);
         }
+        Ok(())
     }
 }
