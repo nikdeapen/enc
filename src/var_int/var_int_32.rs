@@ -1,7 +1,11 @@
 use std::fmt::{Display, Formatter};
 use std::io;
+use std::io::ErrorKind::InvalidData;
+use std::io::{Error, Read};
 
-use crate::{EncodeToSlice, EncodeToWrite, EncodedLen};
+use crate::value::read_single_byte;
+use crate::Error::InvalidEncodedData;
+use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen};
 
 /// A variable-length encoded `u32` value.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
@@ -71,6 +75,39 @@ impl EncodeToWrite for VarInt32 {
     }
 }
 
+impl DecodeFromReadPrefix for VarInt32 {
+    fn decode_from_read_prefix_with_first_byte<R>(first: u8, r: &mut R) -> Result<Self, Error>
+    where
+        R: Read,
+    {
+        let mut result: u32 = (first & 0x7F) as u32;
+        if first & 0x80 == 0 {
+            Ok(result.into())
+        } else {
+            let mut shift: usize = 7;
+            for _ in 0..(Self::MAX_ENCODED_LEN - 2) {
+                let b: u8 = read_single_byte(r)?;
+                if b & 0x80 == 0 {
+                    result |= (b as u32) << shift;
+                    return Ok(result.into());
+                } else {
+                    result |= ((b & 0x7F) as u32) << shift;
+                    shift += 7;
+                }
+            }
+            let b: u8 = read_single_byte(r)?;
+
+            // max of 4 more bits
+            if b & 0xF0 != 0 {
+                Err(io::Error::new(InvalidData, InvalidEncodedData))
+            } else {
+                result |= (b as u32) << shift;
+                Ok(result.into())
+            }
+        }
+    }
+}
+
 impl Display for VarInt32 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.value)
@@ -83,7 +120,7 @@ mod tests {
     use std::io::Cursor;
 
     use crate::var_int::VarInt32;
-    use crate::{EncodeToSlice, EncodeToWrite, EncodedLen};
+    use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen};
 
     #[test]
     fn max_encoded_len() {
@@ -93,17 +130,18 @@ mod tests {
         );
     }
 
+    const TEST_CASES: &[(u32, &[u8])] = &[
+        (0x00, b"\x00"),                     // 0 bits
+        (0x01, b"\x01"),                     // 1 bit
+        (0x7F, b"\x7F"),                     // highest one byte value
+        (0x80, b"\x80\x01"),                 // lowest two byte value
+        (0x3FFF, b"\xFF\x7F"),               // highest two byte value
+        (u32::MAX, b"\xFF\xFF\xFF\xFF\x0F"), // max
+    ];
+
     #[test]
     fn encode() -> Result<(), io::Error> {
-        let test_cases: &[(u32, &[u8])] = &[
-            (0x00, b"\x00"),                     // 0 bits
-            (0x01, b"\x01"),                     // 1 bit
-            (0x7F, b"\x7F"),                     // highest one byte value
-            (0x80, b"\x80\x01"),                 // lowest two byte value
-            (0x3FFF, b"\xFF\x7F"),               // highest two byte value
-            (u32::MAX, b"\xFF\xFF\xFF\xFF\x0F"), // max
-        ];
-        for (value, expected) in test_cases {
+        for (value, expected) in TEST_CASES {
             let value: VarInt32 = VarInt32::from(value);
 
             let encoded_len: usize = value.encoded_len();
@@ -115,6 +153,26 @@ mod tests {
             let mut output: Cursor<Vec<u8>> = Cursor::default();
             value.encode_to_write(&mut output)?;
             assert_eq!(output.into_inner(), *expected);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn decode() -> Result<(), io::Error> {
+        for (expected, input) in TEST_CASES {
+            let mut cursor: Cursor<Vec<u8>> = Cursor::new(input.to_vec());
+            let result: Result<VarInt32, io::Error> =
+                VarInt32::decode_from_read_prefix(&mut cursor);
+            assert!(result.is_ok());
+            assert_eq!(result.unwrap().value, *expected);
+
+            let mut extra: Vec<u8> = input.to_vec();
+            extra.push(0xFF);
+            let mut cursor: Cursor<Vec<u8>> = Cursor::new(extra);
+            let result: Result<VarInt32, io::Error> =
+                VarInt32::decode_from_read_prefix(&mut cursor);
+            assert!(result.is_ok());
+            assert_eq!(result.unwrap().value, *expected);
         }
         Ok(())
     }
