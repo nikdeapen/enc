@@ -5,8 +5,9 @@ use crate::{Decoder, Error};
 ///
 /// # Validation
 /// This decoder implementation does nothing to validate the encoded data beyond requiring an even
-/// number of encoded bytes. The output bytes, given invalid inputs, are undefined. The length
-/// calculation will still be accurate and invalid input data will not cause a panic.
+/// number of encoded bytes. It will decode mixed lowercase & uppercase encoded data. If invalid
+/// input data is given the output bytes are invalid. The encoded length calculation will still be
+/// accurate and invalid input data will not cause a panic.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Default)]
 pub struct HexDecoder {
     _nothing: (),
@@ -47,10 +48,12 @@ impl HexDecoder {
 
 impl Decoder for HexDecoder {
     fn decoded_len(&self, data: &[u8]) -> Result<usize, Error> {
-        if data.len() % 2 == 1 {
+        let div: usize = data.len() / 2;
+        let rem: usize = data.len() % 2;
+        if rem == 1 {
             Err(InvalidEncodedData)
         } else {
-            Ok(data.len() / 2)
+            Ok(div)
         }
     }
 

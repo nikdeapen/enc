@@ -37,7 +37,7 @@ impl HexEncoder {
 impl HexEncoder {
     //! Encoding
 
-    /// Gets the 16 hexadecimal chars.
+    /// Gets the 16 hexadecimal chars of the proper case.
     #[inline(always)]
     fn hex_chars(&self) -> &[u8; 16] {
         if self.uppercase {
@@ -47,7 +47,7 @@ impl HexEncoder {
         }
     }
 
-    /// Encodes the byte as two hex chars.
+    /// Encodes the byte as two hex bytes.
     #[inline(always)]
     pub fn encode(&self, b: u8) -> (u8, u8) {
         let chars: &[u8; 16] = self.hex_chars();
