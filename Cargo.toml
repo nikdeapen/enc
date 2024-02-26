@@ -10,6 +10,7 @@ edition = "2021"
 license = "MIT"
 
 [features]
+base-64 = []
 hex = []
 percent = ["hex"]
 var-int = []
