@@ -8,5 +8,7 @@ mod value;
 
 #[cfg(feature = "hex")]
 pub mod hex;
+#[cfg(feature = "percent")]
+pub mod percent;
 #[cfg(feature = "var-int")]
 pub mod var_int;

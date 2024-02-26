@@ -29,7 +29,7 @@ provide the interface for values that know how to encode and decode themselves s
 
 ## Examples
 
-### Hex
+### Hexadecimal Encoding
 Examples for processing hexadecimal encoded data:
     
     /// Imports
@@ -51,13 +51,37 @@ Examples for processing hexadecimal encoded data:
     let valid: bool = HexValidator::CASELESS.is_valid(data)?;
     assert!(valid);
 
+### URL Percent Encoding
+Examples for processing URL percent encoded data.
 
-### Var-Int
+    /// Imports
+    use enc::{Encoder, Decoder, Validator};
+    use enc::percent::{PercentEncoder, PercentDecoder, PercentValidator}
+
+    /// Encoding
+    let encoder: PercentEncoder = "+-!".into(); // these characters won't be encoded
+    let data: &[u8] = b"Hello, World!";
+    let encoded: String = encoder.encode_as_string(data)?;
+    assert_eq(encoded, "Hello%2C%20World!");
+
+    /// Decoding
+    let decoder: PercentDecoder = PercentDecoder::default();
+    let encoded: &str = "Hello%2C%20World!";
+    let decoded: String = decoder.decode_as_vec(encoded.as_slice()).to_string_utf8_unchecked();
+    assert_eq(encoded, "Hello, World!");
+
+    /// Validation
+    let encoded: &str = "%20%AX";
+    let valid: bool = PercentValidator::default().is_valid(data)?;
+    assert!(!valid);
+
+
+### Variable Length Enocoded Integers
 Examples for processing variable-length encoded integers.
 
     /// Imports
-    use crate::var_int::VarInt64;
-    use crate::{DecodeFromReadPrefix, EncodeToSlice};
+    use enc::var_int::VarInt64;
+    use enc::{DecodeFromReadPrefix, EncodeToSlice};
 
     /// Encoding
     let value: VarInt64 = VarInt64::from(0xFFFF);
