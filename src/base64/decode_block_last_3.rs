@@ -1,5 +1,6 @@
 /// Decodes the last block of 3 bytes without padding.
 /// The last 4 bits of the 2nd decoded byte are ignored.
+/// Returns the number of decoded bytes. (2)
 #[inline(always)]
 pub unsafe fn decode_block_last_3(
     decoding_table: &[u8; 256],

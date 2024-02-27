@@ -1,4 +1,5 @@
 /// Decodes a full block of base-64 encoded data without padding.
+/// Returns the number of decoded bytes. (3)
 #[inline(always)]
 pub unsafe fn decode_block(decoding_table: &[u8; 256], data: &[u8], target: &mut [u8]) -> usize {
     debug_assert!(data.len() >= 4);

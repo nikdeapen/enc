@@ -1,8 +1,9 @@
 /// Removes the padding from the last block of data. Returns the data without the padding.
+#[inline(always)]
 pub unsafe fn remove_padding_last_block(data: &[u8], padding: Option<u8>) -> &[u8] {
     debug_assert!(data.len() <= 4);
 
-    if data.len() < 3 {
+    if data.len() <= 2 {
         data
     } else {
         if let Some(padding) = padding {
@@ -31,7 +32,12 @@ mod tests {
     fn fn_remove_padding_last_block() {
         let test_cases: &[(Option<u8>, &str, &str)] = &[
             (None, "AA==", "AA=="),
+            (Some(b'='), "", ""),
+            (Some(b'='), "A", "A"),
+            (Some(b'='), "A=", "A="),
+            (Some(b'='), "AA", "AA"),
             (Some(b'='), "AA==", "AA"),
+            (Some(b'='), "AA=", "AA"),
             (Some(b'='), "AA=A", "AA"),
             (Some(b'='), "AA=", "AA"),
             (Some(b'='), "AA==", "AA"),
