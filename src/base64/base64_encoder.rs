@@ -229,7 +229,7 @@ impl TextEncoder for Base64Encoder {
 
 #[cfg(test)]
 mod tests {
-    use crate::base_64::Base64Encoder;
+    use crate::base64::Base64Encoder;
     use crate::TextEncoder;
 
     #[test]

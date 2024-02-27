@@ -10,8 +10,14 @@ edition = "2021"
 license = "MIT"
 
 [features]
+
+# Encoders & Decoders
 base-64 = []
 hex = []
 percent = ["hex"]
+
+# Encodable & Decodable Values
 var-int = []
+
+# All
 full = ["hex", "var-int"]
