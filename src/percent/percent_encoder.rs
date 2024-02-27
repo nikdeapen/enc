@@ -4,8 +4,8 @@ use crate::percent::SpecialSet;
 use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
 use crate::{Encoder, Error, TextEncoder};
 
-/// Responsible for encoding data in the URL percent encoding format.
-#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
+/// Responsible for encoding data in the URL percent encoded format.
+#[derive(Copy, Clone, Debug)]
 pub struct PercentEncoder {
     hex_encoder: HexEncoder,
     do_not_encode: SpecialSet,
@@ -56,7 +56,7 @@ impl Encoder for PercentEncoder {
                 if self.needs_encoding(*c) {
                     target[t] = b'%';
                     t += 1;
-                    let (a, b) = self.hex_encoder.encode(*c);
+                    let (a, b) = self.hex_encoder.encode_bytes(*c);
                     target[t] = a;
                     t += 1;
                     target[t] = b;

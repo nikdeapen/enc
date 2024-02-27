@@ -3,7 +3,7 @@ use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
 use crate::{Encoder, Error, TextEncoder};
 
 /// Responsible for encoding data in the hexadecimal format.
-#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct HexEncoder {
     uppercase: bool,
 }
@@ -22,16 +22,10 @@ impl HexEncoder {
     //! Constants
 
     /// The lowercase hex chars.
-    const CHARS_LOWER: [u8; 16] = [
-        b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'a', b'b', b'c', b'd', b'e',
-        b'f',
-    ];
+    const CHARS_LOWER: [u8; 16] = *b"0123456789abcdef";
 
     /// The uppercase hex chars.
-    const CHARS_UPPER: [u8; 16] = [
-        b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'A', b'B', b'C', b'D', b'E',
-        b'F',
-    ];
+    const CHARS_UPPER: [u8; 16] = *b"0123456789ABCDEF";
 }
 
 impl HexEncoder {
@@ -39,7 +33,7 @@ impl HexEncoder {
 
     /// Gets the 16 hexadecimal chars of the proper case.
     #[inline(always)]
-    fn hex_chars(&self) -> &[u8; 16] {
+    const fn hex(&self) -> &[u8; 16] {
         if self.uppercase {
             &Self::CHARS_UPPER
         } else {
@@ -47,17 +41,17 @@ impl HexEncoder {
         }
     }
 
-    /// Encodes the byte as two hex bytes.
+    /// Encodes the byte as two hex chars.
     #[inline(always)]
-    pub fn encode(&self, b: u8) -> (u8, u8) {
-        let chars: &[u8; 16] = self.hex_chars();
-        (chars[(b as usize) >> 4], chars[(b as usize) & 0xF])
+    pub fn encode_bytes(&self, b: u8) -> (u8, u8) {
+        let hex: &[u8; 16] = self.hex();
+        (hex[(b as usize) >> 4], hex[(b as usize) & 0xF])
     }
 
     /// Encodes the byte as two hex chars.
     #[inline(always)]
     pub fn encode_chars(&self, b: u8) -> (char, char) {
-        let (a, b) = self.encode(b);
+        let (a, b) = self.encode_bytes(b);
         (a as char, b as char)
     }
 }
@@ -74,7 +68,7 @@ impl Encoder for HexEncoder {
         } else {
             let target: &mut [u8] = &mut target[..encoded_len];
             for (d, t) in data.iter().zip(target.chunks_exact_mut(2)) {
-                let (a, b) = self.encode(*d);
+                let (a, b) = self.encode_bytes(*d);
                 t[0] = a;
                 t[1] = b;
             }

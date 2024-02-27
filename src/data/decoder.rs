@@ -6,7 +6,7 @@ pub trait Decoder {
     /// Gets the length of the decoded data.
     fn decoded_len(&self, data: &[u8]) -> Result<usize, Error>;
 
-    /// Decodes the data to the target slice. Returns the length of the decoded data.
+    /// Decodes the data into the target slice. Returns the length of the decoded data.
     fn decode_to_slice(&self, data: &[u8], target: &mut [u8]) -> Result<usize, Error>;
 
     /// Appends the decoded data to the target vec. Returns the length of the decoded data.
@@ -17,10 +17,11 @@ pub trait Decoder {
             .checked_add(decoded_len)
             .ok_or(IntegerOverflow)?;
         target.resize(expanded_len, 0u8);
-        match self.decode_to_slice(data, &mut target.as_mut_slice()[original_len..]) {
-            Ok(len) => {
-                debug_assert_eq!(len, decoded_len);
-                Ok(len)
+        let slice: &mut [u8] = &mut target.as_mut_slice()[original_len..];
+        match self.decode_to_slice(data, slice) {
+            Ok(also_decoded_len) => {
+                debug_assert_eq!(decoded_len, also_decoded_len);
+                Ok(also_decoded_len)
             }
             Err(error) => {
                 target.truncate(original_len);

@@ -6,9 +6,9 @@ use crate::{Decoder, Error};
 /// # Validation
 /// This decoder implementation does nothing to validate the encoded data beyond requiring an even
 /// number of encoded bytes. It will decode mixed lowercase & uppercase encoded data. If invalid
-/// input data is given the output bytes are invalid. The encoded length calculation will still be
-/// accurate and invalid input data will not cause a panic.
-#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Default)]
+/// input data is given the output bytes are undefined. The encoded length calculation will still
+/// be accurate and invalid input data will not cause a panic.
+#[derive(Copy, Clone, Default)]
 pub struct HexDecoder {
     _nothing: (),
 }
@@ -16,7 +16,7 @@ pub struct HexDecoder {
 impl HexDecoder {
     //! Constants
 
-    /// The decoding table.
+    /// The case-insensitive decoding table.
     const DECODING_TABLE: [u8; 128] = [
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -35,14 +35,14 @@ impl HexDecoder {
 
     /// Decodes the two hex chars as a byte.
     #[inline(always)]
-    pub const fn decode(&self, a: u8, b: u8) -> u8 {
+    pub const fn decode_bytes(&self, a: u8, b: u8) -> u8 {
         (Self::DECODING_TABLE[(a & 0x7F) as usize] << 4) | Self::DECODING_TABLE[(b & 0x7F) as usize]
     }
 
     /// Decodes the two hex chars as a byte.
     #[inline(always)]
     pub const fn decode_chars(&self, a: char, b: char) -> u8 {
-        self.decode(((a as u32) & 0xFF) as u8, ((b as u32) & 0xFF) as u8)
+        self.decode_bytes(((a as u32) & 0xFF) as u8, ((b as u32) & 0xFF) as u8)
     }
 }
 
@@ -64,7 +64,7 @@ impl Decoder for HexDecoder {
         } else {
             let target: &mut [u8] = &mut target[..decoded_len];
             for (d, t) in data.chunks_exact(2).zip(target.iter_mut()) {
-                *t = self.decode(d[0], d[1])
+                *t = self.decode_bytes(d[0], d[1])
             }
             Ok(decoded_len)
         }
