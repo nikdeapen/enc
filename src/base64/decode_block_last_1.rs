@@ -1,5 +1,6 @@
 /// Decodes the last block of 1 byte without padding.
 /// The last two missing bits are assumed to be 0.
+/// Returns the number of decoded bytes. (1)
 #[inline(always)]
 pub unsafe fn decode_block_last_1(
     decoding_table: &[u8; 256],

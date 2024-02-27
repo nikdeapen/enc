@@ -13,12 +13,21 @@ pub struct Base64Decoder {
     padding: Option<u8>,
 }
 
+impl Base64Decoder {
+    //! Construction
+
+    /// Creates a new base-64 decoder.
+    pub fn new(v63: u8, v64: u8, padding: Option<u8>) -> Self {
+        Self {
+            decoding_table: DecodingTable::get_decoding_table(v63, v64),
+            padding,
+        }
+    }
+}
+
 impl Default for Base64Decoder {
     fn default() -> Self {
-        Self {
-            decoding_table: DecodingTable::default(),
-            padding: Some(b'='),
-        }
+        Self::new(b'+', b'/', Some(b'='))
     }
 }
 

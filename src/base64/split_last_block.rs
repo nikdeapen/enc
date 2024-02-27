@@ -31,6 +31,7 @@ mod tests {
             ("AAAAAA", "AAAA", "AA"),
             ("AAAAAAA", "AAAA", "AAA"),
             ("AAAAAAAA", "AAAA", "AAAA"),
+            ("AAAAAAAAA", "AAAAAAAA", "A"),
         ];
         for (data, expected_1, expected_2) in test_cases {
             let (result_1, result_2) = split_last_block(data.as_bytes());

@@ -3,7 +3,10 @@ use std::sync::Arc;
 /// A decoding table.
 #[derive(Clone, Debug)]
 pub enum DecodingTable {
+    /// A static decoding table.
     Static(&'static [u8; 256]),
+
+    /// An atomic reference counted decoding table.
     Arc(Arc<[u8; 256]>),
 }
 
@@ -21,6 +24,9 @@ impl DecodingTable {
     //! Construction
 
     /// Creates a custom decoding table. Returns the static table if available.
+    ///
+    /// Unsafe:
+    /// This does not validate the 63rd and 64th bytes.
     pub fn get_decoding_table(v63: u8, v64: u8) -> Self {
         match (v63, v64) {
             (b'+', b'/') => Self::STANDARD,
