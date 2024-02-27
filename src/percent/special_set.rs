@@ -1,9 +1,9 @@
 use std::fmt::{Display, Formatter};
 
-/// A set of special US-ASCII punctuation characters for percent encoding.
+/// A set of special US-ASCII punctuation chars for percent encoding.
 ///
 /// # Characters
-/// The valid characters that can be present in the set are:
+/// The valid chars that can be present in the set are:
 /// [15]: !"#$%&'()*+,-./
 /// [7]:  :;<=>?@
 /// [6]:  [\]^_`
@@ -26,7 +26,7 @@ impl From<&str> for SpecialSet {
 impl SpecialSet {
     //! Constants
 
-    /// The special characters. (in order  of index)
+    /// The special chars. (in order  of index)
     const CHARS: &'static [u8; 32] = b"!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
     /// The index table.
@@ -75,7 +75,7 @@ impl SpecialSet {
 impl SpecialSet {
     //! Index
 
-    /// Gets the bit index for the special char. Returns 32 for invalid hcars.
+    /// Gets the bit index for the special char. Returns 32 for invalid chars.
     #[inline(always)]
     const fn index_of(c: u8) -> usize {
         Self::INDEX_TABLE[(c as usize) & 0x7F] as usize
@@ -99,12 +99,12 @@ impl SpecialSet {
 impl SpecialSet {
     //! Properties
 
-    /// Checks if the set contains the character. If the char is invalid this will return false.
+    /// Checks if the set contains the char. If the char is invalid this will return false.
     pub fn contains(&self, c: u8) -> bool {
         (self.bits & 1u32.checked_shl(Self::index_of(c) as u32).unwrap_or(0)) != 0
     }
 
-    /// Gets the number of characters in the set.
+    /// Gets the number of chars in the set.
     pub fn size(&self) -> usize {
         self.bits.count_ones() as usize
     }
@@ -113,7 +113,7 @@ impl SpecialSet {
 impl SpecialSet {
     //! Iteration
 
-    /// Creates a new iterator for the characters.
+    /// Creates a new iterator for the chars.
     pub fn iter(&self) -> impl Iterator<Item = u8> {
         SpecialSetIterator { bits: self.bits }
     }

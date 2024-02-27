@@ -6,8 +6,8 @@ use crate::{Decoder, Error};
 ///
 /// # Validation
 /// No validation is done on the decoded data. All properly encoded characters will be decoded and
-/// improperly encode
-#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Default)]
+/// improperly encoded characters will pass through unchanged.
+#[derive(Copy, Clone, Default)]
 pub struct PercentDecoder {
     hex_decoder: HexDecoder,
 }
@@ -47,7 +47,7 @@ impl Decoder for PercentDecoder {
             while d < data.len() {
                 let c: u8 = data[d];
                 if c == b'%' && Self::prefix_is_encoded(&data[d..]) {
-                    target[t] = self.hex_decoder.decode(data[d + 1], data[d + 2]);
+                    target[t] = self.hex_decoder.decode_bytes(data[d + 1], data[d + 2]);
                     t += 1;
                     d += 3;
                 } else {

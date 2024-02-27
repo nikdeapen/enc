@@ -6,7 +6,7 @@ pub trait Encoder {
     /// Gets the length of the encoded data.
     fn encoded_len(&self, data: &[u8]) -> Result<usize, Error>;
 
-    /// Encodes the data to the target slice. Returns the length of the encoded data.
+    /// Encodes the data into the target slice. Returns the length of the encoded data.
     fn encode_to_slice(&self, data: &[u8], target: &mut [u8]) -> Result<usize, Error>;
 
     /// Appends the encoded data to the target vec. Returns the length of the encoded data.
@@ -17,7 +17,8 @@ pub trait Encoder {
             .checked_add(encoded_len)
             .ok_or(IntegerOverflow)?;
         target.resize(expanded_len, 0u8);
-        match self.encode_to_slice(data, &mut target.as_mut_slice()[original_len..]) {
+        let slice: &mut [u8] = &mut target.as_mut_slice()[original_len..];
+        match self.encode_to_slice(data, slice) {
             Ok(also_encoded_len) => {
                 debug_assert_eq!(encoded_len, also_encoded_len);
                 Ok(also_encoded_len)
@@ -50,8 +51,10 @@ pub trait TextEncoder: Encoder {
     }
 }
 
-/// Appends the encoded data to the target string. Returns the length of the encoded data. This
-/// function does not ensure the encoded data is a valid UTF-8 byte sequence.
+/// Appends the encoded data to the target string. Returns the length of the encoded data.
+///
+/// Unsafe:
+/// This function does not ensure the encoded data is a valid UTF-8 byte sequence.
 pub(crate) unsafe fn append_to_string_unchecked<E>(
     encoder: &E,
     data: &[u8],

@@ -3,7 +3,7 @@ use crate::percent::SpecialSet;
 use crate::Validator;
 
 /// Responsible for validating percent encoded data.
-#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default)]
 pub struct PercentValidator {
     hex_validator: HexValidator,
     encoding_not_needed: SpecialSet,
