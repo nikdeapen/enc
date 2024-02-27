@@ -7,7 +7,7 @@ mod error;
 mod value;
 
 #[cfg(feature = "base-64")]
-pub mod base_64;
+pub mod base64;
 #[cfg(feature = "hex")]
 pub mod hex;
 #[cfg(feature = "percent")]
