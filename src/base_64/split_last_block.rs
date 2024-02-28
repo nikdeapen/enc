@@ -17,7 +17,7 @@ pub fn split_last_block(data: &[u8]) -> (&[u8], &[u8]) {
 
 #[cfg(test)]
 mod tests {
-    use crate::base64::split_last_block::split_last_block;
+    use crate::base_64::split_last_block::split_last_block;
 
     #[test]
     fn fn_split_last_block() {

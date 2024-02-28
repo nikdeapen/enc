@@ -26,7 +26,7 @@ impl From<&str> for SpecialSet {
 impl SpecialSet {
     //! Constants
 
-    /// The special chars. (in order  of index)
+    /// The special chars. (in order of index)
     const CHARS: &'static [u8; 32] = b"!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
     /// The index table.
@@ -167,6 +167,16 @@ mod tests {
             assert!(!set.contains(*c));
             assert_eq!(32 - (i + 1), set.size());
         }
+    }
+
+    #[test]
+    fn invalid_chars() {
+        let mut set: SpecialSet = SpecialSet::default();
+
+        set.add(b'\x00');
+        assert_eq!(set.size(), 0);
+        set.remove(b'\x00');
+        assert_eq!(set.size(), 0);
     }
 
     #[test]

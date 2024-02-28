@@ -1,5 +1,5 @@
 /// Decodes the last block of 3 bytes without padding.
-/// The last 4 bits of the 2nd decoded byte are ignored.
+/// The last 2 bits of the 3rd decoded byte are ignored.
 /// Returns the number of decoded bytes. (2)
 #[inline(always)]
 pub unsafe fn decode_block_last_3(
@@ -22,8 +22,8 @@ pub unsafe fn decode_block_last_3(
 
 #[cfg(test)]
 mod tests {
-    use crate::base64::decode_block_last_3::decode_block_last_3;
-    use crate::base64::decoding_table::DecodingTable;
+    use crate::base_64::decode_block_last_3::decode_block_last_3;
+    use crate::base_64::decoding_table::DecodingTable;
 
     #[test]
     fn fn_decode_block() {

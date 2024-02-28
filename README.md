@@ -8,12 +8,14 @@ This library aids in processing encoded data.
 
 **Transitive Dependencies:**
 
-    no dependencies
+    none
 
 **Features:**
 
 - `full`: all features
-- `hex`: hexadecimal data processing
+- `base-64`: base-64 encoding
+- `hex`: hexadecimal encoding
+- `percent`: url percent encoding
 - `var-int`: variable-length encoded integers
 
 ## Data & Value Encoders
@@ -25,7 +27,6 @@ provide an interface for encoders that operate on slices of data such as `hex` &
 The `src/value` folder holds the traits: `EncodedLen`, `EncodeToSlice`, `EncodeToWrite` etc. These
 provide the interface for values that know how to encode and decode themselves such as 
 `variable-length integers` and can be easily extended by custom types.
-
 
 ## Examples
 
@@ -76,7 +77,7 @@ Examples for processing URL percent encoded data.
     assert!(!valid);
 
 
-### Variable Length Enocoded Integers
+### Variable Length Encoded Integers
 Examples for processing variable-length encoded integers.
 
     /// Imports

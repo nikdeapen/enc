@@ -11,12 +11,21 @@ pub struct PercentEncoder {
     do_not_encode: SpecialSet,
 }
 
+impl PercentEncoder {
+    //! Construction
+
+    /// Creates a new percent encoder.
+    pub const fn new(hex_encoder: HexEncoder, do_not_encode: SpecialSet) -> Self {
+        Self {
+            hex_encoder,
+            do_not_encode,
+        }
+    }
+}
+
 impl<S: Into<SpecialSet>> From<S> for PercentEncoder {
     fn from(do_not_encode: S) -> Self {
-        Self {
-            hex_encoder: HexEncoder::UPPER,
-            do_not_encode: do_not_encode.into(),
-        }
+        Self::new(HexEncoder::UPPER, do_not_encode.into())
     }
 }
 

@@ -1,10 +1,10 @@
-pub use base64_decoder::*;
-pub use base64_encoder::*;
-pub use base64_validator::*;
+pub use base_64_decoder::*;
+pub use base_64_encoder::*;
+pub use base_64_validator::*;
 
-mod base64_decoder;
-mod base64_encoder;
-mod base64_validator;
+mod base_64_decoder;
+mod base_64_encoder;
+mod base_64_validator;
 
 pub(crate) mod decode_block;
 pub(crate) mod decode_block_last;

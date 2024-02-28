@@ -26,7 +26,7 @@ pub unsafe fn remove_padding_last_block(data: &[u8], padding: Option<u8>) -> &[u
 
 #[cfg(test)]
 mod tests {
-    use crate::base64::remove_padding_last_block::remove_padding_last_block;
+    use crate::base_64::remove_padding_last_block::remove_padding_last_block;
 
     #[test]
     fn fn_remove_padding_last_block() {

@@ -21,8 +21,8 @@ pub unsafe fn decode_block(decoding_table: &[u8; 256], data: &[u8], target: &mut
 
 #[cfg(test)]
 mod tests {
-    use crate::base64::decode_block::decode_block;
-    use crate::base64::decoding_table::DecodingTable;
+    use crate::base_64::decode_block::decode_block;
+    use crate::base_64::decoding_table::DecodingTable;
 
     #[test]
     fn fn_decode_block() {

@@ -9,12 +9,21 @@ pub struct PercentValidator {
     encoding_not_needed: SpecialSet,
 }
 
+impl PercentValidator {
+    //! Construction
+
+    /// Creates a new percent validator.
+    pub const fn new(hex_validator: HexValidator, encoding_not_needed: SpecialSet) -> Self {
+        Self {
+            hex_validator,
+            encoding_not_needed,
+        }
+    }
+}
+
 impl<S: Into<SpecialSet>> From<S> for PercentValidator {
     fn from(encoding_not_needed: S) -> Self {
-        Self {
-            hex_validator: HexValidator::default(),
-            encoding_not_needed: encoding_not_needed.into(),
-        }
+        Self::new(HexValidator::CASELESS, encoding_not_needed.into())
     }
 }
 
