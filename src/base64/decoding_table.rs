@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
 /// A decoding table.
+///
+/// This supports static and atomic reference counted tables to avoid allocation for standard
+/// encoders and less allocation for custom decoders.
 #[derive(Clone, Debug)]
 pub enum DecodingTable {
     /// A static decoding table.
@@ -24,9 +27,6 @@ impl DecodingTable {
     //! Construction
 
     /// Creates a custom decoding table. Returns the static table if available.
-    ///
-    /// Unsafe:
-    /// This does not validate the 63rd and 64th bytes.
     pub fn get_decoding_table(v63: u8, v64: u8) -> Self {
         match (v63, v64) {
             (b'+', b'/') => Self::STANDARD,

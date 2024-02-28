@@ -13,7 +13,7 @@ pub struct Base64Encoder {
 impl Base64Encoder {
     //! Construction
 
-    /// Creates a new base-64 encoder.
+    /// Creates a new base-64 encoder. Returns `None` if the encoding config is invalid.
     pub const fn new(v63: u8, v64: u8, padding: Option<u8>) -> Option<Self> {
         if Self::is_valid_config(v63, v64, padding) {
             Some(Self { v63, v64, padding })

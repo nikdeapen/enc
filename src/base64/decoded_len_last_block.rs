@@ -2,7 +2,7 @@ use crate::base64::remove_padding_last_block::remove_padding_last_block;
 
 /// Gets the length of the decoded last block. The padding, if given, will be ignored.
 #[inline(always)]
-pub unsafe fn decoded_length_last_block(padding: Option<u8>, data: &[u8]) -> usize {
+pub unsafe fn decoded_length_last_block(data: &[u8], padding: Option<u8>) -> usize {
     debug_assert!(data.len() <= 4);
 
     let data: &[u8] = remove_padding_last_block(data, padding);
@@ -13,5 +13,35 @@ pub unsafe fn decoded_length_last_block(padding: Option<u8>, data: &[u8]) -> usi
         3 => 2, // may be invalid, we ignore the last 2 bits
         4 => 3,
         _ => unreachable!(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::base64::decoded_len_last_block::decoded_length_last_block;
+
+    #[test]
+    fn fn_decoded_len_last_block() {
+        let test_cases: &[(Option<u8>, &str, usize)] = &[
+            (None, "", 0),
+            (None, "A", 1),
+            (None, "AA", 1),
+            (None, "AAA", 2),
+            (None, "AAAA", 3),
+            (None, "====", 3),
+            (Some(b'='), "====", 1),
+            (None, "A===", 3),
+            (Some(b'='), "A===", 1),
+            (None, "AA==", 3),
+            (Some(b'='), "AA==", 1),
+            (None, "AAA=", 3),
+            (Some(b'='), "AAA=", 2),
+            (None, "AAAA", 3),
+            (Some(b'='), "AAAA", 3),
+        ];
+        for (padding, data, expected) in test_cases {
+            let result: usize = unsafe { decoded_length_last_block(data.as_bytes(), *padding) };
+            assert_eq!(result, *expected, "pad={:?} data={}", *padding, *data);
+        }
     }
 }

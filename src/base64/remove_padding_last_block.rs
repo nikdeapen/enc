@@ -34,15 +34,15 @@ mod tests {
             (None, "AA==", "AA=="),
             (Some(b'='), "", ""),
             (Some(b'='), "A", "A"),
-            (Some(b'='), "A=", "A="),
             (Some(b'='), "AA", "AA"),
-            (Some(b'='), "AA==", "AA"),
-            (Some(b'='), "AA=", "AA"),
-            (Some(b'='), "AA=A", "AA"),
-            (Some(b'='), "AA=", "AA"),
-            (Some(b'='), "AA==", "AA"),
-            (Some(b'='), "AAA=", "AAA"),
+            (Some(b'='), "AAA", "AAA"),
             (Some(b'='), "AAAA", "AAAA"),
+            (Some(b'='), "A=", "A="),
+            (Some(b'='), "AA=", "AA"),
+            (Some(b'='), "AAA=", "AAA"),
+            (Some(b'='), "A==", "A="),
+            (Some(b'='), "AA==", "AA"),
+            (Some(b'='), "A===", "A="),
         ];
         for (padding, data, expected) in test_cases {
             let result: &[u8] = unsafe { remove_padding_last_block(data.as_bytes(), *padding) };

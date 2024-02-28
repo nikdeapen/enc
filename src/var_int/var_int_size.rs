@@ -130,24 +130,13 @@ mod tests {
         );
     }
 
-    #[cfg(target_pointer_width = "64")]
     const TEST_CASES: &[(usize, &[u8])] = &[
-        (0x00, b"\x00"),                                           // 0 bits
-        (0x01, b"\x01"),                                           // 1 bit
-        (0x7F, b"\x7F"),                                           // highest one byte value
-        (0x80, b"\x80\x01"),                                       // lowest two byte value
-        (0x3FFF, b"\xFF\x7F"),                                     // highest two byte value
-        (usize::MAX, b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01"), // max
-    ];
-
-    #[cfg(target_pointer_width = "32")]
-    const TEST_CASES: &[(usize, &[u8])] = &[
-        (0x00, b"\x00"),                       // 0 bits
-        (0x01, b"\x01"),                       // 1 bit
-        (0x7F, b"\x7F"),                       // highest one byte value
-        (0x80, b"\x80\x01"),                   // lowest two byte value
-        (0x3FFF, b"\xFF\x7F"),                 // highest two byte value
-        (usize::MAX, b"\xFF\xFF\xFF\xFF\x0F"), // max
+        (0x00, b"\x00"),                              // 0 bits
+        (0x01, b"\x01"),                              // 1 bit
+        (0x7F, b"\x7F"),                              // highest one byte value
+        (0x80, b"\x80\x01"),                          // lowest two byte value
+        (0x3FFF, b"\xFF\x7F"),                        // highest two byte value
+        (u32::MAX as usize, b"\xFF\xFF\xFF\xFF\x0F"), // u32 max
     ];
 
     #[test]

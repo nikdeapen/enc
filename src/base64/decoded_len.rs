@@ -2,7 +2,7 @@ use crate::base64::decoded_len_last_block::decoded_length_last_block;
 
 /// Gets the length of the decoded data. The padding, if given, will be ignored.
 #[inline(always)]
-pub fn decoded_len(padding: Option<u8>, data: &[u8]) -> usize {
+pub fn decoded_len(data: &[u8], padding: Option<u8>) -> usize {
     let len: usize = data.len();
     if len == 0 {
         0
@@ -10,7 +10,7 @@ pub fn decoded_len(padding: Option<u8>, data: &[u8]) -> usize {
         let rem: usize = len % 4;
         let last_chunk_index: usize = len - if rem == 0 { 4 } else { rem };
         let full: usize = (last_chunk_index / 4) * 3;
-        let last: usize = unsafe { decoded_length_last_block(padding, &data[last_chunk_index..]) };
+        let last: usize = unsafe { decoded_length_last_block(&data[last_chunk_index..], padding) };
         full + last
     }
 }
@@ -43,7 +43,7 @@ mod tests {
             (Some(b'='), "AAAAAAAAAAAA", 9),
         ];
         for (padding, data, expected) in test_cases {
-            let result: usize = decoded_len(*padding, data.as_bytes());
+            let result: usize = decoded_len(data.as_bytes(), *padding);
             assert_eq!(result, *expected, "pad={:?} data={}", *padding, *data);
         }
     }
