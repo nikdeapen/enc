@@ -55,6 +55,7 @@ pub trait TextEncoder: Encoder {
 ///
 /// Unsafe:
 /// This function does not ensure the encoded data is a valid UTF-8 byte sequence.
+#[allow(dead_code)]
 pub(crate) unsafe fn append_to_string_unchecked<E>(
     encoder: &E,
     data: &[u8],
