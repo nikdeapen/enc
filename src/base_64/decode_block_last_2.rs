@@ -20,8 +20,8 @@ pub unsafe fn decode_block_last_2(
 
 #[cfg(test)]
 mod tests {
-    use crate::base64::decode_block_last_2::decode_block_last_2;
-    use crate::base64::decoding_table::DecodingTable;
+    use crate::base_64::decode_block_last_2::decode_block_last_2;
+    use crate::base_64::decoding_table::DecodingTable;
 
     #[test]
     fn fn_decode_block() {

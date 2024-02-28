@@ -2,12 +2,14 @@ use crate::Error::{InsufficientTargetSpace, InvalidEncodedData};
 use crate::{Decoder, Error};
 
 /// Responsible for decoding data in the hexadecimal format.
-/// It will decode mixed lowercase & uppercase encoded data.
+///
+/// # Case
+/// This decoder implementation will decode data encoded in uppercase, lowercase, or mixed case.
 ///
 /// # Validation
 /// This decoder implementation does nothing to validate the encoded data beyond requiring an even
 /// number of encoded bytes.  If invalid input data is given the output bytes are undefined. The
-/// encoded length calculation will still be accurate and invalid input data will not cause a panic.
+/// encoded length calculation will still be accurate and it will not cause a panic.
 #[derive(Copy, Clone, Default)]
 pub struct HexDecoder {
     _nothing: (),
@@ -82,6 +84,10 @@ mod tests {
             ("", b""),
             ("0123456789", b"\x01\x23\x45\x67\x89"),
             ("1032547698", b"\x10\x32\x54\x76\x98"),
+            ("abcdef", b"\xAB\xCD\xEF"),
+            ("badcfe", b"\xBA\xDC\xFE"),
+            ("ABCDEF", b"\xAB\xCD\xEF"),
+            ("BADCFE", b"\xBA\xDC\xFE"),
             ("aBcDeF", b"\xAB\xCD\xEF"),
             ("AbCdEf", b"\xAB\xCD\xEF"),
             ("BaDcFe", b"\xBA\xDC\xFE"),

@@ -1,4 +1,4 @@
-use crate::base64::remove_padding_last_block::remove_padding_last_block;
+use crate::base_64::remove_padding_last_block::remove_padding_last_block;
 
 /// Gets the length of the decoded last block. The padding, if given, will be ignored.
 #[inline(always)]
@@ -18,7 +18,7 @@ pub unsafe fn decoded_length_last_block(data: &[u8], padding: Option<u8>) -> usi
 
 #[cfg(test)]
 mod tests {
-    use crate::base64::decoded_len_last_block::decoded_length_last_block;
+    use crate::base_64::decoded_len_last_block::decoded_length_last_block;
 
     #[test]
     fn fn_decoded_len_last_block() {

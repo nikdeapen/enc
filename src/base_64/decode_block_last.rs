@@ -1,10 +1,10 @@
-use crate::base64::decode_block::decode_block;
-use crate::base64::decode_block_last_1::decode_block_last_1;
-use crate::base64::decode_block_last_2::decode_block_last_2;
-use crate::base64::decode_block_last_3::decode_block_last_3;
-use crate::base64::remove_padding_last_block::remove_padding_last_block;
+use crate::base_64::decode_block::decode_block;
+use crate::base_64::decode_block_last_1::decode_block_last_1;
+use crate::base_64::decode_block_last_2::decode_block_last_2;
+use crate::base_64::decode_block_last_3::decode_block_last_3;
+use crate::base_64::remove_padding_last_block::remove_padding_last_block;
 
-/// Decodes a the last block of base-64 encoded data with padding.
+/// Decodes a the last block of base-64 encoded data with optional padding.
 /// Returns the number of decoded bytes.
 #[inline(always)]
 pub unsafe fn decode_block_last(
@@ -40,8 +40,8 @@ pub unsafe fn decode_block_last(
 
 #[cfg(test)]
 mod tests {
-    use crate::base64::decode_block_last::decode_block_last;
-    use crate::base64::decoding_table::DecodingTable;
+    use crate::base_64::decode_block_last::decode_block_last;
+    use crate::base_64::decoding_table::DecodingTable;
 
     #[test]
     fn fn_decode_block_last() {

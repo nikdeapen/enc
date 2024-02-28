@@ -1,8 +1,8 @@
-use crate::base64::decode_block::decode_block;
-use crate::base64::decode_block_last::decode_block_last;
-use crate::base64::decoded_len::decoded_len;
-use crate::base64::decoding_table::DecodingTable;
-use crate::base64::split_last_block::split_last_block;
+use crate::base_64::decode_block::decode_block;
+use crate::base_64::decode_block_last::decode_block_last;
+use crate::base_64::decoded_len::decoded_len;
+use crate::base_64::decoding_table::DecodingTable;
+use crate::base_64::split_last_block::split_last_block;
 use crate::Error::InsufficientTargetSpace;
 use crate::{Decoder, Error};
 
@@ -60,7 +60,7 @@ impl Decoder for Base64Decoder {
 
 #[cfg(test)]
 mod tests {
-    use crate::base64::Base64Decoder;
+    use crate::base_64::Base64Decoder;
     use crate::{Decoder, Error};
 
     #[test]

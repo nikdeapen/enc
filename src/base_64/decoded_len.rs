@@ -1,4 +1,4 @@
-use crate::base64::decoded_len_last_block::decoded_length_last_block;
+use crate::base_64::decoded_len_last_block::decoded_length_last_block;
 
 /// Gets the length of the decoded data. The padding, if given, will be ignored.
 #[inline(always)]
@@ -17,7 +17,7 @@ pub fn decoded_len(data: &[u8], padding: Option<u8>) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use crate::base64::decoded_len::decoded_len;
+    use crate::base_64::decoded_len::decoded_len;
 
     #[test]
     fn fn_decoded_len() {
