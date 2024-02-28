@@ -33,7 +33,7 @@ impl Default for Base64Decoder {
 
 impl Decoder for Base64Decoder {
     fn decoded_len(&self, data: &[u8]) -> Result<usize, Error> {
-        Ok(decoded_len(self.padding, data))
+        Ok(decoded_len(data, self.padding))
     }
 
     fn decode_to_slice(&self, data: &[u8], target: &mut [u8]) -> Result<usize, Error> {

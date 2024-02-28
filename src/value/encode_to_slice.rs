@@ -12,7 +12,9 @@ pub trait EncodeToSlice: EncodedLen {
     ///
     /// # Unsafe
     /// This function is unsafe so implementations can assume the target slice has sufficient space
-    /// for the encoded value. Clients must ensure this invariant always holds true.
+    /// for the encoded value. Clients must ensure the target buffer has sufficient space as
+    /// defined by the `EncodedLen` trait and implementations must ensure this length matches the
+    /// actual length of the encoded value.
     unsafe fn encode_to_slice_unchecked(&self, target: &mut [u8]) -> usize;
 
     /// Encodes the value to the target slice. Returns the length of the encoded value.
