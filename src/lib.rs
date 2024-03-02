@@ -1,9 +1,11 @@
 pub use data::*;
 pub use error::*;
+pub use read::*;
 pub use value::*;
 
 mod data;
 mod error;
+mod read;
 mod value;
 
 #[cfg(feature = "base-64")]
