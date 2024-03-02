@@ -18,7 +18,7 @@ pub trait DecodeFromReadPrefix: Sized {
         Self::decode_from_read_prefix_with_first_byte(first, r)
     }
 
-    /// Decodes a value from the `Read` prefix given the first byte from the `Read`.
+    /// Decodes a value from the `Read` prefix given the first byte.
     fn decode_from_read_prefix_with_first_byte<R>(first: u8, r: &mut R) -> Result<Self, io::Error>
     where
         R: io::Read;
