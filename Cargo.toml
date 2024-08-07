@@ -10,5 +10,9 @@ edition = "2021"
 license = "MIT"
 
 [features]
-value = []
 data = []
+hex = ["data"]
+
+value = []
+
+full = ["data", "hex", "value"]
