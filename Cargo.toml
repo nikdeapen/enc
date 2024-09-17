@@ -12,10 +12,11 @@ license = "MIT"
 [features]
 data = []
 hex = ["data"]
+percent = ["hex"]
 
 value = []
 var-int = ["value"]
 
-full-data = ["data"]
+full-data = ["hex", "percent"]
 full-value = ["var-int"]
 full = ["full-data", "full-value"]
