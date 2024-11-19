@@ -17,6 +17,9 @@ jobs:
       - name: Test
         run: |
           cargo test
+      - name: Test all
+        run: |
+          cargo test --all-features
       - name: Format
         run: |
           cargo fmt --all -- --check
