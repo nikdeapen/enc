@@ -46,6 +46,22 @@ impl EncodedLen for VarIntSize {
     }
 }
 
+impl VarIntSize {
+    //! ZigZag
+
+    /// Creates a `VarIntSize` from the signed `value` using zigzag encoding.
+    pub fn from_zigzag(value: isize) -> Self {
+        let value: usize = value as usize;
+        let value: usize = (value << 1) ^ (value >> (usize::BITS - 1));
+        Self::from(value)
+    }
+
+    /// Creates a `VarIntSize` from the signed `value` using zigzag encoding.
+    pub fn to_zigzag(&self) -> isize {
+        ((self.value >> 1) as isize) ^ -((self.value & 1) as isize)
+    }
+}
+
 impl EncodeToSlice for VarIntSize {
     unsafe fn encode_to_slice_unchecked(&self, target: &mut [u8]) -> Result<usize, Error> {
         let mut t: usize = 0;

@@ -35,6 +35,22 @@ impl VarInt128 {
     const LAST_DECODING_BYTE_MASK: u8 = 0xFF << (u128::BITS % 7);
 }
 
+impl VarInt128 {
+    //! ZigZag
+
+    /// Creates a `VarInt128` from the signed `value` using zigzag encoding.
+    pub fn from_zigzag(value: i128) -> Self {
+        let value: u128 = value as u128;
+        let value: u128 = (value << 1) ^ (value >> 127);
+        Self::from(value)
+    }
+
+    /// Creates a `VarInt128` from the signed `value` using zigzag encoding.
+    pub fn to_zigzag(&self) -> i128 {
+        ((self.value >> 1) as i128) ^ -((self.value & 1) as i128)
+    }
+}
+
 impl EncodedLen for VarInt128 {
     fn encoded_len(&self) -> Result<usize, Error> {
         let encoded_len: usize = if self.value == 0 {

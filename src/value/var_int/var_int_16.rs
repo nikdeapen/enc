@@ -31,6 +31,22 @@ impl VarInt16 {
     pub const MAX_ENCODED_LEN: usize = ((u16::BITS + 6) / 7) as usize;
 }
 
+impl VarInt16 {
+    //! ZigZag
+
+    /// Creates a `VarInt16` from the signed `value` using zigzag encoding.
+    pub fn from_zigzag(value: i16) -> Self {
+        let value: u16 = value as u16;
+        let value: u16 = (value << 1) ^ (value >> 15);
+        Self::from(value)
+    }
+
+    /// Creates a `VarInt16` from the signed `value` using zigzag encoding.
+    pub fn to_zigzag(&self) -> i16 {
+        ((self.value >> 1) as i16) ^ -((self.value & 1) as i16)
+    }
+}
+
 impl EncodedLen for VarInt16 {
     fn encoded_len(&self) -> Result<usize, Error> {
         VarInt32::from(self.value as u32).encoded_len()

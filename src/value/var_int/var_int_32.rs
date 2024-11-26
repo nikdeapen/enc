@@ -34,6 +34,22 @@ impl VarInt32 {
     const LAST_DECODING_BYTE_MASK: u8 = 0xFF << (u32::BITS % 7);
 }
 
+impl VarInt32 {
+    //! ZigZag
+
+    /// Creates a `VarInt32` from the signed `value` using zigzag encoding.
+    pub fn from_zigzag(value: i32) -> Self {
+        let value: u32 = value as u32;
+        let value: u32 = (value << 1) ^ (value >> 31);
+        Self::from(value)
+    }
+
+    /// Creates a `VarInt32` from the signed `value` using zigzag encoding.
+    pub fn to_zigzag(&self) -> i32 {
+        ((self.value >> 1) as i32) ^ -((self.value & 1) as i32)
+    }
+}
+
 impl EncodedLen for VarInt32 {
     fn encoded_len(&self) -> Result<usize, Error> {
         let encoded_len: usize = if self.value == 0 {
