@@ -1,0 +1,62 @@
+use crate::Error::InsufficientTargetSpace;
+use crate::{EncodedLen, Error};
+
+/// A value that can encode itself to a slice.
+pub trait EncodeToSlice: EncodedLen {
+    /// Encodes the value to the `target` slice.
+    ///
+    /// Returns the length of the encoded value.
+    ///
+    /// Note:
+    /// - The impl must not read from the `target` slice.
+    /// - The impl must not write to the `target` slice outside the range: [0, encoded_len - 1].
+    /// - The impl must overwrite the entire range [0, encoded_len-1].
+    ///
+    /// # Unsafe
+    /// This function is `unsafe` so implementations can assume the `target` slice has sufficient
+    /// space for the encoded value and avoid recomputing an encoded length.
+    ///
+    /// This comes with two requirements:
+    ///
+    ///  1. The clients must ensure the `target` buffer has sufficient space as defined by the
+    ///         `EncodedLen::encoded_len` implementation.
+    ///  2. Implementations must ensure the length above matches the actual number of bytes
+    ///         written to the `target` buffer when encoding the value.
+    unsafe fn encode_to_slice_unchecked(&self, target: &mut [u8]) -> Result<usize, Error>;
+
+    /// Encodes the value to the `target` slice.
+    ///
+    /// Returns the length of the encoded value.
+    ///
+    /// See: `encode_to_slice_unchecked`.
+    fn encode_to_slice(&self, target: &mut [u8]) -> Result<usize, Error> {
+        let encoded_len: usize = self.encoded_len()?;
+        if encoded_len > target.len() {
+            Err(InsufficientTargetSpace)
+        } else {
+            let also_encoded_len: usize = unsafe { self.encode_to_slice_unchecked(target)? };
+            debug_assert_eq!(encoded_len, also_encoded_len);
+            Ok(encoded_len)
+        }
+    }
+
+    /// Appends the encoded value to the `target` vec.
+    ///
+    /// Returns the length of the encoded value.
+    fn append_to_vec(&self, target: &mut Vec<u8>) -> Result<usize, Error> {
+        let original_len: usize = target.len();
+        let encoded_len: usize = self.encoded_len()?;
+        target.resize(original_len + encoded_len, 0u8);
+        let target: &mut [u8] = &mut target.as_mut_slice()[original_len..];
+        let also_encoded_len: usize = unsafe { self.encode_to_slice_unchecked(target)? };
+        debug_assert_eq!(encoded_len, also_encoded_len);
+        Ok(encoded_len)
+    }
+
+    /// Encodes the value as a vec. Returns the vec.
+    fn encode_as_vec(&self) -> Result<Vec<u8>, Error> {
+        let mut vec: Vec<u8> = Vec::default();
+        self.append_to_vec(&mut vec)?;
+        Ok(vec)
+    }
+}
