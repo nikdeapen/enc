@@ -9,3 +9,5 @@ mod decode_from_read_prefix;
 mod encode_to_slice;
 mod encode_to_write;
 mod encoded_len;
+
+pub mod var_int;
