@@ -8,6 +8,8 @@ mod encoder;
 mod string_encoder;
 mod validator;
 
+#[cfg(feature = "base-64")]
+pub mod base_64;
 #[cfg(feature = "hex")]
 pub mod hex;
 #[cfg(feature = "percent")]
