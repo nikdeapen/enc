@@ -1,7 +1,7 @@
 use crate::Validator;
 
 /// Responsible for validating hexadecimal encoded data.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct HexValidator {
     allow_lowercase: bool,
     allow_uppercase: bool,
@@ -38,7 +38,7 @@ impl Default for HexValidator {
 impl HexValidator {
     //! Validation
 
-    /// Checks if the hex byte is valid.
+    /// Checks if `b` is valid.
     #[inline(always)]
     pub const fn is_valid_byte(&self, b: u8) -> bool {
         b.is_ascii_digit()
@@ -46,7 +46,7 @@ impl HexValidator {
             || (self.allow_uppercase && matches!(b, b'A'..=b'F'))
     }
 
-    /// Checks if the hex char `c` is valid.
+    /// Checks if `c` is valid.
     #[inline(always)]
     pub const fn is_valid_char(&self, c: char) -> bool {
         let c: u32 = c as u32;

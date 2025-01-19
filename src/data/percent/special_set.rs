@@ -34,7 +34,7 @@ impl From<&str> for SpecialSet {
 impl SpecialSet {
     //! Constants
 
-    /// The percent chars. (in order of index and sorted ascending by var_int)
+    /// The percent chars. (in order of index and sorted ascending by ASCII code)
     const CHARS: &'static [u8; 32] = b" !\"#$&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
     /// The index table.
@@ -98,12 +98,12 @@ impl SpecialSet {
 impl SpecialSet {
     //! Mutations
 
-    /// Adds the percent char. If the char is invalid or already present this has no effect.
+    /// Adds `c`. If `c` is invalid or already present this has no effect.
     pub fn add(&mut self, c: u8) {
-        self.bits |= 1u32.checked_shl(Self::index_of(c) as u32).unwrap_or(0);
+        self.bits |= 1u32.checked_shl(Self::index_of(c) as u32).unwrap_or(0)
     }
 
-    /// Removes the percent char. If the char is invalid or not present this has no effect.
+    /// Removes `c`. If `c` is invalid or not present this has no effect.
     pub fn remove(&mut self, c: u8) {
         self.bits &= !1u32.checked_shl(Self::index_of(c) as u32).unwrap_or(0);
     }
@@ -112,8 +112,9 @@ impl SpecialSet {
 impl SpecialSet {
     //! Properties
 
-    /// Checks if the set contains the char.
-    /// - If the char is invalid this will return false.
+    /// Checks if the set contains `c`.
+    ///
+    /// If `c` is invalid this will return false.
     pub fn contains(&self, c: u8) -> bool {
         (self.bits & 1u32.checked_shl(Self::index_of(c) as u32).unwrap_or(0)) != 0
     }

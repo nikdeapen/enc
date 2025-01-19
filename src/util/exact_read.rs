@@ -20,6 +20,20 @@ impl<'a, R: Read> ExactRead<'a, R> {
     }
 }
 
+impl<'a, R: Read> ExactRead<'a, R> {
+    //! Properties
+
+    /// Gets the number of remaining bytes.
+    pub fn remaining(&self) -> usize {
+        self.remaining
+    }
+
+    /// Checks if there are no remaining bytes.
+    pub fn is_finished(&self) -> bool {
+        self.remaining == 0
+    }
+}
+
 impl<'a, R: Read> Read for ExactRead<'a, R> {
     fn read(&mut self, buffer: &mut [u8]) -> std::io::Result<usize> {
         if self.remaining == 0 || buffer.len() == 0 {

@@ -10,4 +10,5 @@ mod encode_to_slice;
 mod encode_to_write;
 mod encoded_len;
 
+#[cfg(feature = "var-int")]
 pub mod var_int;

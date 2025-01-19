@@ -3,7 +3,7 @@ use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
 use crate::{Encoder, Error, StringEncoder};
 
 /// Responsible for encoding data in the hexadecimal format.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct HexEncoder {
     uppercase: bool,
 }
@@ -41,14 +41,14 @@ impl HexEncoder {
         }
     }
 
-    /// Encodes the byte `b` as two hex bytes.
+    /// Encodes `b` as two hex bytes.
     #[inline(always)]
     pub fn encode_bytes(&self, b: u8) -> (u8, u8) {
         let hex: &[u8; 16] = self.hex();
         (hex[(b as usize) >> 4], hex[(b as usize) & 0xF])
     }
 
-    /// Encodes the byte `b` as two hex chars.
+    /// Encodes `b` as two hex chars.
     #[inline(always)]
     pub fn encode_chars(&self, b: u8) -> (char, char) {
         let (a, b) = self.encode_bytes(b);

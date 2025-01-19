@@ -4,7 +4,7 @@ use crate::{Encoder, Error};
 pub trait StringEncoder: Encoder {
     /// Appends the encoded `data` to the `target` string.
     ///
-    /// Returns the length of the encoded data.
+    /// Returns the length of the encoded `data`.
     fn append_to_string(&self, data: &[u8], target: &mut String) -> Result<usize, Error>;
 
     /// Encodes the `data` as a string.
@@ -19,10 +19,10 @@ pub trait StringEncoder: Encoder {
 
 /// Appends the encoded `data` to the `target` string.
 ///
-/// Returns the length of the encoded data.
+/// Returns the length of the encoded `data`.
 ///
 /// # Unsafe
-/// This function does not ensure the encoded data is a valid UTF-8 byte sequence.
+/// This function does not ensure the encoded `data` is a valid UTF-8 byte sequence.
 #[allow(dead_code)]
 pub(crate) unsafe fn append_to_string_unchecked<E>(
     encoder: &E,
