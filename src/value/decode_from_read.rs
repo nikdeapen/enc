@@ -33,7 +33,7 @@ pub trait DecodeFromRead: Sized {
     {
         let len_prefix: usize =
             VarIntSize::decode_from_read_prefix_with_first_byte(first, r)?.value;
-        let mut exact: ExactRead<R> = ExactRead::new(r, len_prefix);
+        let mut exact: Box<dyn Read> = Box::new(ExactRead::new(r, len_prefix));
         Self::decode_from_read(&mut exact)
     }
 }
