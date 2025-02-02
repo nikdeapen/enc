@@ -12,5 +12,8 @@ license = "MIT"
 [features]
 data = []
 
+value = []
+
 full-data = ["data"]
-full = ["full-data"]
+full-value = ["value"]
+full = ["full-data", "full-value"]
