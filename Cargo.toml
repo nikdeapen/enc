@@ -13,7 +13,8 @@ license = "MIT"
 data = []
 
 value = []
+var-int = ["value"]
 
 full-data = ["data"]
-full-value = ["value"]
+full-value = ["value", "var-int"]
 full = ["full-data", "full-value"]
