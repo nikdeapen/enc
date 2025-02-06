@@ -1,5 +1,6 @@
 use std::cmp::min;
-use std::io::Read;
+use std::io::ErrorKind::UnexpectedEof;
+use std::io::{Error, Read, Result};
 
 /// A `Read` that reads an exact number of bytes.
 #[derive(Debug)]
@@ -30,9 +31,25 @@ impl<'a, R: Read> ExactRead<'a, R> {
 }
 
 impl<'a, R: Read> Read for ExactRead<'a, R> {
-    fn read(&mut self, b: &mut [u8]) -> std::io::Result<usize> {
+    fn read(&mut self, b: &mut [u8]) -> Result<usize> {
         let max: usize = min(b.len(), self.remaining);
+        if max == 0 {
+            return Ok(0);
+        }
         let b: &mut [u8] = &mut b[..max];
-        self.read.read(b)
+        match self.read.read(b) {
+            Ok(read) => {
+                if read == 0 {
+                    Err(Error::new(
+                        UnexpectedEof,
+                        format!("{} more bytes expected", self.remaining),
+                    ))
+                } else {
+                    self.remaining -= read;
+                    Ok(read)
+                }
+            }
+            Err(error) => Err(error),
+        }
     }
 }
