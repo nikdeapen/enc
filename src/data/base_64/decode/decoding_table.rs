@@ -3,7 +3,8 @@ use std::sync::Arc;
 /// A base-64 decoding table.
 ///
 /// This supports static and atomic reference counted tables. This avoids all allocation for the
-/// standard decoding table definitions and allocating when cloning reference counted tables.
+/// standard decoding table definitions and also avoids allocating when cloning reference counted
+/// tables. The only allocation needed is when creating a new non-standard decoding table.
 #[derive(Clone, Debug)]
 pub enum DecodingTable {
     /// A static decoding table.
@@ -120,7 +121,7 @@ impl Default for DecodingTable {
 impl DecodingTable {
     //! Properties
 
-    /// Gets the decoding table.
+    /// Gets the raw decoding table.
     pub fn decoding_table(&self) -> &[u8; 256] {
         match self {
             Self::Static(table) => *table,

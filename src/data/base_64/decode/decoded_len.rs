@@ -1,20 +1,13 @@
 use crate::base_64::decode::decoded_len_last_block::decoded_length_last_block;
+use crate::base_64::decode::split_last_block::split_last_block;
 
-/// Gets the decoded length of the data.
-///
-/// The padding, if given, will be ignored. See `remove_padding_last_block`.
+/// Gets the length of the decoded `data`.
 #[inline(always)]
 pub fn decoded_len(data: &[u8], padding: Option<u8>) -> usize {
-    let len: usize = data.len();
-    if len == 0 {
-        0
-    } else {
-        let rem: usize = len % 4;
-        let last_chunk_index: usize = len - if rem == 0 { 4 } else { rem };
-        let full: usize = (last_chunk_index / 4) * 3;
-        let last: usize = unsafe { decoded_length_last_block(&data[last_chunk_index..], padding) };
-        full + last
-    }
+    let (full_chunks, last_block) = split_last_block(data);
+    let full: usize = (full_chunks.len() / 4) * 3;
+    let last: usize = unsafe { decoded_length_last_block(last_block, padding) };
+    full + last
 }
 
 #[cfg(test)]

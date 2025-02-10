@@ -21,7 +21,7 @@ pub struct Base64Decoder {
 impl Base64Decoder {
     //! Construction
 
-    /// Creates a new base-64 decoder.
+    /// Creates a new `Base64Decoder`.
     pub fn new(v63: u8, v64: u8, padding: Option<u8>) -> Self {
         Self {
             decoding_table: DecodingTable::get_decoding_table(v63, v64),

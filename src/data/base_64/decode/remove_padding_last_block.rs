@@ -1,29 +1,29 @@
-/// Removes the padding from the last block of data.
+/// Removes the padding from the `last_block`.
 ///
-/// Returns the data without the padding.
+/// Returns the `last_block` without the padding.
 #[inline(always)]
-pub unsafe fn remove_padding_last_block(data: &[u8], padding: Option<u8>) -> &[u8] {
-    debug_assert!(data.len() <= 4);
+pub unsafe fn remove_padding_last_block(last_block: &[u8], padding: Option<u8>) -> &[u8] {
+    debug_assert!(last_block.len() <= 4);
 
-    if data.len() <= 2 {
-        data
+    if last_block.len() <= 2 {
+        last_block
     } else {
         if let Some(padding) = padding {
-            let c: u8 = *data.get_unchecked(2);
+            let c: u8 = *last_block.get_unchecked(2);
             if c == padding {
-                &data[..2]
-            } else if data.len() == 4 {
-                let d: u8 = *data.get_unchecked(3);
+                &last_block[..2]
+            } else if last_block.len() == 4 {
+                let d: u8 = *last_block.get_unchecked(3);
                 if d == padding {
-                    &data[..3]
+                    &last_block[..3]
                 } else {
-                    data
+                    last_block
                 }
             } else {
-                data
+                last_block
             }
         } else {
-            data
+            last_block
         }
     }
 }
@@ -48,8 +48,10 @@ mod tests {
             (Some(b'='), "AA==", "AA"),
             (Some(b'='), "A===", "A="),
         ];
-        for (padding, data, expected) in test_cases {
-            let result: &[u8] = unsafe { remove_padding_last_block(data.as_bytes(), *padding) };
+        for (padding, last_block, expected) in test_cases {
+            let result: &[u8] =
+                unsafe { remove_padding_last_block(last_block.as_bytes(), *padding) };
+
             assert_eq!(result, expected.as_bytes());
         }
     }
