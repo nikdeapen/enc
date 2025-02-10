@@ -4,7 +4,7 @@ use crate::{Decoder, Error};
 /// Responsible for decoding data in the hexadecimal format.
 ///
 /// # Case
-/// This decoder implementation will decode data encoded in uppercase, lowercase, or mixed case.
+/// This decoder implementation is case-insensitive.
 ///
 /// # Validation
 /// This decoder implementation does nothing to validate the encoded data beyond requiring an even
@@ -97,10 +97,12 @@ mod tests {
             ("BaDcFe", b"\xBA\xDC\xFE"),
             ("bAdCfE", b"\xBA\xDC\xFE"),
         ];
+
         for (input, expected) in test_cases {
             let result: Vec<u8> = HexDecoder::default().decode_as_vec(input.as_bytes())?;
             assert_eq!(result, *expected, "input={}", *input);
         }
+
         Ok(())
     }
 }
