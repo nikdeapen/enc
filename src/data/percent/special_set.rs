@@ -8,7 +8,7 @@ use std::fmt::{Display, Formatter};
 /// - The `%` char is not included since it must always be encoded in any percent encoded string.
 /// - The `SPACE` char is included, although it is not defined as a punctuation char.
 ///
-/// # Characters
+/// # Chars
 /// The [32] valid chars that can be present in the set are:
 /// [1]:  SPACE
 /// [4]:  !"#$
@@ -34,7 +34,7 @@ impl From<&str> for SpecialSet {
 impl SpecialSet {
     //! Constants
 
-    /// The percent chars. (in order of index and sorted ascending by ASCII code)
+    /// The set of valid chars. (in order of index and sorted ascending by ASCII code)
     const CHARS: &'static [u8; 32] = b" !\"#$&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
     /// The index table.
@@ -84,7 +84,9 @@ impl SpecialSet {
 impl SpecialSet {
     //! Index
 
-    /// Gets the bit index for the percent char. Returns 32 for invalid chars.
+    /// Gets the bit index for `c`.
+    ///
+    /// Returns `32` for invalid chars.
     #[inline(always)]
     const fn index_of(c: u8) -> usize {
         if c > 0x7F {

@@ -1,16 +1,16 @@
-/// Decodes a full block of 4 bytes without padding.
+/// Decodes a full `block` of 4 bytes without padding.
 ///
-/// Decoding 4 chars produces 24 bits which is exactly 3 bytes.
+/// Decoding 4 bytes produces 24 bits which is exactly 3 bytes.
 /// Returns the number of decoded bytes. (3)
 #[inline(always)]
-pub unsafe fn decode_block(decoding_table: &[u8; 256], data: &[u8], target: &mut [u8]) -> usize {
-    debug_assert!(data.len() >= 4);
+pub unsafe fn decode_block(decoding_table: &[u8; 256], block: &[u8], target: &mut [u8]) -> usize {
+    debug_assert!(block.len() >= 4);
     debug_assert!(target.len() >= 3);
 
-    let a: u32 = *decoding_table.get_unchecked(data[0] as usize) as u32;
-    let b: u32 = *decoding_table.get_unchecked(data[1] as usize) as u32;
-    let c: u32 = *decoding_table.get_unchecked(data[2] as usize) as u32;
-    let d: u32 = *decoding_table.get_unchecked(data[3] as usize) as u32;
+    let a: u32 = *decoding_table.get_unchecked(*block.get_unchecked(0) as usize) as u32;
+    let b: u32 = *decoding_table.get_unchecked(*block.get_unchecked(1) as usize) as u32;
+    let c: u32 = *decoding_table.get_unchecked(*block.get_unchecked(2) as usize) as u32;
+    let d: u32 = *decoding_table.get_unchecked(*block.get_unchecked(3) as usize) as u32;
 
     let bits: u32 = (a << 18) | (b << 12) | (c << 6) | d;
 
@@ -53,6 +53,7 @@ mod tests {
 
             let result: usize =
                 unsafe { decode_block(decoding_table, data.as_bytes(), &mut target) };
+
             assert_eq!(result, 3);
             assert_eq!(target[3], 0x00);
             assert_eq!(&target[..3], *expected, "data={}", *data);

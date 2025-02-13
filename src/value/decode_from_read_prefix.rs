@@ -5,9 +5,9 @@ use crate::{read_optional_byte, read_single_byte};
 /// A value that can decode itself from a `Read` prefix.
 ///
 /// # Note
-/// - The decoder does not need to fully drain the `Read`.
-/// - The decoder must read the entire encoded value.
-/// - The decoder must not read past the end of the encoded value.
+/// - The impl does not need to fully drain the `Read`.
+/// - The impl must read the entire encoded value.
+/// - The impl must not read past the end of the encoded value.
 /// - An encoded value must be at least one byte in length.
 pub trait DecodeFromReadPrefix: Sized {
     /// Decodes a value from the `Read` prefix.

@@ -1,4 +1,10 @@
-/// Splits the data into full blocks and the last block.
+/// Splits the `data` into full blocks and the last block.
+///
+/// Returns `(full_blocks, last_block)`.
+///
+/// The last block will only be empty if `data` is empty, otherwise it will contain the last bytes
+/// after all the full 4-byte blocks. If the length of the `data` is mod 4 it will return the
+/// entire last 4 bytes so the last block can be stripped for padding.
 #[inline(always)]
 pub fn split_last_block(data: &[u8]) -> (&[u8], &[u8]) {
     let len: usize = data.len();

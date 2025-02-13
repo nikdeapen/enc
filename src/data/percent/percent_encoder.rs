@@ -32,7 +32,7 @@ impl<S: Into<SpecialSet>> From<S> for PercentEncoder {
 impl PercentEncoder {
     //! Encoding
 
-    /// Checks if the character needs encoding.
+    /// Checks if `c` needs encoding.
     #[inline(always)]
     pub fn needs_encoding(&self, c: u8) -> bool {
         !c.is_ascii_alphanumeric() && !self.do_not_encode.contains(c)

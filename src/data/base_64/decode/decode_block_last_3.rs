@@ -1,7 +1,7 @@
-/// Decodes the last block of 3 bytes without padding.
+/// Decodes the `last_block` of 3 bytes into the `target`.
 ///
-/// Decoding 3 chars produces 18 bits which is compressed to 2 bytes.
-/// The last 2 bits are invalid and discarded.
+/// Decoding 3 bytes produces 18 bits which is compressed to 2 bytes.
+/// The last 2 bits of output are invalid and discarded.
 /// Returns the number of decoded bytes. (2)
 #[inline(always)]
 pub unsafe fn decode_block_last_3(

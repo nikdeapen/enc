@@ -109,6 +109,7 @@ mod tests {
             (b"\xAB\xCD\xEF", "abcdef"),
             (b"\xBA\xDC\xFE", "badcfe"),
         ];
+
         for (data, expected) in test_cases {
             let result: String = HexEncoder::LOWER.encode_as_string(*data)?;
             assert_eq!(result, *expected);
@@ -116,6 +117,7 @@ mod tests {
             let result: String = HexEncoder::UPPER.encode_as_string(*data)?;
             assert_eq!(result, expected.to_ascii_uppercase());
         }
+
         Ok(())
     }
 }

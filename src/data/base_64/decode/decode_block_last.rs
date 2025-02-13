@@ -4,37 +4,39 @@ use crate::base_64::decode::decode_block_last_2::decode_block_last_2;
 use crate::base_64::decode::decode_block_last_3::decode_block_last_3;
 use crate::base_64::decode::remove_padding_last_block::remove_padding_last_block;
 
-/// Decodes the last block of up to 4 bytes with padding.
+/// Decodes the `last_block` of up to 4 bytes into the `target`.
 ///
-/// Padding will be removed based on `remove_padding_last_block`.
-/// Returns the number of decoded bytes. ([1, 3])
+/// Returns the number of decoded bytes. ([0, 3])
 #[inline(always)]
 pub unsafe fn decode_block_last(
     decoding_table: &[u8; 256],
     padding: Option<u8>,
-    data: &[u8],
+    last_block: &[u8],
     target: &mut [u8],
 ) -> usize {
-    debug_assert!(data.len() <= 4);
+    debug_assert!(last_block.len() <= 4);
 
-    let data: &[u8] = remove_padding_last_block(data, padding);
-    match data.len() {
-        0 => 0,
+    let last_block: &[u8] = remove_padding_last_block(last_block, padding);
+    match last_block.len() {
+        0 => {
+            debug_assert_eq!(target.len(), 0);
+            0
+        }
         1 => {
             debug_assert_eq!(target.len(), 1);
-            decode_block_last_1(decoding_table, data, target)
+            decode_block_last_1(decoding_table, last_block, target)
         }
         2 => {
             debug_assert_eq!(target.len(), 1);
-            decode_block_last_2(decoding_table, data, target)
+            decode_block_last_2(decoding_table, last_block, target)
         }
         3 => {
             debug_assert_eq!(target.len(), 2);
-            decode_block_last_3(decoding_table, data, target)
+            decode_block_last_3(decoding_table, last_block, target)
         }
         4 => {
             debug_assert_eq!(target.len(), 3);
-            decode_block(decoding_table, data, target)
+            decode_block(decoding_table, last_block, target)
         }
         _ => unreachable!(),
     }
@@ -61,6 +63,7 @@ mod tests {
         let decoding_table: &[u8; 256] = decoding_table.decoding_table();
         for (data, expected) in test_cases {
             let mut target: [u8; 3] = [0, 0, 0];
+
             let result: usize = unsafe {
                 decode_block_last(
                     decoding_table,
@@ -69,6 +72,7 @@ mod tests {
                     &mut target[..expected.len()],
                 )
             };
+
             assert_eq!(result, expected.len(), "data={}", *data);
             assert_eq!(&target[..expected.len()], *expected, "data={}", *data);
         }

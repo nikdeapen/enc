@@ -5,8 +5,8 @@ use crate::{Decoder, Error};
 /// Responsible for decoding data in the URL percent encoded format.
 ///
 /// # Validation
-/// No validation is done on the decoded data. All properly encoded characters will be decoded and
-/// improperly encoded characters will pass through unchanged.
+/// No validation is done on the encoded data. All properly encoded chars will be decoded and
+/// improperly encoded chars will pass through unchanged.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Default)]
 pub struct PercentDecoder {
     _nothing: (),

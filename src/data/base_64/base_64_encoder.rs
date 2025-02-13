@@ -5,7 +5,7 @@ use crate::{Encoder, Error, StringEncoder};
 /// Responsible for encoding data in the base-64 format.
 ///
 /// # Note
-/// This encoder is optimized for the default 63rd and 64th values (`+` and `/`). It will work for
+/// This encoder is optimized for the URL-safe 63rd and 64th values (`-` and `.`). It will work for
 /// any valid custom encoding but with a performance cost of an extra scan & replace. This is done
 /// to allow a low memory footprint and to implement `Copy`.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
@@ -33,8 +33,8 @@ impl Base64Encoder {
 impl Default for Base64Encoder {
     fn default() -> Self {
         Self {
-            v63: b'+',
-            v64: b'/',
+            v63: b'-',
+            v64: b'.',
             padding: Some(b'='),
         }
     }
@@ -61,7 +61,7 @@ impl Base64Encoder {
 
     /// The encoding table.
     const ENCODING_TABLE: &'static [u8; 64] =
-        b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.";
 }
 
 impl Base64Encoder {
@@ -154,14 +154,14 @@ impl Base64Encoder {
 
     /// Corrects the last two encoding bytes.
     ///
-    /// This makes non-default configs slower but ¯\_(ツ)_/¯.
+    /// This makes non-URL-safe configs slower but ¯\_(ツ)_/¯.
     #[inline(always)]
     fn correct_v63_and_v64(&self, target: &mut [u8]) {
-        if self.v63 != b'+' || self.v64 != b'/' {
+        if self.v63 != b'-' || self.v64 != b'.' {
             target.iter_mut().for_each(|t| {
-                if *t == b'+' {
+                if *t == b'-' {
                     *t = self.v63
-                } else if *t == b'/' {
+                } else if *t == b'.' {
                     *t = self.v64
                 }
             });
@@ -258,20 +258,20 @@ mod tests {
             (b"\xC3\x1C\xB3", "wxyz"),
             (b"\xD3\x5D\xB7", "0123"),
             (b"\xE3\x9E\xBB", "4567"),
-            (b"\xF3\xDF\xBF", "89+/"),
+            (b"\xF3\xDF\xBF", "89-."),
             (b"", ""),
             (b"\x00", "AA=="),
-            (b"\xFF", "/w=="),
+            (b"\xFF", ".w=="),
             (b"\x00\x00", "AAA="),
-            (b"\xFF\xFF", "//8="),
+            (b"\xFF\xFF", "..8="),
             (b"\x00\x00\x00", "AAAA"),
-            (b"\xFF\xFF\xFF", "////"),
+            (b"\xFF\xFF\xFF", "...."),
             (b"\x00\x00\x00\x00", "AAAAAA=="),
-            (b"\xFF\xFF\xFF\xFF", "/////w=="),
+            (b"\xFF\xFF\xFF\xFF", ".....w=="),
             (b"\x00\x00\x00\x00\x00", "AAAAAAA="),
-            (b"\xFF\xFF\xFF\xFF\xFF", "//////8="),
+            (b"\xFF\xFF\xFF\xFF\xFF", "......8="),
             (b"\x00\x00\x00\x00\x00\x00", "AAAAAAAA"),
-            (b"\xFF\xFF\xFF\xFF\xFF\xFF", "////////"),
+            (b"\xFF\xFF\xFF\xFF\xFF\xFF", "........"),
         ];
         let encoder: Base64Encoder = Base64Encoder::default();
         for (data, expected) in test_cases {

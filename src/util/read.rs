@@ -31,3 +31,45 @@ where
         _ => unreachable!(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::error::Error;
+    use std::io::{Cursor, ErrorKind};
+
+    use crate::{read_optional_byte, read_single_byte};
+
+    #[test]
+    fn fn_read_single_byte() {
+        let data: Vec<u8> = vec![0xFF; 1];
+        let mut data: Cursor<Vec<u8>> = Cursor::new(data);
+
+        match read_single_byte(&mut data) {
+            Ok(b) => assert_eq!(b, 0xFF),
+            Err(error) => assert!(false, "{:#?}", error),
+        }
+
+        match read_single_byte(&mut data) {
+            Ok(b) => assert!(false, "b={}", b),
+            Err(error) => assert_eq!(error.kind(), ErrorKind::UnexpectedEof),
+        }
+    }
+
+    #[test]
+    fn fn_read_optional_byte() -> Result<(), Box<dyn Error>> {
+        let data: Vec<u8> = vec![0xFF; 1];
+        let mut data: Cursor<Vec<u8>> = Cursor::new(data);
+
+        match read_optional_byte(&mut data)? {
+            Some(b) => assert_eq!(b, 0xFF),
+            None => assert!(false),
+        }
+
+        match read_optional_byte(&mut data)? {
+            Some(b) => assert!(false, "b={}", b),
+            None => {}
+        }
+
+        Ok(())
+    }
+}
