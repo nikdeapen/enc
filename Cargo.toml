@@ -15,5 +15,8 @@ base-64 = ["data"]
 hex = ["data"]
 percent = ["data", "hex"]
 
+value = []
+
 full-data = ["data", "base-64", "hex", "percent"]
-full = ["full-data"]
+full-value = ["value"]
+full = ["full-data", "full-value"]
