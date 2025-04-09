@@ -32,6 +32,51 @@ impl VarInt64 {
 
     /// The last decoded byte mask. (used to ensure a decoded value does not overflow)
     const LAST_DECODING_BYTE_MASK: u8 = 0xFF << (u64::BITS % 7);
+
+    /// Converts a signed i64 to an unsigned u64 using zigzag encoding.
+    ///
+    /// Zigzag encoding maps signed integers to unsigned integers so that numbers
+    /// with a small absolute value have a small encoded value too.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use enc::var_int::VarInt64;
+    /// assert_eq!(VarInt64::zigzag_encode(0), 0);
+    /// assert_eq!(VarInt64::zigzag_encode(-1), 1);
+    /// assert_eq!(VarInt64::zigzag_encode(1), 2);
+    /// assert_eq!(VarInt64::zigzag_encode(-2), 3);
+    /// ```
+    pub fn zigzag_encode(value: i64) -> u64 {
+        ((value << 1) ^ (value >> 63)) as u64
+    }
+
+    /// Converts an unsigned u64 to a signed i64 using zigzag decoding.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use enc::var_int::VarInt64;
+    /// assert_eq!(VarInt64::zigzag_decode(0), 0);
+    /// assert_eq!(VarInt64::zigzag_decode(1), -1);
+    /// assert_eq!(VarInt64::zigzag_decode(2), 1);
+    /// assert_eq!(VarInt64::zigzag_decode(3), -2);
+    /// ```
+    pub fn zigzag_decode(value: u64) -> i64 {
+        ((value >> 1) as i64) ^ (-((value & 1) as i64))
+    }
+
+    /// Creates a VarInt64 from a signed i64 value using zigzag encoding.
+    pub fn from_i64(value: i64) -> Self {
+        Self {
+            value: Self::zigzag_encode(value),
+        }
+    }
+
+    /// Converts this VarInt64 to a signed i64 value using zigzag decoding.
+    pub fn to_i64(&self) -> i64 {
+        Self::zigzag_decode(self.value)
+    }
 }
 
 impl EncodedLen for VarInt64 {
@@ -177,5 +222,32 @@ mod tests {
             assert_eq!(result.unwrap().value, *expected);
         }
         Ok(())
+    }
+
+    #[test]
+    fn zigzag_encoding() {
+        // Test cases: (signed, unsigned)
+        let test_cases = [
+            (0i64, 0u64),
+            (1i64, 2u64),
+            (-1i64, 1u64),
+            (2i64, 4u64),
+            (-2i64, 3u64),
+            (i64::MAX, (i64::MAX as u64) * 2),
+            (i64::MIN, u64::MAX),
+        ];
+
+        for (signed, unsigned) in test_cases {
+            // Test encoding
+            assert_eq!(VarInt64::zigzag_encode(signed), unsigned);
+
+            // Test decoding
+            assert_eq!(VarInt64::zigzag_decode(unsigned), signed);
+
+            // Test convenience methods
+            let var_int = VarInt64::from_i64(signed);
+            assert_eq!(var_int.value, unsigned);
+            assert_eq!(var_int.to_i64(), signed);
+        }
     }
 }

@@ -33,6 +33,51 @@ impl VarInt128 {
 
     /// The last decoded byte mask. (used to ensure a decoded value does not overflow)
     const LAST_DECODING_BYTE_MASK: u8 = 0xFF << (u128::BITS % 7);
+
+    /// Converts a signed i128 to an unsigned u128 using zigzag encoding.
+    ///
+    /// Zigzag encoding maps signed integers to unsigned integers so that numbers
+    /// with a small absolute value have a small encoded value too.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use enc::var_int::VarInt128;
+    /// assert_eq!(VarInt128::zigzag_encode(0), 0);
+    /// assert_eq!(VarInt128::zigzag_encode(-1), 1);
+    /// assert_eq!(VarInt128::zigzag_encode(1), 2);
+    /// assert_eq!(VarInt128::zigzag_encode(-2), 3);
+    /// ```
+    pub fn zigzag_encode(value: i128) -> u128 {
+        ((value << 1) ^ (value >> 127)) as u128
+    }
+
+    /// Converts an unsigned u128 to a signed i128 using zigzag decoding.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use enc::var_int::VarInt128;
+    /// assert_eq!(VarInt128::zigzag_decode(0), 0);
+    /// assert_eq!(VarInt128::zigzag_decode(1), -1);
+    /// assert_eq!(VarInt128::zigzag_decode(2), 1);
+    /// assert_eq!(VarInt128::zigzag_decode(3), -2);
+    /// ```
+    pub fn zigzag_decode(value: u128) -> i128 {
+        ((value >> 1) as i128) ^ (-((value & 1) as i128))
+    }
+
+    /// Creates a VarInt128 from a signed i128 value using zigzag encoding.
+    pub fn from_i128(value: i128) -> Self {
+        Self {
+            value: Self::zigzag_encode(value),
+        }
+    }
+
+    /// Converts this VarInt128 to a signed i128 value using zigzag decoding.
+    pub fn to_i128(&self) -> i128 {
+        Self::zigzag_decode(self.value)
+    }
 }
 
 impl EncodedLen for VarInt128 {
@@ -180,5 +225,32 @@ mod tests {
             assert_eq!(result.unwrap().value, *expected);
         }
         Ok(())
+    }
+
+    #[test]
+    fn zigzag_encoding() {
+        // Test cases: (signed, unsigned)
+        let test_cases = [
+            (0i128, 0u128),
+            (1i128, 2u128),
+            (-1i128, 1u128),
+            (2i128, 4u128),
+            (-2i128, 3u128),
+            (i128::MAX, (i128::MAX as u128) * 2),
+            (i128::MIN, u128::MAX),
+        ];
+
+        for (signed, unsigned) in test_cases {
+            // Test encoding
+            assert_eq!(VarInt128::zigzag_encode(signed), unsigned);
+
+            // Test decoding
+            assert_eq!(VarInt128::zigzag_decode(unsigned), signed);
+
+            // Test convenience methods
+            let var_int = VarInt128::from_i128(signed);
+            assert_eq!(var_int.value, unsigned);
+            assert_eq!(var_int.to_i128(), signed);
+        }
     }
 }

@@ -29,6 +29,51 @@ impl VarInt16 {
 
     /// The maximum length of an encoded `u16` value. (3)
     pub const MAX_ENCODED_LEN: usize = ((u16::BITS + 6) / 7) as usize;
+
+    /// Converts a signed i16 to an unsigned u16 using zigzag encoding.
+    ///
+    /// Zigzag encoding maps signed integers to unsigned integers so that numbers
+    /// with a small absolute value have a small encoded value too.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use enc::var_int::VarInt16;
+    /// assert_eq!(VarInt16::zigzag_encode(0), 0);
+    /// assert_eq!(VarInt16::zigzag_encode(-1), 1);
+    /// assert_eq!(VarInt16::zigzag_encode(1), 2);
+    /// assert_eq!(VarInt16::zigzag_encode(-2), 3);
+    /// ```
+    pub fn zigzag_encode(value: i16) -> u16 {
+        ((value << 1) ^ (value >> 15)) as u16
+    }
+
+    /// Converts an unsigned u16 to a signed i16 using zigzag decoding.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use enc::var_int::VarInt16;
+    /// assert_eq!(VarInt16::zigzag_decode(0), 0);
+    /// assert_eq!(VarInt16::zigzag_decode(1), -1);
+    /// assert_eq!(VarInt16::zigzag_decode(2), 1);
+    /// assert_eq!(VarInt16::zigzag_decode(3), -2);
+    /// ```
+    pub fn zigzag_decode(value: u16) -> i16 {
+        ((value >> 1) as i16) ^ (-((value & 1) as i16))
+    }
+
+    /// Creates a VarInt16 from a signed i16 value using zigzag encoding.
+    pub fn from_i16(value: i16) -> Self {
+        Self {
+            value: Self::zigzag_encode(value),
+        }
+    }
+
+    /// Converts this VarInt16 to a signed i16 value using zigzag decoding.
+    pub fn to_i16(&self) -> i16 {
+        Self::zigzag_decode(self.value)
+    }
 }
 
 impl EncodedLen for VarInt16 {
@@ -134,5 +179,32 @@ mod tests {
             assert_eq!(result?.value, *expected);
         }
         Ok(())
+    }
+
+    #[test]
+    fn zigzag_encoding() {
+        // Test cases: (signed, unsigned)
+        let test_cases = [
+            (0i16, 0u16),
+            (1i16, 2u16),
+            (-1i16, 1u16),
+            (2i16, 4u16),
+            (-2i16, 3u16),
+            (i16::MAX, (i16::MAX as u16) * 2),
+            (i16::MIN, u16::MAX),
+        ];
+
+        for (signed, unsigned) in test_cases {
+            // Test encoding
+            assert_eq!(VarInt16::zigzag_encode(signed), unsigned);
+
+            // Test decoding
+            assert_eq!(VarInt16::zigzag_decode(unsigned), signed);
+
+            // Test convenience methods
+            let var_int = VarInt16::from_i16(signed);
+            assert_eq!(var_int.value, unsigned);
+            assert_eq!(var_int.to_i16(), signed);
+        }
     }
 }

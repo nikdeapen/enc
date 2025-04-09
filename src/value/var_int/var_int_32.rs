@@ -32,6 +32,51 @@ impl VarInt32 {
 
     /// The last decoded byte mask. (used to ensure a decoded value does not overflow)
     const LAST_DECODING_BYTE_MASK: u8 = 0xFF << (u32::BITS % 7);
+
+    /// Converts a signed i32 to an unsigned u32 using zigzag encoding.
+    ///
+    /// Zigzag encoding maps signed integers to unsigned integers so that numbers
+    /// with a small absolute value have a small encoded value too.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use enc::var_int::VarInt32;
+    /// assert_eq!(VarInt32::zigzag_encode(0), 0);
+    /// assert_eq!(VarInt32::zigzag_encode(-1), 1);
+    /// assert_eq!(VarInt32::zigzag_encode(1), 2);
+    /// assert_eq!(VarInt32::zigzag_encode(-2), 3);
+    /// ```
+    pub fn zigzag_encode(value: i32) -> u32 {
+        ((value << 1) ^ (value >> 31)) as u32
+    }
+
+    /// Converts an unsigned u32 to a signed i32 using zigzag decoding.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use enc::var_int::VarInt32;
+    /// assert_eq!(VarInt32::zigzag_decode(0), 0);
+    /// assert_eq!(VarInt32::zigzag_decode(1), -1);
+    /// assert_eq!(VarInt32::zigzag_decode(2), 1);
+    /// assert_eq!(VarInt32::zigzag_decode(3), -2);
+    /// ```
+    pub fn zigzag_decode(value: u32) -> i32 {
+        ((value >> 1) as i32) ^ (-((value & 1) as i32))
+    }
+
+    /// Creates a VarInt32 from a signed i32 value using zigzag encoding.
+    pub fn from_i32(value: i32) -> Self {
+        Self {
+            value: Self::zigzag_encode(value),
+        }
+    }
+
+    /// Converts this VarInt32 to a signed i32 value using zigzag decoding.
+    pub fn to_i32(&self) -> i32 {
+        Self::zigzag_decode(self.value)
+    }
 }
 
 impl EncodedLen for VarInt32 {
@@ -177,5 +222,32 @@ mod tests {
             assert_eq!(result.unwrap().value, *expected);
         }
         Ok(())
+    }
+
+    #[test]
+    fn zigzag_encoding() {
+        // Test cases: (signed, unsigned)
+        let test_cases = [
+            (0i32, 0u32),
+            (1i32, 2u32),
+            (-1i32, 1u32),
+            (2i32, 4u32),
+            (-2i32, 3u32),
+            (i32::MAX, (i32::MAX as u32) * 2),
+            (i32::MIN, u32::MAX),
+        ];
+
+        for (signed, unsigned) in test_cases {
+            // Test encoding
+            assert_eq!(VarInt32::zigzag_encode(signed), unsigned);
+
+            // Test decoding
+            assert_eq!(VarInt32::zigzag_decode(unsigned), signed);
+
+            // Test convenience methods
+            let var_int = VarInt32::from_i32(signed);
+            assert_eq!(var_int.value, unsigned);
+            assert_eq!(var_int.to_i32(), signed);
+        }
     }
 }
