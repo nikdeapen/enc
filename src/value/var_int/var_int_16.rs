@@ -3,7 +3,7 @@ use std::io;
 
 use crate::var_int::VarInt32;
 use crate::Error::InvalidEncodedData;
-use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen, Error, StreamError};
+use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodedLen, Error, StreamError};
 
 /// A variable-length encoded `u16` value.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
@@ -53,15 +53,6 @@ impl EncodedLen for VarInt16 {
 impl EncodeToSlice for VarInt16 {
     unsafe fn encode_to_slice_unchecked(&self, target: &mut [u8]) -> Result<usize, Error> {
         VarInt32::from(self.value as u32).encode_to_slice_unchecked(target)
-    }
-}
-
-impl EncodeToWrite for VarInt16 {
-    fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, StreamError>
-    where
-        W: io::Write,
-    {
-        VarInt32::from(self.value as u32).encode_to_write(w)
     }
 }
 

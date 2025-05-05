@@ -3,7 +3,7 @@ use std::io;
 
 use crate::Error::InvalidEncodedData;
 use crate::{read_single_byte, StreamError};
-use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen, Error};
+use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodedLen, Error};
 
 /// A variable-length encoded `u64` value.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
@@ -76,18 +76,6 @@ impl EncodeToSlice for VarInt64 {
         }
         *target.get_unchecked_mut(t) = v as u8;
         Ok(t + 1)
-    }
-}
-
-impl EncodeToWrite for VarInt64 {
-    fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, StreamError>
-    where
-        W: io::Write,
-    {
-        let mut buffer: [u8; Self::MAX_ENCODED_LEN] = [0u8; Self::MAX_ENCODED_LEN];
-        let encoded_len: usize = unsafe { self.encode_to_slice_unchecked(&mut buffer)? };
-        w.write_all(&mut buffer[..encoded_len])?;
-        Ok(encoded_len)
     }
 }
 
