@@ -1,4 +1,5 @@
-use std::io::{Error, Read};
+use crate::StreamError;
+use std::io::Read;
 
 /// A value that can decode itself from a `Read`.
 pub trait DecodeFromRead: Sized {
@@ -6,13 +7,13 @@ pub trait DecodeFromRead: Sized {
     ///
     /// # Note
     /// The impl must fully drain the `Read`.
-    fn decode_from_read<R>(r: &mut R) -> Result<Self, Error>
+    fn decode_from_read<R>(r: &mut R) -> Result<Self, StreamError>
     where
         R: Read;
 
     /// Decodes a length-prefixed value from the `Read` prefix.
     #[cfg(feature = "var-int")]
-    fn decode_from_read_length_prefixed<R>(r: &mut R) -> Result<Self, Error>
+    fn decode_from_read_length_prefixed<R>(r: &mut R) -> Result<Self, StreamError>
     where
         R: Read,
     {
@@ -24,7 +25,7 @@ pub trait DecodeFromRead: Sized {
     fn decode_from_read_length_prefixed_with_first_byte<R>(
         first: u8,
         r: &mut R,
-    ) -> Result<Self, Error>
+    ) -> Result<Self, StreamError>
     where
         R: Read,
     {

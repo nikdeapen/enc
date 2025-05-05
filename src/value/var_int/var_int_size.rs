@@ -1,9 +1,8 @@
 use std::fmt::{Display, Formatter};
 use std::io;
-use std::io::ErrorKind::InvalidData;
 
 use crate::Error::InvalidEncodedData;
-use crate::{read_single_byte, Error};
+use crate::{read_single_byte, Error, StreamError};
 use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen};
 
 /// A variable-length encoded `usize` value.
@@ -81,7 +80,7 @@ impl EncodeToSlice for VarIntSize {
 }
 
 impl EncodeToWrite for VarIntSize {
-    fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, io::Error>
+    fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, StreamError>
     where
         W: io::Write,
     {
@@ -93,7 +92,7 @@ impl EncodeToWrite for VarIntSize {
 }
 
 impl DecodeFromReadPrefix for VarIntSize {
-    fn decode_from_read_prefix_with_first_byte<R>(first: u8, r: &mut R) -> Result<Self, io::Error>
+    fn decode_from_read_prefix_with_first_byte<R>(first: u8, r: &mut R) -> Result<Self, StreamError>
     where
         R: io::Read,
     {
@@ -114,7 +113,7 @@ impl DecodeFromReadPrefix for VarIntSize {
             }
             let b: u8 = read_single_byte(r)?;
             if b & Self::LAST_DECODING_BYTE_MASK != 0 {
-                Err(io::Error::new(InvalidData, InvalidEncodedData))
+                Err(InvalidEncodedData.into())
             } else {
                 result |= (b as usize) << (7 * (Self::MAX_ENCODED_LEN - 1));
                 Ok(result.into())
@@ -135,7 +134,9 @@ mod tests {
     use std::{io, usize};
 
     use crate::var_int::VarIntSize;
-    use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen, Error};
+    use crate::{
+        DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen, Error, StreamError,
+    };
 
     #[test]
     fn max_encoded_len() -> Result<(), Error> {
@@ -180,7 +181,7 @@ mod tests {
     fn decode() -> Result<(), io::Error> {
         for (expected, input) in TEST_CASES {
             let mut cursor: Cursor<Vec<u8>> = Cursor::new(input.to_vec());
-            let result: Result<VarIntSize, io::Error> =
+            let result: Result<VarIntSize, StreamError> =
                 VarIntSize::decode_from_read_prefix(&mut cursor);
             assert!(result.is_ok());
             assert_eq!(result.unwrap().value, *expected);
@@ -188,7 +189,7 @@ mod tests {
             let mut extra: Vec<u8> = input.to_vec();
             extra.push(0xFF);
             let mut cursor: Cursor<Vec<u8>> = Cursor::new(extra);
-            let result: Result<VarIntSize, io::Error> =
+            let result: Result<VarIntSize, StreamError> =
                 VarIntSize::decode_from_read_prefix(&mut cursor);
             assert!(result.is_ok());
             assert_eq!(result.unwrap().value, *expected);

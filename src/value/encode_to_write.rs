@@ -1,11 +1,12 @@
-use std::io;
+use crate::StreamError;
+use std::io::Write;
 
 /// A value that can encode itself to a `Write`.
 pub trait EncodeToWrite {
     /// Encodes the value to the `Write`.
     ///
     /// Returns the length of the encoded value.
-    fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, io::Error>
+    fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, StreamError>
     where
-        W: io::Write;
+        W: Write;
 }

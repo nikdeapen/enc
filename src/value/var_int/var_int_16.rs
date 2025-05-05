@@ -1,10 +1,9 @@
 use std::fmt::{Display, Formatter};
 use std::io;
-use std::io::ErrorKind::InvalidData;
 
 use crate::var_int::VarInt32;
 use crate::Error::InvalidEncodedData;
-use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen, Error};
+use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen, Error, StreamError};
 
 /// A variable-length encoded `u16` value.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
@@ -58,7 +57,7 @@ impl EncodeToSlice for VarInt16 {
 }
 
 impl EncodeToWrite for VarInt16 {
-    fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, io::Error>
+    fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, StreamError>
     where
         W: io::Write,
     {
@@ -67,13 +66,13 @@ impl EncodeToWrite for VarInt16 {
 }
 
 impl DecodeFromReadPrefix for VarInt16 {
-    fn decode_from_read_prefix_with_first_byte<R>(first: u8, r: &mut R) -> Result<Self, io::Error>
+    fn decode_from_read_prefix_with_first_byte<R>(first: u8, r: &mut R) -> Result<Self, StreamError>
     where
         R: io::Read,
     {
         let value: u32 = VarInt32::decode_from_read_prefix_with_first_byte(first, r)?.value;
         if value > (u16::MAX as u32) {
-            Err(io::Error::new(InvalidData, InvalidEncodedData))
+            Err(InvalidEncodedData.into())
         } else {
             Ok(Self::from(value as u16))
         }
@@ -92,7 +91,9 @@ mod tests {
     use std::io::Cursor;
 
     use crate::var_int::VarInt16;
-    use crate::{DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen, Error};
+    use crate::{
+        DecodeFromReadPrefix, EncodeToSlice, EncodeToWrite, EncodedLen, Error, StreamError,
+    };
 
     #[test]
     fn max_encoded_len() -> Result<(), Error> {
@@ -134,7 +135,7 @@ mod tests {
     fn decode() -> Result<(), io::Error> {
         for (expected, input) in TEST_CASES {
             let mut cursor: Cursor<Vec<u8>> = Cursor::new(input.to_vec());
-            let result: Result<VarInt16, io::Error> =
+            let result: Result<VarInt16, StreamError> =
                 VarInt16::decode_from_read_prefix(&mut cursor);
             assert!(result.is_ok());
             assert_eq!(result?.value, *expected);
@@ -142,7 +143,7 @@ mod tests {
             let mut extra: Vec<u8> = input.to_vec();
             extra.push(0xFF);
             let mut cursor: Cursor<Vec<u8>> = Cursor::new(extra);
-            let result: Result<VarInt16, io::Error> =
+            let result: Result<VarInt16, StreamError> =
                 VarInt16::decode_from_read_prefix(&mut cursor);
             assert!(result.is_ok());
             assert_eq!(result?.value, *expected);
