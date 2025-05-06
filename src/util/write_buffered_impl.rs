@@ -3,12 +3,12 @@
 #[macro_export]
 macro_rules! write_stack_buf_impl {
     ($target_type:ty, $max_len:expr) => {
-        impl crate::EncodeToWrite for $target_type {
-            fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, crate::StreamError>
+        impl $crate::EncodeToWrite for $target_type {
+            fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, $crate::StreamError>
             where
                 W: std::io::Write,
             {
-                use crate::EncodeToSlice;
+                use $crate::EncodeToSlice;
 
                 let mut buffer: [u8; $max_len] = [0u8; $max_len];
                 let encoded_len: usize = unsafe { self.encode_to_slice_unchecked(&mut buffer)? };
