@@ -21,3 +21,5 @@ var-int = ["value"]
 full-data = ["data", "base-64", "hex", "percent"]
 full-value = ["value", "var-int"]
 full = ["full-data", "full-value"]
+
+test = ["full"]
