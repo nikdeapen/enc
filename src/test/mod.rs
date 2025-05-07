@@ -4,6 +4,7 @@ pub use encode_to_slice::*;
 pub use encode_to_write::*;
 pub use encoded_len::*;
 pub use hex::*;
+pub use io::*;
 
 mod decode_from_read;
 mod decode_from_read_prefix;
@@ -11,3 +12,4 @@ mod encode_to_slice;
 mod encode_to_write;
 mod encoded_len;
 mod hex;
+mod io;
