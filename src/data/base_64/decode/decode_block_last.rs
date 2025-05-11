@@ -58,11 +58,11 @@ mod tests {
             ("///=", b"\xFF\xFF"),
             ("////", b"\xFF\xFF\xFF"),
         ];
+
         let decoding_table: DecodingTable = DecodingTable::default();
         let decoding_table: &[u8; 256] = decoding_table.decoding_table();
         for (data, expected) in test_cases {
             let mut target: [u8; 3] = [0, 0, 0];
-
             let result: usize = unsafe {
                 decode_block_last(
                     decoding_table,
@@ -71,7 +71,6 @@ mod tests {
                     &mut target[..expected.len()],
                 )
             };
-
             assert_eq!(result, expected.len(), "data={}", *data);
             assert_eq!(&target[..expected.len()], *expected, "data={}", *data);
         }

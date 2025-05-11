@@ -82,11 +82,13 @@ mod tests {
             ("///////=", b"\xFF\xFF\xFF\xFF\xFF"),
             ("////////", b"\xFF\xFF\xFF\xFF\xFF\xFF"),
         ];
+
         let decoder: Base64Decoder = Base64Decoder::default();
         for (data, expected) in test_cases {
             let result: Vec<u8> = decoder.decode_as_vec(data.as_bytes())?;
             assert_eq!(result, *expected, "data={}", *data);
         }
+
         Ok(())
     }
 }

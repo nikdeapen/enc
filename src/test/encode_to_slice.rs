@@ -24,7 +24,7 @@ where
             );
         }
         Err(error) => {
-            assert!(false, "value={:?} error={:?}", value, error);
+            panic!("value={:?} error={:?}", value, error);
         }
     }
 }

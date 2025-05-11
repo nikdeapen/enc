@@ -46,11 +46,11 @@ mod tests {
 
         match read_single_byte(&mut data) {
             Ok(b) => assert_eq!(b, 0xFF),
-            Err(error) => assert!(false, "{:#?}", error),
+            Err(error) => panic!("{:#?}", error),
         }
 
         match read_single_byte(&mut data) {
-            Ok(b) => assert!(false, "b={}", b),
+            Ok(b) => panic!("b={}", b),
             Err(error) => assert_eq!(error.kind(), ErrorKind::UnexpectedEof),
         }
     }
@@ -62,12 +62,11 @@ mod tests {
 
         match read_optional_byte(&mut data)? {
             Some(b) => assert_eq!(b, 0xFF),
-            None => assert!(false),
+            None => panic!(""),
         }
 
-        match read_optional_byte(&mut data)? {
-            Some(b) => assert!(false, "b={}", b),
-            None => {}
+        if let Some(b) = read_optional_byte(&mut data)? {
+            panic!("b={}", b)
         }
 
         Ok(())

@@ -12,16 +12,14 @@ pub trait EncodeToSlice: EncodedLen {
     /// - The impl must not write to the `target` slice outside the range: [0, encoded_len - 1].
     /// - The impl must overwrite the entire range [0, encoded_len - 1].
     ///
-    /// # Unsafe
+    /// # Safety
     /// This function is `unsafe` so implementations can assume the `target` slice has sufficient
     /// space for the encoded value. This allows implementations to avoid computing an encoded
     /// length when determining a buffer size and recomputing it when encoding the value.
     ///
     /// This comes with two requirements:
-    ///  1. The clients must ensure the `target` buffer has sufficient space as defined by the
-    ///         `EncodedLen::encoded_len` implementation.
-    ///  2. Implementations must ensure the length above matches the actual number of bytes
-    ///         written to the `target` buffer when encoding the value.
+    ///  1. The clients must ensure the `target` buffer has sufficient space as defined by the `EncodedLen::encoded_len` implementation.
+    ///  2. Implementations must ensure the length above matches the actual number of bytes written to the `target` buffer when encoding the value.
     unsafe fn encode_to_slice_unchecked(&self, target: &mut [u8]) -> Result<usize, Error>;
 
     /// Encodes the value to the `target` slice.

@@ -1,7 +1,7 @@
 /// Implements `EncodeToWrite` for a type that also implements `EncodeToSlice` where the encoding
 /// has a small maximum encoded length. The data is buffered on the stack before it is written out.
 #[macro_export]
-macro_rules! write_stack_buf_impl {
+macro_rules! impl_encode_to_write_stack_buf {
     ($target_type:ty, $max_len:expr) => {
         impl $crate::EncodeToWrite for $target_type {
             fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, $crate::StreamError>

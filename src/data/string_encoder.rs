@@ -21,7 +21,7 @@ pub trait StringEncoder: Encoder {
 ///
 /// Returns the length of the encoded `data`.
 ///
-/// # Unsafe
+/// # Safety
 /// This function does not ensure the encoded `data` is a valid UTF-8 byte sequence.
 #[allow(dead_code)]
 pub(crate) unsafe fn append_to_string_unchecked<E>(
@@ -32,5 +32,5 @@ pub(crate) unsafe fn append_to_string_unchecked<E>(
 where
     E: Encoder,
 {
-    Ok(encoder.append_to_vec(data, &mut (target.as_mut_vec()))?)
+    encoder.append_to_vec(data, target.as_mut_vec())
 }

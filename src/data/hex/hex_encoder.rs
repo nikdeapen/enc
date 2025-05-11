@@ -19,7 +19,7 @@ impl Ord for HexEncoder {
 
 impl PartialOrd for HexEncoder {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.hex[10].partial_cmp(&other.hex[10])
+        Some(self.cmp(other))
     }
 }
 
@@ -111,10 +111,10 @@ mod tests {
         ];
 
         for (data, expected) in test_cases {
-            let result: String = HexEncoder::LOWER.encode_as_string(*data)?;
+            let result: String = HexEncoder::LOWER.encode_as_string(data)?;
             assert_eq!(result, *expected);
 
-            let result: String = HexEncoder::UPPER.encode_as_string(*data)?;
+            let result: String = HexEncoder::UPPER.encode_as_string(data)?;
             assert_eq!(result, expected.to_ascii_uppercase());
         }
 

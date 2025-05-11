@@ -38,6 +38,7 @@ mod tests {
             (None, "AAAA", 3),
             (Some(b'='), "AAAA", 3),
         ];
+
         for (padding, data, expected) in test_cases {
             let result: usize = unsafe { decoded_length_last_block(data.as_bytes(), *padding) };
             assert_eq!(result, *expected, "pad={:?} data={}", *padding, *data);

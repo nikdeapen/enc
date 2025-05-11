@@ -36,6 +36,7 @@ mod tests {
             (None, "AAAAAAAAAAAA", 9),
             (Some(b'='), "AAAAAAAAAAAA", 9),
         ];
+
         for (padding, data, expected) in test_cases {
             let result: usize = decoded_len(data.as_bytes(), *padding);
             assert_eq!(result, *expected, "pad={:?} data={}", *padding, *data);

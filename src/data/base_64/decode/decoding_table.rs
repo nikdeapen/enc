@@ -124,7 +124,7 @@ impl DecodingTable {
     /// Gets the raw decoding table.
     pub fn decoding_table(&self) -> &[u8; 256] {
         match self {
-            Self::Static(table) => *table,
+            Self::Static(table) => table,
             Self::Reference(table) => table.as_ref(),
         }
     }

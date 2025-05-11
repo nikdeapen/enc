@@ -35,6 +35,7 @@ mod tests {
             ("zz", b"\xCF"),
             ("//", b"\xFF"),
         ];
+
         let decoding_table: DecodingTable = DecodingTable::default();
         let decoding_table: &[u8; 256] = decoding_table.decoding_table();
         for (data, expected) in test_cases {

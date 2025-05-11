@@ -3,7 +3,7 @@ use std::io;
 use std::io::ErrorKind;
 
 /// An error processing encoded data.
-#[derive(Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub enum Error {
     /// An integer overflowed.
     IntegerOverflow,
