@@ -210,6 +210,7 @@ mod tests {
             ("AAAAAA==", true),
             ("AAAAA~==", false),
         ];
+
         let validator: Base64Validator = Base64Validator::default();
         for (input, expected) in test_cases {
             let result: bool = validator.is_valid(input.as_bytes());

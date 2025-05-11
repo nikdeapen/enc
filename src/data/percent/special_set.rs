@@ -34,7 +34,7 @@ impl From<&str> for SpecialSet {
 impl SpecialSet {
     //! Constants
 
-    /// The set of valid chars. (in order of index and sorted ascending by ASCII code)
+    /// The set of valid chars. (in order of the bit index and sorted ascending by ASCII code)
     const CHARS: &'static [u8; 32] = b" !\"#$&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
     /// The index table.
@@ -170,6 +170,7 @@ mod tests {
     #[test]
     fn add_contains_remove_size() {
         let mut set: SpecialSet = SpecialSet::default();
+
         for (i, c) in SpecialSet::CHARS.iter().enumerate() {
             assert_eq!(i, set.size());
             assert!(!set.contains(*c));
@@ -177,6 +178,7 @@ mod tests {
             assert!(set.contains(*c));
             assert_eq!(i + 1, set.size());
         }
+
         for (i, c) in SpecialSet::CHARS.iter().enumerate() {
             assert_eq!(32 - i, set.size());
             assert!(set.contains(*c));
@@ -192,6 +194,7 @@ mod tests {
 
         set.add(b'\x00');
         assert_eq!(set.size(), 0);
+
         set.remove(b'\x00');
         assert_eq!(set.size(), 0);
     }
@@ -202,6 +205,7 @@ mod tests {
         for c in SpecialSet::CHARS.iter() {
             set.add(*c);
         }
+
         assert_eq!(set.to_string(), " !\"#$&'()*+,-./:;<=>?@[\\]^_`{|}~");
     }
 }

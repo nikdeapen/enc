@@ -11,7 +11,7 @@ where
             assert_eq!(encoded_len, expected, "value={:?}", value);
         }
         Err(error) => {
-            assert!(false, "value={:?} error={:?}", value, error);
+            panic!("value={:?} error={:?}", value, error);
         }
     }
 }

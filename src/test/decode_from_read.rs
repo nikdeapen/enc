@@ -21,8 +21,7 @@ where
             );
         }
         Err(error) => {
-            assert!(
-                false,
+            panic!(
                 "encoded={} expected={:?}, error={:?}",
                 hex(encoded),
                 expected,

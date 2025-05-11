@@ -32,9 +32,8 @@ impl Validator for PercentValidator {
         for (i, c) in data.iter().enumerate() {
             if !c.is_ascii_alphanumeric() && !c.is_ascii_digit() {
                 if *c == b'%' {
-                    if i + 2 >= data.len() {
-                        return false;
-                    } else if !self.hex_validator.is_valid_byte(data[i + 1])
+                    if i + 2 >= data.len()
+                        || !self.hex_validator.is_valid_byte(data[i + 1])
                         || !self.hex_validator.is_valid_byte(data[i + 2])
                     {
                         return false;
@@ -71,6 +70,7 @@ mod tests {
             (" ", false),
             ("你好", false),
         ];
+
         let validator: PercentValidator = "+-.".into();
         for (data, expected) in test_cases {
             let result: bool = validator.is_valid(data.as_bytes());

@@ -273,11 +273,13 @@ mod tests {
             (b"\x00\x00\x00\x00\x00\x00", "AAAAAAAA"),
             (b"\xFF\xFF\xFF\xFF\xFF\xFF", "........"),
         ];
+
         let encoder: Base64Encoder = Base64Encoder::default();
         for (data, expected) in test_cases {
-            let result: String = encoder.encode_as_string(*data)?;
-            assert_eq!(result, *expected, "data={:?}", *data);
+            let result: String = encoder.encode_as_string(data)?;
+            assert_eq!(result, *expected, "data={:?}", data);
         }
+
         Ok(())
     }
 }

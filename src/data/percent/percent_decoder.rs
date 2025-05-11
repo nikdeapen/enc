@@ -4,9 +4,11 @@ use crate::{Decoder, Error};
 
 /// Responsible for decoding data in the URL percent encoded format.
 ///
+/// This decoder is case-insensitive. All encoded `%XX %xx %xX %Xx` sequences will be decoded.
+///
 /// # Validation
 /// No validation is done on the encoded data. All properly encoded chars will be decoded and
-/// improperly encoded chars will pass through unchanged.
+/// improperly encoded chars will pass through the decoding unchanged.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Default)]
 pub struct PercentDecoder {
     _nothing: (),
@@ -80,12 +82,14 @@ mod tests {
             ("%x0", "%x0"),
             ("%%00", "%\x00"),
         ];
+
         let decoder: PercentDecoder = PercentDecoder::default();
         for (data, decoded) in test_cases {
             let result: Vec<u8> = decoder.decode_as_vec(data.as_bytes())?;
             let result: String = String::from_utf8(result).unwrap();
             assert_eq!(result, *decoded);
         }
+
         Ok(())
     }
 }

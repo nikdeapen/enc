@@ -34,14 +34,13 @@ mod tests {
             ("z", b"\xCC"),
             ("/", b"\xFC"),
         ];
+
         let decoding_table: DecodingTable = DecodingTable::default();
         let decoding_table: &[u8; 256] = decoding_table.decoding_table();
         for (data, expected) in test_cases {
             let mut target: [u8; 1] = [0u8; 1];
-
             let result: usize =
                 unsafe { decode_block_last_1(decoding_table, data.as_bytes(), &mut target) };
-
             assert_eq!(result, 1);
             assert_eq!(&target[..1], *expected, "data={}", *data);
         }

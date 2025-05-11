@@ -97,11 +97,13 @@ mod tests {
             ("!@`~", "%21%40%60%7E"),
             ("你好", "%E4%BD%A0%E5%A5%BD"),
         ];
+
         let encoder: PercentEncoder = "+-.".into();
         for (data, expected) in test_cases {
             let result: String = encoder.encode_as_string(data.as_bytes())?;
             assert_eq!(result, *expected);
         }
+
         Ok(())
     }
 }
