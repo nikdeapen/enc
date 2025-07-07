@@ -11,4 +11,12 @@ license = "MIT"
 
 [features]
 data = []
+
 value = []
+var-int = ["value"]
+
+full-data = ["data"]
+full-value = ["value", "var-int"]
+full = ["full-data", "full-value"]
+
+test = []
