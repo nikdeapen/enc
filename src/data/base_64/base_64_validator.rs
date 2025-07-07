@@ -1,6 +1,6 @@
-use crate::Validator;
-use crate::base_64::Base64Encoder;
 use crate::base_64::decode::decoding_table::DecodingTable;
+use crate::base_64::Base64Encoder;
+use crate::Validator;
 
 /// Responsible for validating base-64 encoded data.
 #[derive(Clone, Debug)]
@@ -174,8 +174,8 @@ impl Validator for Base64Validator {
 
 #[cfg(test)]
 mod tests {
-    use crate::Validator;
     use crate::base_64::base_64_validator::Base64Validator;
+    use crate::Validator;
 
     #[test]
     fn is_valid_default() {

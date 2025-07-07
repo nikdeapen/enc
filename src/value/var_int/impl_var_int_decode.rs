@@ -1,4 +1,4 @@
-use crate::var_int::impl_var_int::{VarInt16, VarInt32, VarInt64, VarInt128, VarIntSize};
+use crate::var_int::impl_var_int::{VarInt128, VarInt16, VarInt32, VarInt64, VarIntSize};
 
 macro_rules! impl_var_int_decode {
     ($target_type:ident, $unsigned_type:ty) => {

@@ -1,5 +1,5 @@
-use crate::Error::InsufficientTargetSpace;
 use crate::hex::{HexDecoder, HexValidator};
+use crate::Error::InsufficientTargetSpace;
 use crate::{Decoder, Error};
 
 /// Responsible for decoding data in the URL percent encoded format.
