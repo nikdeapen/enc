@@ -10,7 +10,7 @@ pub fn hex(data: &[u8]) -> String {
             s.push(':');
         }
         // todo -- HexEncoder
-        s.push_str(&format!("{:02x}", b));
+        s.push_str(&format!("{b:02x}"));
     }
 
     s
