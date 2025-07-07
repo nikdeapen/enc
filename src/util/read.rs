@@ -26,7 +26,10 @@ where
     match r.read(&mut buffer)? {
         0 => Ok(None),
         1 => Ok(Some(buffer[0])),
-        _ => Err(io::Error::other("invalid std::io::Read implementation")),
+        c => Err(io::Error::other(format!(
+            "invalid std::io::Read::read bytes read: {c} (buffer_len={})",
+            buffer.len()
+        ))),
     }
 }
 

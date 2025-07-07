@@ -40,6 +40,7 @@ mod tests {
             (Some(b'='), "AAAA", "AAAA"),
             (Some(b'='), "A=", "A="),
             (Some(b'='), "AA=", "AA"),
+            (Some(b'='), "AA=A", "AA"),
             (Some(b'='), "AAA=", "AAA"),
             (Some(b'='), "A==", "A="),
             (Some(b'='), "AA==", "AA"),

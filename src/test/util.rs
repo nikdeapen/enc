@@ -1,3 +1,5 @@
+use crate::hex::HexEncoder;
+
 /// Converts the `data` to a human-readable hex string.
 ///
 /// # Example
@@ -9,8 +11,9 @@ pub fn hex(data: &[u8]) -> String {
         if i != 0 && i != data.len() && i % 2 == 0 {
             s.push(':');
         }
-        // todo -- HexEncoder
-        s.push_str(&format!("{b:02x}"));
+        let (a, b) = HexEncoder::UPPER.encode_chars(*b);
+        s.push(a);
+        s.push(b);
     }
 
     s

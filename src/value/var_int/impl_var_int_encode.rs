@@ -1,5 +1,5 @@
+use crate::var_int::impl_var_int::{VarInt128, VarInt16, VarInt32, VarInt64, VarIntSize};
 use crate::Error;
-use crate::var_int::impl_var_int::{VarInt16, VarInt32, VarInt64, VarInt128, VarIntSize};
 
 macro_rules! impl_var_int_encode {
     ($target_type:ty, $unsigned_type:ty, $bit_size:expr) => {
@@ -31,7 +31,7 @@ macro_rules! impl_var_int_encode {
             }
         }
 
-        crate::impl_encode_to_write_with_stack_buffer!($target_type, Self::MAX_ENCODED_LEN);
+        crate::impl_encode_to_write_stack_buf!($target_type, Self::MAX_ENCODED_LEN);
     };
 }
 
@@ -44,7 +44,7 @@ impl_var_int_encode!(VarIntSize, usize, usize::BITS);
 #[cfg(test)]
 mod tests {
     use crate::test::{test_decode_from_read_prefix, test_encode};
-    use crate::var_int::{VarInt16, VarInt32, VarInt64, VarInt128, VarIntSize};
+    use crate::var_int::{VarInt128, VarInt16, VarInt32, VarInt64, VarIntSize};
 
     #[test]
     fn var_int_16() {

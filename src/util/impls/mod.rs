@@ -1,1 +1,1 @@
-mod impl_encode_to_write_with_stack_buffer;
+mod impl_encode_to_write_stack_buf;

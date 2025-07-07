@@ -9,13 +9,13 @@ use std::fmt::{Display, Formatter};
 /// - The `SPACE` char is included, although it is not defined as a punctuation char.
 ///
 /// # Chars
-/// The [32] valid chars that can be present in the set are:
-/// [1]:  SPACE
-/// [4]:  !"#$
-/// [10]: &'()*+,-./
-/// [7]:  :;<=>?@
-/// [6]:  [\]^_`
-/// [4]:  {|}~
+/// The 32 valid chars that can be present in the set are:
+/// 1:  SPACE
+/// 4:  !"#$
+/// 10: &'()*+,-./
+/// 7:  :;<=>?@
+/// 6:  [\]^_`
+/// 4:  {|}~
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Default)]
 pub struct SpecialSet {
     bits: u32,
