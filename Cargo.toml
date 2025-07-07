@@ -1,6 +1,6 @@
 [package]
 name = "enc"
-version = "0.11.0"
+version = "0.12.0"
 description = "This library aids in processing encoded data."
 readme = "README.md"
 repository = "https://github.com/nikdeapen/enc"
