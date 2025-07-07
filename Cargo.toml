@@ -1,0 +1,10 @@
+[package]
+name = "enc"
+version = "0.0.0"
+description = "This library aids in processing encoded data."
+readme = "README.md"
+repository = "https://github.com/nikdeapen/enc"
+homepage = "https://github.com/nikdeapen/enc"
+authors = ["Nik Deapen <nik@deapen.com>"]
+edition = "2021"
+license = "MIT"
