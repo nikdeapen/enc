@@ -1,6 +1,6 @@
-use crate::Validator;
 use crate::hex::HexValidator;
 use crate::percent::SpecialSet;
+use crate::Validator;
 
 /// Responsible for validating percent encoded data.
 #[derive(Copy, Clone, Debug, Default)]
@@ -49,8 +49,8 @@ impl Validator for PercentValidator {
 
 #[cfg(test)]
 mod tests {
-    use crate::Validator;
     use crate::percent::PercentValidator;
+    use crate::Validator;
 
     #[test]
     fn is_valid() {

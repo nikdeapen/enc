@@ -1,7 +1,7 @@
-use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
 use crate::data::append_to_string_unchecked;
 use crate::hex::HexEncoder;
 use crate::percent::SpecialSet;
+use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
 use crate::{Encoder, Error, StringEncoder};
 
 /// Responsible for encoding data in the URL percent encoded format.

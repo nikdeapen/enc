@@ -1,5 +1,5 @@
-use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
 use crate::data::append_to_string_unchecked;
+use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
 use crate::{Encoder, Error, StringEncoder};
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
