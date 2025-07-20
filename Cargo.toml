@@ -9,17 +9,41 @@ authors = ["Nik Deapen <nik@deapen.com>"]
 edition = "2021"
 license = "MIT"
 
+[package.metadata.docs.rs]
+all-features = true
+features = ["document-features"]
+
+[dependencies]
+document-features = { version = "0.2.11", optional = true }
+
 [features]
+
+## Enables the traits & utilities required for data oriented features.
 data = []
+
+## Enables the traits & utilities required for value oriented features.
+value = []
+
+## Enables the handling of base-64 encoded data.
 base-64 = ["data"]
+
+## Enables the handling of hexadecimal encoded data.
 hex = ["data"]
+
+## Enables the handling of URL percent encoded data.
 percent = ["data", "hex"]
 
-value = []
+## Enables the handling of variable-length encoded integers.
 var-int = ["value"]
 
+## Activates all data oriented features.
 full-data = ["data", "base-64", "hex", "percent"]
+
+## Activates all value oriented features.
 full-value = ["value", "var-int"]
+
+## Activates all data & value oriented features.
 full = ["full-data", "full-value"]
 
+## Provides utilities for testing data & value encodings.
 test = ["full"]
