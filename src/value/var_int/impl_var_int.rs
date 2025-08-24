@@ -67,3 +67,95 @@ impl_var_int!(VarInt32, u32, i32, u32::BITS);
 impl_var_int!(VarInt64, u64, i64, u64::BITS);
 impl_var_int!(VarInt128, u128, i128, u128::BITS);
 impl_var_int!(VarIntSize, usize, isize, usize::BITS);
+
+#[cfg(test)]
+mod tests {
+    use crate::var_int::{VarInt128, VarInt16, VarInt32, VarInt64, VarIntSize};
+    use crate::EncodedLen;
+    use std::error::Error;
+
+    #[test]
+    fn max_encoded_len() -> Result<(), Box<dyn Error>> {
+        assert_eq!(
+            VarInt16::MAX_ENCODED_LEN,
+            VarInt16::from(u16::MAX).encoded_len()?
+        );
+        assert_eq!(
+            VarInt32::MAX_ENCODED_LEN,
+            VarInt32::from(u32::MAX).encoded_len()?
+        );
+        assert_eq!(
+            VarInt64::MAX_ENCODED_LEN,
+            VarInt64::from(u64::MAX).encoded_len()?
+        );
+        assert_eq!(
+            VarInt128::MAX_ENCODED_LEN,
+            VarInt128::from(u128::MAX).encoded_len()?
+        );
+        assert_eq!(
+            VarIntSize::MAX_ENCODED_LEN,
+            VarIntSize::from(usize::MAX).encoded_len()?
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn from_zig_zag() {
+        let test_cases: &[(i32, u32)] = &[
+            (0, 0),
+            (-1, 1),
+            (1, 2),
+            (-2, 3),
+            (2, 4),
+            (-3, 5),
+            (3, 6),
+            (-4, 7),
+            (4, 8),
+            (-5, 9),
+            (5, 10),
+        ];
+
+        for (value, expected) in test_cases {
+            let result: u32 = VarInt32::from_zig_zag(*value).value;
+            assert_eq!(result, *expected);
+        }
+    }
+
+    #[test]
+    fn zig_zag() {
+        for i in -100i32..100i32 {
+            let result: i16 = VarInt16::from_zig_zag(i as i16).to_zig_zag();
+            assert_eq!(result, i as i16);
+
+            let result: i32 = VarInt32::from_zig_zag(i).to_zig_zag();
+            assert_eq!(result, i);
+
+            let result: i64 = VarInt64::from_zig_zag(i as i64).to_zig_zag();
+            assert_eq!(result, i as i64);
+
+            let result: i128 = VarInt128::from_zig_zag(i as i128).to_zig_zag();
+            assert_eq!(result, i as i128);
+
+            let result: isize = VarIntSize::from_zig_zag(i as isize).to_zig_zag();
+            assert_eq!(result, i as isize);
+        }
+    }
+
+    #[test]
+    fn zig_zag_max() {
+        let result: i16 = VarInt16::from_zig_zag(i16::MAX).to_zig_zag();
+        assert_eq!(result, i16::MAX);
+
+        let result: i32 = VarInt32::from_zig_zag(i32::MAX).to_zig_zag();
+        assert_eq!(result, i32::MAX);
+
+        let result: i64 = VarInt64::from_zig_zag(i64::MAX).to_zig_zag();
+        assert_eq!(result, i64::MAX);
+
+        let result: i128 = VarInt128::from_zig_zag(i128::MAX).to_zig_zag();
+        assert_eq!(result, i128::MAX);
+
+        let result: isize = VarIntSize::from_zig_zag(isize::MAX).to_zig_zag();
+        assert_eq!(result, isize::MAX);
+    }
+}
