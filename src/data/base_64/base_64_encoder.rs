@@ -1,5 +1,7 @@
+use crate::base_64::encode;
+use crate::base_64::encode::EncodingTable;
 use crate::data::append_to_string_unchecked;
-use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
+use crate::Error::InsufficientTargetSpace;
 use crate::{Encoder, Error, StringEncoder};
 
 /// Responsible for encoding data in the base-64 format.
@@ -8,10 +10,9 @@ use crate::{Encoder, Error, StringEncoder};
 /// This encoder is optimized for the URL-safe 63rd and 64th values (`-` and `_`). It will work for
 /// any valid custom encoding but with a performance cost of an extra scan & replace. This is done
 /// to allow a low memory footprint and to implement `Copy`.
-#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
+#[derive(Clone, Debug)]
 pub struct Base64Encoder {
-    v63: u8,
-    v64: u8,
+    table: EncodingTable,
     padding: Option<u8>,
 }
 
@@ -21,9 +22,12 @@ impl Base64Encoder {
     /// Creates a new base-64 encoder.
     ///
     /// Returns `None` if the encoding config is invalid.
-    pub const fn new(v63: u8, v64: u8, padding: Option<u8>) -> Option<Self> {
+    pub fn new(v63: u8, v64: u8, padding: Option<u8>) -> Option<Self> {
         if Self::is_valid_config(v63, v64, padding) {
-            Some(Self { v63, v64, padding })
+            Some(Self {
+                table: EncodingTable::get_encoding_table(v63, v64),
+                padding,
+            })
         } else {
             None
         }
@@ -33,8 +37,7 @@ impl Base64Encoder {
 impl Default for Base64Encoder {
     fn default() -> Self {
         Self {
-            v63: b'-',
-            v64: b'_',
+            table: EncodingTable::get_encoding_table(b'-', b'_'),
             padding: Some(b'='),
         }
     }
@@ -56,145 +59,9 @@ impl Base64Encoder {
     }
 }
 
-impl Base64Encoder {
-    //! Constants
-
-    /// The encoding table.
-    const ENCODING_TABLE: &'static [u8; 64] =
-        b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-}
-
-impl Base64Encoder {
-    //! Block Encoding
-
-    /// Encodes a single full block of data.
-    ///
-    /// This will encode 3 `data` bytes into 4 `target` bytes.
-    #[inline(always)]
-    fn encode_block(data: &[u8], target: &mut [u8]) {
-        debug_assert!(data.len() >= 3);
-        debug_assert!(target.len() >= 4);
-
-        let a: u32 = data[0] as u32;
-        let b: u32 = data[1] as u32;
-        let c: u32 = data[2] as u32;
-        let bits: u32 = (a << 16) | (b << 8) | c;
-
-        let ai: usize = (bits >> 18) as usize;
-        let bi: usize = ((bits >> 12) & 0x3F) as usize;
-        let ci: usize = ((bits >> 6) & 0x3F) as usize;
-        let di: usize = (bits & 0x3F) as usize;
-
-        target[0] = Self::ENCODING_TABLE[ai];
-        target[1] = Self::ENCODING_TABLE[bi];
-        target[2] = Self::ENCODING_TABLE[ci];
-        target[3] = Self::ENCODING_TABLE[di];
-    }
-
-    /// Encodes the last block with one byte of data.
-    ///
-    /// Returns the number of encoded bytes: (2 or 4).
-    #[inline(always)]
-    fn encode_last_1(&self, data: &[u8], target: &mut [u8]) -> usize {
-        debug_assert_eq!(data.len(), 1);
-        debug_assert!(target.len() >= 2);
-
-        let bits: u32 = data[0] as u32;
-
-        let ai: usize = (bits >> 2) as usize;
-        let bi: usize = ((bits << 4) & 0x3F) as usize;
-
-        target[0] = Self::ENCODING_TABLE[ai];
-        target[1] = Self::ENCODING_TABLE[bi];
-
-        if let Some(padding) = self.padding {
-            debug_assert_eq!(target.len(), 4);
-            target[2] = padding;
-            target[3] = padding;
-            4
-        } else {
-            debug_assert_eq!(target.len(), 2);
-            2
-        }
-    }
-
-    /// Encodes the last block with two bytes of data.
-    ///
-    /// Returns the number of encoded bytes: (3 or 4).
-    #[inline(always)]
-    fn encode_last_2(&self, data: &[u8], target: &mut [u8]) -> usize {
-        debug_assert_eq!(data.len(), 2);
-        debug_assert!(target.len() >= 3);
-
-        let a: u32 = data[0] as u32;
-        let b: u32 = data[1] as u32;
-        let bits: u32 = (a << 8) | b;
-
-        let ai: usize = (bits >> 10) as usize;
-        let bi: usize = ((bits >> 4) & 0x3F) as usize;
-        let ci: usize = ((bits << 2) & 0x3F) as usize;
-
-        target[0] = Self::ENCODING_TABLE[ai];
-        target[1] = Self::ENCODING_TABLE[bi];
-        target[2] = Self::ENCODING_TABLE[ci];
-
-        if let Some(padding) = self.padding {
-            debug_assert_eq!(target.len(), 4);
-            target[3] = padding;
-            4
-        } else {
-            debug_assert_eq!(target.len(), 3);
-            3
-        }
-    }
-}
-
-impl Base64Encoder {
-    //! Correction
-
-    /// Corrects the last two encoding bytes.
-    ///
-    /// This makes non-URL-safe configs slower but ¯\_(ツ)_/¯.
-    #[inline(always)]
-    fn correct_v63_and_v64(&self, target: &mut [u8]) {
-        if self.v63 != b'-' || self.v64 != b'.' {
-            target.iter_mut().for_each(|t| {
-                if *t == b'-' {
-                    *t = self.v63
-                } else if *t == b'.' {
-                    *t = self.v64
-                }
-            });
-        }
-    }
-}
-
 impl Encoder for Base64Encoder {
     fn encoded_len(&self, data: &[u8]) -> Result<usize, Error> {
-        let div: usize = data.len() / 3;
-        let rem: usize = data.len() % 3;
-        let extra: usize = match rem {
-            0 => 0,
-            1 => {
-                if self.padding.is_some() {
-                    4
-                } else {
-                    2
-                }
-            }
-            2 => {
-                if self.padding.is_some() {
-                    4
-                } else {
-                    3
-                }
-            }
-            _ => unreachable!(),
-        };
-        div.checked_mul(4)
-            .ok_or(IntegerOverflow)?
-            .checked_add(extra)
-            .ok_or(IntegerOverflow)
+        encode::encoded_len(data.len(), self.padding.is_some())
     }
 
     fn encode_to_slice(&self, data: &[u8], target: &mut [u8]) -> Result<usize, Error> {
@@ -202,27 +69,28 @@ impl Encoder for Base64Encoder {
         if encoded_len > target.len() {
             Err(InsufficientTargetSpace)
         } else {
+            let table: &[u8; 64] = self.table.encoding_table();
+
             let target: &mut [u8] = &mut target[..encoded_len];
             let div: usize = data.len() / 3;
             let rem: usize = data.len() % 3;
             let mut d: usize = 0;
             let mut t: usize = 0;
             for _ in 0..div {
-                Self::encode_block(&data[d..], &mut target[t..]);
+                encode::encode_block(table, &data[d..], &mut target[t..]);
                 d += 3;
                 t += 4;
             }
             match rem {
                 0 => {}
                 1 => {
-                    t += self.encode_last_1(&data[d..], &mut target[t..]);
+                    t += encode::encode_last_1(table, self.padding, &data[d..], &mut target[t..]);
                 }
                 2 => {
-                    t += self.encode_last_2(&data[d..], &mut target[t..]);
+                    t += encode::encode_last_2(table, self.padding, &data[d..], &mut target[t..]);
                 }
                 _ => unreachable!(),
             }
-            self.correct_v63_and_v64(&mut target[..encoded_len]);
             debug_assert_eq!(encoded_len, t);
             Ok(encoded_len)
         }
