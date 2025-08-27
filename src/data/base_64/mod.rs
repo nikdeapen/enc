@@ -7,3 +7,4 @@ mod base_64_encoder;
 mod base_64_validator;
 
 pub(in crate::data::base_64) mod decode;
+pub(in crate::data::base_64) mod encode;

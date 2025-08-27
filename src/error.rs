@@ -20,9 +20,9 @@ pub enum Error {
 impl From<Error> for io::Error {
     fn from(error: Error) -> Self {
         match error {
-            Error::IntegerOverflow => io::Error::new(ErrorKind::OutOfMemory, error),
-            Error::InsufficientTargetSpace => io::Error::new(ErrorKind::InvalidInput, error),
-            Error::InvalidEncodedData { .. } => io::Error::new(ErrorKind::InvalidData, error),
+            Error::IntegerOverflow => Self::new(ErrorKind::OutOfMemory, error),
+            Error::InsufficientTargetSpace => Self::new(ErrorKind::InvalidInput, error),
+            Error::InvalidEncodedData { .. } => Self::new(ErrorKind::InvalidData, error),
         }
     }
 }
@@ -36,8 +36,6 @@ impl Display for Error {
                 write!(f, "invalid encoded data")?;
                 if let Some(reason) = reason {
                     write!(f, ": {reason}")?;
-                } else {
-                    write!(f, "")?;
                 }
                 return Ok(());
             }
