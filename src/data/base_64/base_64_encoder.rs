@@ -37,7 +37,7 @@ impl Base64Encoder {
 impl Default for Base64Encoder {
     fn default() -> Self {
         Self {
-            table: EncodingTable::get_encoding_table(b'-', b'_'),
+            table: EncodingTable::get_encoding_table(Self::DEFAULT_V63, Self::DEFAULT_V64),
             padding: Some(b'='),
         }
     }
@@ -69,6 +69,7 @@ impl Encoder for Base64Encoder {
         if encoded_len > target.len() {
             Err(InsufficientTargetSpace)
         } else {
+            let target: &mut [u8] = &mut target[..encoded_len];
             let table: &[u8; 64] = self.table.encoding_table();
 
             let target: &mut [u8] = &mut target[..encoded_len];
@@ -84,10 +85,20 @@ impl Encoder for Base64Encoder {
             match rem {
                 0 => {}
                 1 => {
-                    t += encode::encode_last_1(table, self.padding, &data[d..], &mut target[t..]);
+                    t += encode::encode_last_block_1(
+                        table,
+                        self.padding,
+                        &data[d..],
+                        &mut target[t..],
+                    );
                 }
                 2 => {
-                    t += encode::encode_last_2(table, self.padding, &data[d..], &mut target[t..]);
+                    t += encode::encode_last_block_2(
+                        table,
+                        self.padding,
+                        &data[d..],
+                        &mut target[t..],
+                    );
                 }
                 _ => unreachable!(),
             }
@@ -142,7 +153,7 @@ mod tests {
             (b"\xFF\xFF\xFF\xFF\xFF\xFF", "________"),
         ];
 
-        let encoder: Base64Encoder = Base64Encoder::default();
+        let encoder: Base64Encoder = Base64Encoder::new(b'-', b'_', Some(b'=')).unwrap();
         for (data, expected) in test_cases {
             let result: String = encoder.encode_as_string(data)?;
             assert_eq!(result, *expected, "data={data:?}");

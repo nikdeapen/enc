@@ -1,6 +1,6 @@
-/// Removes the padding from the `last_block`.
+/// Removes the `padding` from the `last_block`.
 ///
-/// Returns the `last_block` without the padding.
+/// Returns the `last_block` without the `padding`.
 pub unsafe fn remove_padding_last_block(last_block: &[u8], padding: Option<u8>) -> &[u8] {
     debug_assert!(last_block.len() <= 4);
 
