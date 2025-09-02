@@ -2,13 +2,13 @@ use crate::Error;
 use std::fmt::{Debug, Display, Formatter};
 use std::{fmt, io};
 
-/// Either a source error or an encoding error.
+/// Either a data source error or a data encoding error.
 #[derive(Debug)]
 pub enum StreamError {
-    /// A source error.
+    /// A data source error.
     Source(io::Error),
 
-    /// An encoding error.
+    /// An data encoding error.
     Encoding(Error),
 }
 

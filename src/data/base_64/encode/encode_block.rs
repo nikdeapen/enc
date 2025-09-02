@@ -1,13 +1,14 @@
-/// Encodes a single full block of data.
+/// Encodes the full `block` of data.
 ///
-/// This will encode 3 `data` bytes into 4 `target` bytes.
-pub fn encode_block(table: &[u8; 64], data: &[u8], target: &mut [u8]) {
-    debug_assert!(data.len() >= 3);
+/// This will encode 3 `block` bytes into 4 `target` bytes.
+pub fn encode_block(table: &[u8; 64], block: &[u8], target: &mut [u8]) {
+    debug_assert!(block.len() >= 3);
     debug_assert!(target.len() >= 4);
 
-    let a: u32 = data[0] as u32;
-    let b: u32 = data[1] as u32;
-    let c: u32 = data[2] as u32;
+    let a: u32 = block[0] as u32;
+    let b: u32 = block[1] as u32;
+    let c: u32 = block[2] as u32;
+
     let bits: u32 = (a << 16) | (b << 8) | c;
 
     let ai: usize = (bits >> 18) as usize;

@@ -1,3 +1,4 @@
+use crate::base_64::Base64Decoder;
 use std::sync::Arc;
 
 /// A base-64 decoding table.
@@ -19,10 +20,16 @@ impl DecodingTable {
     //! Special Tables
 
     /// The standard decoding table.
-    const STANDARD: Self = Self::Static(&Self::create_custom_decoding_table(b'+', b'/'));
+    const STANDARD: Self = Self::Static(&Self::create_custom_decoding_table(
+        Base64Decoder::DEFAULT_V63,
+        Base64Decoder::DEFAULT_V64,
+    ));
 
     /// The URL-safe decoding table.
-    const URL_SAFE: Self = Self::Static(&Self::create_custom_decoding_table(b'-', b'_'));
+    const URL_SAFE: Self = Self::Static(&Self::create_custom_decoding_table(
+        Base64Decoder::URL_SAFE_V63,
+        Base64Decoder::URL_SAFE_V64,
+    ));
 }
 
 impl DecodingTable {
@@ -31,8 +38,8 @@ impl DecodingTable {
     /// Creates a custom decoding table. Returns the static table if available.
     pub fn get_decoding_table(v63: u8, v64: u8) -> Self {
         match (v63, v64) {
-            (b'+', b'/') => Self::STANDARD,
-            (b'-', b'_') => Self::URL_SAFE,
+            (Base64Decoder::DEFAULT_V63, Base64Decoder::DEFAULT_V64) => Self::STANDARD,
+            (Base64Decoder::URL_SAFE_V63, Base64Decoder::URL_SAFE_V64) => Self::URL_SAFE,
             (v63, v64) => Self::Reference(Arc::new(Self::create_custom_decoding_table(v63, v64))),
         }
     }

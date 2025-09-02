@@ -29,18 +29,17 @@ impl From<Error> for io::Error {
 
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let message: &str = match self {
-            Self::IntegerOverflow => "integer overflow",
-            Self::InsufficientTargetSpace => "insufficient target space",
+        match self {
+            Self::IntegerOverflow => write!(f, "integer overflow"),
+            Self::InsufficientTargetSpace => write!(f, "insufficient target space"),
             Self::InvalidEncodedData { reason } => {
                 write!(f, "invalid encoded data")?;
                 if let Some(reason) = reason {
                     write!(f, ": {reason}")?;
                 }
-                return Ok(());
+                Ok(())
             }
-        };
-        write!(f, "{message}")
+        }
     }
 }
 

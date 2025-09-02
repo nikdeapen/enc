@@ -1,18 +1,18 @@
-/// Encodes the last block with two bytes of data.
+/// Encodes the last `block` with two bytes of data.
 ///
 /// Returns the number of encoded bytes: (3 or 4).
 #[inline(always)]
-pub fn encode_last_2(
+pub fn encode_last_block_2(
     table: &[u8; 64],
     padding: Option<u8>,
-    data: &[u8],
+    block: &[u8],
     target: &mut [u8],
 ) -> usize {
-    debug_assert_eq!(data.len(), 2);
+    debug_assert_eq!(block.len(), 2);
     debug_assert!(target.len() >= 3);
 
-    let a: u32 = data[0] as u32;
-    let b: u32 = data[1] as u32;
+    let a: u32 = block[0] as u32;
+    let b: u32 = block[1] as u32;
     let bits: u32 = (a << 8) | b;
 
     let ai: usize = (bits >> 10) as usize;
