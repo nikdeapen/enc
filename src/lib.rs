@@ -1,3 +1,4 @@
+#![allow(clippy::module_inception)]
 #![cfg_attr(
     feature = "document-features",
     cfg_attr(doc, doc = ::document_features::document_features!())
