@@ -25,7 +25,7 @@ pub trait Encoder {
         match self.encode_to_slice(data, slice) {
             Ok(also_encoded_len) => {
                 debug_assert_eq!(encoded_len, also_encoded_len);
-                Ok(also_encoded_len)
+                Ok(encoded_len)
             }
             Err(error) => {
                 target.truncate(original_len);

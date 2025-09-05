@@ -25,7 +25,7 @@ pub trait Decoder {
         match self.decode_to_slice(data, slice) {
             Ok(also_decoded_len) => {
                 debug_assert_eq!(decoded_len, also_decoded_len);
-                Ok(also_decoded_len)
+                Ok(decoded_len)
             }
             Err(error) => {
                 target.truncate(original_len);
