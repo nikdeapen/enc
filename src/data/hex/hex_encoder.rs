@@ -100,6 +100,14 @@ mod tests {
     use crate::{Error, StringEncoder};
 
     #[test]
+    fn compare() {
+        assert_eq!(HexEncoder::LOWER, HexEncoder::LOWER);
+        assert_eq!(HexEncoder::UPPER, HexEncoder::UPPER);
+        assert_ne!(HexEncoder::LOWER, HexEncoder::UPPER);
+        assert!(HexEncoder::UPPER < HexEncoder::LOWER);
+    }
+
+    #[test]
     fn encode() -> Result<(), Error> {
         let test_cases: &[(&[u8], &str)] = &[
             (b"", ""),

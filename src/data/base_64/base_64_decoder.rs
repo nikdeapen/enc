@@ -10,12 +10,19 @@ use crate::{Decoder, Error};
 ///
 /// # Validation
 /// This decoder implementation does nothing to validate the encoded data. If invalid input data is
-/// given the output bytes are undefined. The encoded length calculation will still be accurate,
-/// and it will not cause a panic.
+/// given the output bytes are undefined. The decoded length calculation will still be accurate and
+/// decoding data will not cause a panic.
 #[derive(Clone, Debug)]
 pub struct Base64Decoder {
     table: DecodingTable,
     padding: Option<u8>,
+}
+
+impl Base64Decoder {
+    //! Constants
+
+    /// The block size for base-64 decoding.
+    const BLOCK_SIZE: usize = 4;
 }
 
 impl Base64Decoder {
@@ -50,9 +57,9 @@ impl Decoder for Base64Decoder {
             let (full_blocks, last_block) = split_last_block(data);
             let mut d: usize = 0;
             let mut t: usize = 0;
-            for _ in 0..(full_blocks.len() >> 2) {
+            for _ in 0..(full_blocks.len() / Self::BLOCK_SIZE) {
                 t += unsafe { decode_block(table, &full_blocks[d..], &mut target[t..]) };
-                d += 4;
+                d += Self::BLOCK_SIZE;
             }
             t += unsafe { decode_block_last(table, self.padding, last_block, &mut target[t..]) };
             debug_assert_eq!(decoded_len, t);

@@ -1,8 +1,9 @@
-#![allow(clippy::module_inception)]
 #![cfg_attr(
     feature = "document-features",
     cfg_attr(doc, doc = ::document_features::document_features!())
 )]
+
+const _: () = assert!(usize::BITS == 32 || usize::BITS == 64);
 
 pub use error::*;
 pub use util::*;
