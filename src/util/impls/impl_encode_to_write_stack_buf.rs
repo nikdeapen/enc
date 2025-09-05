@@ -7,7 +7,7 @@
 macro_rules! impl_encode_to_write_stack_buf {
     ($target_type:ty, $max_encoded_len:expr) => {
         impl $crate::EncodeToWrite for $target_type {
-            fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, $crate::StreamError>
+            fn encode_to_write<W>(&self, w: &mut W) -> Result<usize, $crate::Error>
             where
                 W: std::io::Write,
             {

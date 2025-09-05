@@ -9,7 +9,7 @@ use crate::{Decoder, Error};
 /// # Validation
 /// This decoder implementation does nothing to validate the encoded data beyond requiring an even
 /// number of encoded bytes. If invalid input data is given the output bytes are undefined. The
-/// encoded length calculation will still be accurate and decoding data will not cause a panic.
+/// decoded length calculation will still be accurate and decoding data will not cause a panic.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Default)]
 pub struct HexDecoder {
     _nothing: (),
@@ -35,20 +35,21 @@ impl HexDecoder {
 impl HexDecoder {
     //! Decoding
 
-    /// Decodes the two hex bytes as a byte.
+    /// Decodes the `high` and `low` hex bytes as a byte.
     ///
     /// If either input byte is invalid, the output byte is undefined.
     #[inline(always)]
-    pub const fn decode_bytes(a: u8, b: u8) -> u8 {
-        (Self::DECODING_TABLE[(a & 0x7F) as usize] << 4) | Self::DECODING_TABLE[(b & 0x7F) as usize]
+    pub const fn decode_bytes(high: u8, low: u8) -> u8 {
+        (Self::DECODING_TABLE[(high & 0x7F) as usize] << 4)
+            | Self::DECODING_TABLE[(low & 0x7F) as usize]
     }
 
-    /// Decodes the two hex chars as a byte.
+    /// Decodes the `high` and `low` hex chars as a byte.
     ///
     /// If either input char is invalid, the output byte is undefined.
     #[inline(always)]
-    pub const fn decode_chars(a: char, b: char) -> u8 {
-        Self::decode_bytes(((a as u32) & 0xFF) as u8, ((b as u32) & 0xFF) as u8)
+    pub const fn decode_chars(high: char, low: char) -> u8 {
+        Self::decode_bytes(((high as u32) & 0xFF) as u8, ((low as u32) & 0xFF) as u8)
     }
 }
 

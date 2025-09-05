@@ -6,7 +6,7 @@ macro_rules! impl_var_int_decode {
             fn decode_from_read_prefix_with_first_byte<R>(
                 r: &mut R,
                 first: u8,
-            ) -> Result<Self, $crate::StreamError>
+            ) -> Result<Self, $crate::Error>
             where
                 R: std::io::Read,
             {
