@@ -5,11 +5,6 @@ use crate::Error::InsufficientTargetSpace;
 use crate::{Encoder, Error, StringEncoder};
 
 /// Responsible for encoding data in the base-64 format.
-///
-/// # Note
-/// This encoder is optimized for the URL-safe 63rd and 64th values (`-` and `_`). It will work for
-/// any valid custom encoding but with a performance cost of an extra scan & replace. This is done
-/// to allow a low memory footprint and to implement `Copy`.
 #[derive(Clone, Debug)]
 pub struct Base64Encoder {
     table: EncodingTable,
@@ -38,7 +33,7 @@ impl Default for Base64Encoder {
     fn default() -> Self {
         Self {
             table: EncodingTable::get_encoding_table(Self::DEFAULT_V63, Self::DEFAULT_V64),
-            padding: Some(b'='),
+            padding: Self::DEFAULT_PADDING,
         }
     }
 }

@@ -6,6 +6,7 @@ mod base_64_decoder;
 mod base_64_encoder;
 mod base_64_validator;
 
-mod constants;
 pub(in crate::data::base_64) mod decode;
 pub(in crate::data::base_64) mod encode;
+
+mod constants;

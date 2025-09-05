@@ -32,7 +32,7 @@ impl Base64Decoder {
 
 impl Default for Base64Decoder {
     fn default() -> Self {
-        Self::new(b'+', b'/', Some(b'='))
+        Self::new(Self::DEFAULT_V63, Self::DEFAULT_V64, Self::DEFAULT_PADDING)
     }
 }
 

@@ -1,21 +1,22 @@
+#![allow(clippy::module_inception)]
 #![cfg_attr(
     feature = "document-features",
     cfg_attr(doc, doc = ::document_features::document_features!())
 )]
 
+pub use error::*;
+pub use util::*;
+
+mod error;
+mod util;
+
 #[cfg(feature = "data")]
 pub use data::*;
-pub use error::*;
-pub use stream_error::*;
-pub use util::*;
 #[cfg(feature = "value")]
 pub use value::*;
 
 #[cfg(feature = "data")]
 mod data;
-mod error;
-mod stream_error;
-mod util;
 #[cfg(feature = "value")]
 mod value;
 
