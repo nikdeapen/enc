@@ -24,7 +24,7 @@ impl From<Error> for io::Error {
     fn from(error: Error) -> Self {
         match error {
             Error::Source(error) => error,
-            Error::IntegerOverflow => Self::new(ErrorKind::OutOfMemory, error),
+            Error::IntegerOverflow => Self::new(ErrorKind::InvalidInput, error),
             Error::InsufficientTargetSpace => Self::new(ErrorKind::InvalidInput, error),
             Error::InvalidEncodedData { .. } => Self::new(ErrorKind::InvalidData, error),
         }
