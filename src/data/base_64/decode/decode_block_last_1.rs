@@ -1,6 +1,6 @@
 /// Decodes the `last_block` of 1 byte into the `target`.
 ///
-/// Decoding 1 byte produces 6 bits which is expanded to 1 byte.
+/// Decoding 1 byte produces 6 bits, which is expanded to 1 byte.
 /// The last 2 bits of output are set to 0.
 /// Returns the number of decoded bytes. (1)
 pub unsafe fn decode_block_last_1(
