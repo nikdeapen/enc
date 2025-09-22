@@ -1,6 +1,6 @@
 /// Decodes the `last_block` of 2 bytes into the `target`.
 ///
-/// Decoding 2 bytes produces 12 bits which is compressed to 1 byte.
+/// Decoding 2 bytes produces 12 bits, which is compressed to 1 byte.
 /// The last 4 bits of output are invalid and are discarded.
 /// Returns the number of decoded bytes. (1)
 pub unsafe fn decode_block_last_2(

@@ -52,8 +52,8 @@ mod tests {
             (0x00, b"\x00"),       // 0 bits
             (0x01, b"\x01"),       // 1 bit
             (0x7F, b"\x7F"),       // highest one byte value
-            (0x80, b"\x80\x01"),   // lowest two byte value
-            (0x3FFF, b"\xFF\x7F"), // highest two byte value
+            (0x80, b"\x80\x01"),   // lowest two-byte value
+            (0x3FFF, b"\xFF\x7F"), // highest two-byte value
             (u16::MAX, b"\xFF\xFF\x03"),
         ];
 
@@ -70,8 +70,8 @@ mod tests {
             (0x00, b"\x00"),       // 0 bits
             (0x01, b"\x01"),       // 1 bit
             (0x7F, b"\x7F"),       // highest one byte value
-            (0x80, b"\x80\x01"),   // lowest two byte value
-            (0x3FFF, b"\xFF\x7F"), // highest two byte value
+            (0x80, b"\x80\x01"),   // lowest two-byte value
+            (0x3FFF, b"\xFF\x7F"), // highest two-byte value
             (u32::MAX, b"\xFF\xFF\xFF\xFF\x0F"),
         ];
 
@@ -88,8 +88,8 @@ mod tests {
             (0x00, b"\x00"),       // 0 bits
             (0x01, b"\x01"),       // 1 bit
             (0x7F, b"\x7F"),       // highest one byte value
-            (0x80, b"\x80\x01"),   // lowest two byte value
-            (0x3FFF, b"\xFF\x7F"), // highest two byte value
+            (0x80, b"\x80\x01"),   // lowest two-byte value
+            (0x3FFF, b"\xFF\x7F"), // highest two-byte value
             (u64::MAX, b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01"),
         ];
 
@@ -106,8 +106,8 @@ mod tests {
             (0x00, b"\x00"),       // 0 bits
             (0x01, b"\x01"),       // 1 bit
             (0x7F, b"\x7F"),       // highest one byte value
-            (0x80, b"\x80\x01"),   // lowest two byte value
-            (0x3FFF, b"\xFF\x7F"), // highest two byte value
+            (0x80, b"\x80\x01"),   // lowest two-byte value
+            (0x3FFF, b"\xFF\x7F"), // highest two-byte value
             (
                 u128::MAX,
                 b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x03",
@@ -127,8 +127,8 @@ mod tests {
             (0x00, b"\x00"),       // 0 bits
             (0x01, b"\x01"),       // 1 bit
             (0x7F, b"\x7F"),       // highest one byte value
-            (0x80, b"\x80\x01"),   // lowest two byte value
-            (0x3FFF, b"\xFF\x7F"), // highest two byte value
+            (0x80, b"\x80\x01"),   // lowest two-byte value
+            (0x3FFF, b"\xFF\x7F"), // highest two-byte value
             #[cfg(target_pointer_width = "32")]
             (usize::MAX, b"\xFF\xFF\xFF\xFF\x0F"),
             #[cfg(target_pointer_width = "64")]

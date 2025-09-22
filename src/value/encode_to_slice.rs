@@ -10,7 +10,7 @@ pub trait EncodeToSlice: EncodedLen {
     /// # Note
     /// - The impl must not read from the `target` slice.
     /// - The impl must not write to the `target` slice outside the range: [0, encoded_len - 1].
-    /// - The impl must overwrite the entire range [0, encoded_len - 1].
+    /// - The impl must overwrite the entire range: [0, encoded_len - 1].
     ///
     /// # Safety
     /// This function is `unsafe` so implementations can assume the `target` slice has sufficient
