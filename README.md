@@ -4,7 +4,7 @@ This library aids in processing encoded data.
 
 ## Features & Dependencies
 
-    enc = { version = "0.14.0", features = ["full"] }
+    enc = { version = "0.15.0", features = ["full"] }
 
 ### Primary Features
 
