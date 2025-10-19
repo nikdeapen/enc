@@ -20,6 +20,18 @@ macro_rules! impl_var_int {
             }
         }
 
+        impl From<$signed_type> for $target_type {
+            fn from(value: $signed_type) -> Self {
+                Self::from_zig_zag(value)
+            }
+        }
+
+        impl From<&$signed_type> for $target_type {
+            fn from(value: &$signed_type) -> Self {
+                Self::from(*value)
+            }
+        }
+
         impl $target_type {
             //! Constants
 
