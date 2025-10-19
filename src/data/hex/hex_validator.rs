@@ -56,7 +56,7 @@ impl HexValidator {
 
 impl Validator for HexValidator {
     fn is_valid(&self, data: &[u8]) -> bool {
-        data.len() % 2 == 0
+        data.len().is_multiple_of(2)
             && match (self.allow_lowercase, self.allow_uppercase) {
                 (true, true) => data.iter().all(|c| c.is_ascii_hexdigit()),
                 (true, false) => data

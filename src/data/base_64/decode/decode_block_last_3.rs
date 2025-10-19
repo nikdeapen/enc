@@ -1,6 +1,6 @@
 /// Decodes the `last_block` of 3 bytes into the `target`.
 ///
-/// Decoding 3 bytes produces 18 bits which is compressed to 2 bytes.
+/// Decoding 3 bytes produces 18 bits, which is compressed to 2 bytes.
 /// The last 2 bits of output are invalid and are discarded.
 /// Returns the number of decoded bytes. (2)
 pub unsafe fn decode_block_last_3(

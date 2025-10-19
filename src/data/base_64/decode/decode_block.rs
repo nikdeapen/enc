@@ -1,6 +1,6 @@
 /// Decodes a full `block` of 4 bytes without padding into the `target`.
 ///
-/// Decoding 4 bytes produces 24 bits which is exactly 3 bytes.
+/// Decoding 4 bytes produces 24 bits, which is exactly 3 bytes.
 /// Returns the number of decoded bytes. (3)
 pub unsafe fn decode_block(table: &[u8; 256], block: &[u8], target: &mut [u8]) -> usize {
     debug_assert!(block.len() >= 4);

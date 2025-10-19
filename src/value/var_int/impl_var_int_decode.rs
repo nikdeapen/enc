@@ -26,7 +26,7 @@ macro_rules! impl_var_int_decode {
                         }
                     }
                     let b: u8 = $crate::read_single_byte(r)?;
-                    if b & Self::LAST_DECODING_BYTE_MASK != 0 {
+                    if b & Self::LAST_BYTE_MASK != 0 {
                         Err($crate::Error::InvalidEncodedData { reason: None }.into())
                     } else {
                         result |= (b as $unsigned_type) << (7 * (Self::MAX_ENCODED_LEN - 1));

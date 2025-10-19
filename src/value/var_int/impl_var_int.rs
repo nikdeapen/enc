@@ -27,8 +27,7 @@ macro_rules! impl_var_int {
             pub const MAX_ENCODED_LEN: usize = $bit_len.div_ceil(7) as usize;
 
             /// The last decoded byte mask. (used to detect integer overflow while decoding)
-            pub(in crate::value::var_int) const LAST_DECODING_BYTE_MASK: u8 =
-                0xFF << ($bit_len % 7);
+            pub(in crate::value::var_int) const LAST_BYTE_MASK: u8 = 0xFF << ($bit_len % 7);
         }
 
         impl $target_type {
