@@ -7,3 +7,6 @@ mod decoder;
 mod encoder;
 mod string_encoder;
 mod validator;
+
+#[cfg(feature = "hex")]
+pub mod hex;
