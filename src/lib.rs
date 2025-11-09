@@ -11,3 +11,6 @@ mod error;
 mod util;
 #[cfg(feature = "value")]
 mod value;
+
+#[cfg(feature = "test")]
+pub mod test;
