@@ -33,6 +33,6 @@ where
     E: Encoder,
 {
     let encoded_len: usize = encoder.append_to_vec(data, unsafe { target.as_mut_vec() })?;
-    debug_assert!(std::str::from_utf8(&target[..(target.len() - encoded_len)].as_bytes()).is_ok());
+    debug_assert!(std::str::from_utf8(&target.as_bytes()[..(target.len() - encoded_len)]).is_ok());
     Ok(encoded_len)
 }
