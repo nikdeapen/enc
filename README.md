@@ -4,7 +4,7 @@ This library aids in processing encoded data.
 
 ## Features & Dependencies
 
-    enc = { version = "0.16.0", features = ["full"] }
+    enc = { version = "0.17.0-rc.1", features = ["full"] }
 
 ### Primary Features
 
@@ -14,13 +14,13 @@ This library aids in processing encoded data.
     percent
     var-int
 
-For more features see the [Feature Flag Docs](https://docs.rs/crate/enc/latest/features).
+For more features see the [Crate Docs](https://docs.rs/enc/latest/enc/).
 
 ### Dependencies
 
 This crate has no dependencies.
 
-# Data & Value Encoding
+## Data & Value Encoding
 
 There are separate traits for handling encoded data and encoded values.
 

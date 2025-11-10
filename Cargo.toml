@@ -1,6 +1,6 @@
 [package]
 name = "enc"
-version = "0.16.0"
+version = "0.17.0-rc.1"
 description = "This library aids in processing encoded data."
 readme = "README.md"
 repository = "https://github.com/nikdeapen/enc"
@@ -17,40 +17,40 @@ rustdoc-args = ["--cfg", "docsrs"]
 document-features = { version = "0.2.11", optional = true }
 
 [features]
-#! ## Data Encoding Features
+#! ## Data Encoding
 
-## Provides data encoding traits & utilities.
+## Provides traits & utilities for encoding data.
 data = []
 
-## Provides base-64 encoding.
+## Provides support for base-64 encoded data.
 base-64 = ["data"]
 
-## Provides hexadecimal encoding.
+## Provides support for hexadecimal encoded data.
 hex = ["data"]
 
-## Provides URL percent encoding.
+## Provides support for URL percent encoded data.
 percent = ["data", "hex"]
+
+#! ## Value Encoding
+
+## Provides traits & utilities for encoding values.
+value = []
+
+## Provides support for variable-length encoded integers.
+var-int = ["value"]
+
+#! ## Full
 
 ## Includes all the data encoding features.
 full-data = ["data", "base-64", "hex", "percent"]
 
-#! ## Value Encoding Features
-
-## Provides value encoding traits & utilities.
-value = []
-
-## Provides variable-length integer encoding.
-var-int = ["value"]
-
 ## Includes all the value encoding features.
 full-value = ["value", "var-int"]
-
-#! ## Full
 
 ## Includes all the data & value encoding features.
 full = ["full-data", "full-value"]
 
-#! ## Dev Features
+#! ## Dev
 
 ## Provides utilities for testing encoding implementations.
 test = ["full"]
