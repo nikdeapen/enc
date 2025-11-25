@@ -7,6 +7,9 @@ use crate::base_64::decode::remove_padding_last_block::remove_padding_last_block
 /// Decodes the `last_block` of up to 4 bytes into the `target`.
 ///
 /// Returns the number of decoded bytes. ([0, 3])
+///
+/// # Safety
+/// The `last_block` length must be at most 4.
 pub unsafe fn decode_block_last(
     table: &[u8; 256],
     padding: Option<u8>,

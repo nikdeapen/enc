@@ -1,6 +1,5 @@
-use crate::data::append_to_string_unchecked;
 use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
-use crate::{Encoder, Error, StringEncoder};
+use crate::{data, Encoder, Error, StringEncoder};
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 
@@ -90,7 +89,7 @@ impl Encoder for HexEncoder {
 
 impl StringEncoder for HexEncoder {
     fn append_to_string(&self, data: &[u8], target: &mut String) -> Result<usize, Error> {
-        unsafe { append_to_string_unchecked(self, data, target) }
+        unsafe { data::util::append_to_string_unchecked(self, data, target) }
     }
 }
 
@@ -117,6 +116,7 @@ mod tests {
             (b"\xBA\xDC\xFE", "badcfe"),
         ];
 
+        // todo -- encoder testing
         for (data, expected) in test_cases {
             let result: String = HexEncoder::LOWER.encode_as_string(data)?;
             assert_eq!(result, *expected);

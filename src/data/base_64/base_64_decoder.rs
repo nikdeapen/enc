@@ -93,6 +93,7 @@ mod tests {
             ("////////", b"\xFF\xFF\xFF\xFF\xFF\xFF"),
         ];
 
+        // todo -- decoder testing
         let decoder: Base64Decoder = Base64Decoder::default();
         for (data, expected) in test_cases {
             let result: Vec<u8> = decoder.decode_as_vec(data.as_bytes())?;

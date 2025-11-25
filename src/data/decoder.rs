@@ -1,5 +1,4 @@
-use crate::data::default_append_to_vec;
-use crate::Error;
+use crate::{data, Error};
 
 /// Responsible for decoding binary data.
 pub trait Decoder {
@@ -15,7 +14,7 @@ pub trait Decoder {
     ///
     /// Returns the length of the decoded `data`.
     fn append_to_vec(&self, data: &[u8], target: &mut Vec<u8>) -> Result<usize, Error> {
-        default_append_to_vec(
+        data::util::default_append_to_vec(
             data,
             target,
             |data| self.decoded_len(data),

@@ -4,7 +4,7 @@ This library aids in processing encoded data.
 
 ## Features & Dependencies
 
-    enc = { version = "0.17.0-rc.1", features = ["full"] }
+    enc = { version = "0.17.0-rc.2", features = ["full"] }
 
 ### Primary Features
 
@@ -29,3 +29,11 @@ interface for encoders that operate on byte slices, such as `base-64` & `hex`.
 
 The `src/value` folder holds the traits: `EncodedLen`, `EncodeToSlice`, `EncodeToWrite` etc. These traits provide an
 interface for values that know how to encode and decode themselves such as `var-int`.
+
+## Future Work
+
+- Write better test cases and add fuzz testing.
+- Optimize encoding & decoding performance & memory usage.
+- Add third-party crate support for encodings (ex: `faster-hex`).
+- Add support for `serde`.
+- Add support for `async` contexts.

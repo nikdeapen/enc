@@ -1,8 +1,7 @@
-use crate::data::append_to_string_unchecked;
 use crate::hex::HexEncoder;
 use crate::percent::SpecialSet;
 use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
-use crate::{Encoder, Error, StringEncoder};
+use crate::{data, Encoder, Error, StringEncoder};
 
 /// Responsible for encoding data in the URL percent encoded format.
 #[derive(Copy, Clone, Debug)]
@@ -75,7 +74,7 @@ impl Encoder for PercentEncoder {
 
 impl StringEncoder for PercentEncoder {
     fn append_to_string(&self, data: &[u8], target: &mut String) -> Result<usize, Error> {
-        unsafe { append_to_string_unchecked(self, data, target) }
+        unsafe { data::util::append_to_string_unchecked(self, data, target) }
     }
 }
 
@@ -98,6 +97,7 @@ mod tests {
             ("你好", "%E4%BD%A0%E5%A5%BD"),
         ];
 
+        // todo - encoder testing
         let encoder: PercentEncoder = "+-.".into();
         for (data, expected) in test_cases {
             let result: String = encoder.encode_as_string(data.as_bytes())?;

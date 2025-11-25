@@ -1,8 +1,12 @@
 /// Encodes the last `block` with two bytes of data.
 ///
 /// Returns the number of encoded bytes: (3 or 4).
+///
+/// # Safety
+/// The `block` must be 1 byte in length.
+/// The `target` must be 3 or 4 bytes in length, depending on `padding`.
 #[inline(always)]
-pub fn encode_last_block_2(
+pub unsafe fn encode_last_block_2(
     table: &[u8; 64],
     padding: Option<u8>,
     block: &[u8],
@@ -14,7 +18,6 @@ pub fn encode_last_block_2(
     let a: u32 = block[0] as u32;
     let b: u32 = block[1] as u32;
     let bits: u32 = (a << 8) | b;
-
     let ai: usize = (bits >> 10) as usize;
     let bi: usize = ((bits >> 4) & 0x3F) as usize;
     let ci: usize = ((bits << 2) & 0x3F) as usize;
@@ -32,3 +35,5 @@ pub fn encode_last_block_2(
         3
     }
 }
+
+// todo -- test cases

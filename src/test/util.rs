@@ -3,7 +3,7 @@ use crate::hex::HexEncoder;
 /// Converts the `data` to a human-readable hex string.
 ///
 /// # Example
-/// &[255, 255, 255] -> "FFFF:FF"
+/// &[255, 255, 255] -> `FFFF:FF`
 pub fn hex(data: &[u8]) -> String {
     let mut s: String = String::with_capacity(data.len() * 3);
 
@@ -18,3 +18,5 @@ pub fn hex(data: &[u8]) -> String {
 
     s
 }
+
+// todo -- test cases

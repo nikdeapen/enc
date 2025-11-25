@@ -100,12 +100,12 @@ impl SpecialSet {
 impl SpecialSet {
     //! Mutations
 
-    /// Adds `c`. If `c` is invalid or already present this has no effect.
+    /// Adds `c`. If `c` is invalid or already present, this has no effect.
     pub fn add(&mut self, c: u8) {
         self.bits |= 1u32.checked_shl(Self::index_of(c) as u32).unwrap_or(0)
     }
 
-    /// Removes `c`. If `c` is invalid or not present this has no effect.
+    /// Removes `c`. If `c` is invalid or not present, this has no effect.
     pub fn remove(&mut self, c: u8) {
         self.bits &= !1u32.checked_shl(Self::index_of(c) as u32).unwrap_or(0);
     }
@@ -116,7 +116,7 @@ impl SpecialSet {
 
     /// Checks if the set contains `c`.
     ///
-    /// If `c` is invalid this will return false.
+    /// If `c` is invalid, this will return false.
     pub fn contains(&self, c: u8) -> bool {
         (self.bits & 1u32.checked_shl(Self::index_of(c) as u32).unwrap_or(0)) != 0
     }
