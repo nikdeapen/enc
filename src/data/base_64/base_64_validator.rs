@@ -15,7 +15,7 @@ impl Base64Validator {
 
     /// Creates a base-64 validator.
     ///
-    /// Returns `None` if the config is invalid.
+    /// Returns `None` if the encoding config is invalid.
     pub fn from(v63: u8, v64: u8, padding: Option<u8>, require_padding: bool) -> Option<Self> {
         if Base64Encoder::is_valid_config(v63, v64, padding) {
             Some(Self {
@@ -33,7 +33,7 @@ impl Default for Base64Validator {
     fn default() -> Self {
         Self {
             decoding_table: DecodingTable::default(),
-            padding: Some(b'='),
+            padding: Base64Encoder::DEFAULT_PADDING,
             require_padding: false,
         }
     }
@@ -43,6 +43,9 @@ impl Base64Validator {
     //! Validation
 
     /// Checks if the last two bytes are valid. Padding is invalid.
+    ///
+    /// # Safety
+    /// The `data` length must be exactly 2.
     #[inline(always)]
     unsafe fn is_valid_2_not_padded(decoding_table: &[u8; 256], data: &[u8]) -> bool {
         debug_assert_eq!(data.len(), 2);
@@ -61,6 +64,9 @@ impl Base64Validator {
     }
 
     /// Checks if the last three bytes are valid. Padding is invalid.
+    ///
+    /// # Safety
+    /// The `data` length must be exactly 3.
     #[inline(always)]
     unsafe fn is_valid_3_not_padded(decoding_table: &[u8; 256], data: &[u8]) -> bool {
         debug_assert_eq!(data.len(), 3);
@@ -81,6 +87,9 @@ impl Base64Validator {
     }
 
     /// Checks if the last four bytes are valid. Padding is invalid.
+    ///
+    /// # Safety
+    /// The `data` length must be exactly 4.
     #[inline(always)]
     unsafe fn is_valid_4_not_padded(decoding_table: &[u8; 256], data: &[u8]) -> bool {
         debug_assert_eq!(data.len(), 4);
@@ -103,6 +112,10 @@ impl Base64Validator {
     }
 
     /// Checks if the last block is valid.
+    ///
+    /// # Safety
+    /// The `data` length must be at most 4.
+    #[inline(always)]
     unsafe fn is_valid_block_last(
         decoding_table: &[u8; 256],
         padding: Option<u8>,
@@ -222,6 +235,7 @@ mod tests {
             ("AAAAA~==", false),
         ];
 
+        // todo -- validator testing
         let validator: Base64Validator = Base64Validator::default();
         for (input, expected) in test_cases {
             let result: bool = validator.is_valid(input.as_bytes())?;

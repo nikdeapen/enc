@@ -1,8 +1,7 @@
 use crate::base_64::encode;
 use crate::base_64::encode::EncodingTable;
-use crate::data::append_to_string_unchecked;
 use crate::Error::InsufficientTargetSpace;
-use crate::{Encoder, Error, StringEncoder};
+use crate::{data, Encoder, Error, StringEncoder};
 
 /// Responsible for encoding data in the base-64 format.
 #[derive(Clone, Debug)]
@@ -16,8 +15,7 @@ impl Base64Encoder {
 
     /// Checks if the encoding config is valid.
     pub const fn is_valid_config(v63: u8, v64: u8, padding: Option<u8>) -> bool {
-        v63.is_ascii_punctuation()
-            && v64.is_ascii_punctuation()
+        (v63.is_ascii_punctuation() && v64.is_ascii_punctuation())
             && v63 != v64
             && (if let Some(padding) = padding {
                 padding.is_ascii_punctuation() && padding != v63 && padding != v64
@@ -48,9 +46,23 @@ impl Base64Encoder {
 impl Default for Base64Encoder {
     fn default() -> Self {
         Self {
-            table: EncodingTable::get_encoding_table(Self::DEFAULT_V63, Self::DEFAULT_V64),
+            table: EncodingTable::default(),
             padding: Self::DEFAULT_PADDING,
         }
+    }
+}
+
+impl Base64Encoder {
+    //! Special Encoders
+
+    /// Gets the URL-safe encoder.
+    pub fn url_safe_encoder() -> Self {
+        Self::new(
+            Self::URL_SAFE_V63,
+            Self::URL_SAFE_V64,
+            Self::URL_SAFE_PADDING,
+        )
+        .unwrap()
     }
 }
 
@@ -71,27 +83,31 @@ impl Encoder for Base64Encoder {
             let mut d: usize = 0;
             let mut t: usize = 0;
             for _ in 0..div {
-                encode::encode_block(table, &data[d..], &mut target[t..]);
+                unsafe { encode::encode_block(table, &data[d..], &mut target[t..]) };
                 d += 3;
                 t += 4;
             }
             match rem {
                 0 => {}
                 1 => {
-                    t += encode::encode_last_block_1(
-                        table,
-                        self.padding,
-                        &data[d..],
-                        &mut target[t..],
-                    );
+                    t += unsafe {
+                        encode::encode_last_block_1(
+                            table,
+                            self.padding,
+                            &data[d..],
+                            &mut target[t..],
+                        )
+                    }
                 }
                 2 => {
-                    t += encode::encode_last_block_2(
-                        table,
-                        self.padding,
-                        &data[d..],
-                        &mut target[t..],
-                    );
+                    t += unsafe {
+                        encode::encode_last_block_2(
+                            table,
+                            self.padding,
+                            &data[d..],
+                            &mut target[t..],
+                        )
+                    }
                 }
                 _ => unreachable!(),
             }
@@ -103,7 +119,7 @@ impl Encoder for Base64Encoder {
 
 impl StringEncoder for Base64Encoder {
     fn append_to_string(&self, data: &[u8], target: &mut String) -> Result<usize, Error> {
-        unsafe { append_to_string_unchecked(self, data, target) }
+        unsafe { data::util::append_to_string_unchecked(self, data, target) }
     }
 }
 
@@ -146,7 +162,8 @@ mod tests {
             (b"\xFF\xFF\xFF\xFF\xFF\xFF", "________"),
         ];
 
-        let encoder: Base64Encoder = Base64Encoder::new(b'-', b'_', Some(b'=')).unwrap();
+        // todo -- encoder testing
+        let encoder: Base64Encoder = Base64Encoder::url_safe_encoder();
         for (data, expected) in test_cases {
             let result: String = encoder.encode_as_string(data)?;
             assert_eq!(result, *expected, "data={data:?}");

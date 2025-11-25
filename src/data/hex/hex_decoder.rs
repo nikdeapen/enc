@@ -101,6 +101,7 @@ mod tests {
             ("bAdCfE", b"\xBA\xDC\xFE"),
         ];
 
+        // todo -- decoder testing
         for (input, expected) in test_cases {
             let result: Vec<u8> = HexDecoder::default().decode_as_vec(input.as_bytes())?;
             assert_eq!(result, *expected, "input={}", *input);

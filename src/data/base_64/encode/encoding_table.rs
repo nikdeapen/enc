@@ -85,3 +85,5 @@ impl EncodingTable {
         }
     }
 }
+
+// todo -- test cases

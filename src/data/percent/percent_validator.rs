@@ -72,6 +72,7 @@ mod tests {
             ("你好", false),
         ];
 
+        // todo - validator testing
         let validator: PercentValidator = "+-.".into();
         for (data, expected) in test_cases {
             let result: bool = validator.is_valid(data.as_bytes())?;

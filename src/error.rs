@@ -5,8 +5,8 @@ use std::io::ErrorKind;
 /// An error processing encoded data.
 #[derive(Debug)]
 pub enum Error {
-    /// The data source produced an error.
-    Source(io::Error),
+    /// There was an error streaming the data.
+    Stream(io::Error),
 
     /// An integer overflowed while computing a buffer size.
     IntegerOverflow,
@@ -23,7 +23,7 @@ pub enum Error {
 impl From<Error> for io::Error {
     fn from(error: Error) -> Self {
         match error {
-            Error::Source(error) => error,
+            Error::Stream(error) => error,
             Error::IntegerOverflow => Self::new(ErrorKind::InvalidInput, error),
             Error::InsufficientTargetSpace => Self::new(ErrorKind::InvalidInput, error),
             Error::InvalidEncodedData { .. } => Self::new(ErrorKind::InvalidData, error),
@@ -33,14 +33,14 @@ impl From<Error> for io::Error {
 
 impl From<io::Error> for Error {
     fn from(error: io::Error) -> Self {
-        Self::Source(error)
+        Self::Stream(error)
     }
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Source(error) => write!(f, "{}", error),
+            Self::Stream(error) => write!(f, "{}", error),
             Self::IntegerOverflow => write!(f, "integer overflow"),
             Self::InsufficientTargetSpace => write!(f, "insufficient target space"),
             Self::InvalidEncodedData { reason } => {

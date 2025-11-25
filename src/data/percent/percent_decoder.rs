@@ -19,8 +19,12 @@ impl PercentDecoder {
     //! Decoding
 
     /// Checks if the prefix of `data` is a valid, encoded byte.
+    ///
+    /// # Safety
+    /// The `data` must not be empty.
+    /// The first byte in `data` must be the `%` symbol.
     #[inline(always)]
-    fn prefix_is_encoded(data: &[u8]) -> bool {
+    unsafe fn prefix_is_encoded(data: &[u8]) -> bool {
         debug_assert!(!data.is_empty());
         debug_assert_eq!(data[0], b'%');
 
@@ -36,7 +40,7 @@ impl Decoder for PercentDecoder {
             .iter()
             .enumerate()
             .filter(|(_, c)| **c == b'%')
-            .filter(|(i, _)| Self::prefix_is_encoded(&data[*i..]))
+            .filter(|(i, _)| unsafe { Self::prefix_is_encoded(&data[*i..]) })
             .count();
         Ok(data.len() - (encoded * 2))
     }
@@ -50,7 +54,7 @@ impl Decoder for PercentDecoder {
             let mut t: usize = 0;
             while d < data.len() {
                 let c: u8 = data[d];
-                if c == b'%' && Self::prefix_is_encoded(&data[d..]) {
+                if c == b'%' && unsafe { Self::prefix_is_encoded(&data[d..]) } {
                     target[t] = HexDecoder::decode_bytes(data[d + 1], data[d + 2]);
                     t += 1;
                     d += 3;
@@ -85,6 +89,7 @@ mod tests {
             ("%%00", "%\x00"),
         ];
 
+        // todo - decoder testing
         let decoder: PercentDecoder = PercentDecoder::default();
         for (data, decoded) in test_cases {
             let result: Vec<u8> = decoder.decode_as_vec(data.as_bytes())?;

@@ -1,15 +1,18 @@
 use crate::base_64::decode::remove_padding_last_block::remove_padding_last_block;
 
 /// Gets the length of the decoded `last_block`.
+///
+/// # Safety
+/// The `last_block` length must be at most 4.
 pub unsafe fn decoded_length_last_block(last_block: &[u8], padding: Option<u8>) -> usize {
     debug_assert!(last_block.len() <= 4);
 
     let data: &[u8] = unsafe { remove_padding_last_block(last_block, padding) };
     match data.len() {
         0 => 0, // the data is empty
-        1 => 1, // invalid, we assume two more 0 bits
-        2 => 1, // may be invalid, we discard the last 4 bits
-        3 => 2, // may be invalid, we discard the last 2 bits
+        1 => 1, // this is invalid, we assume two more 0 bits
+        2 => 1, // this may be invalid, we discard the last 4 bits
+        3 => 2, // this may be invalid, we discard the last 2 bits
         4 => 3, // a full block of data
         _ => unreachable!(),
     }

@@ -1,5 +1,5 @@
-/// Implements the `DecodeFromRead` trait for the `target_type` by delegating to the
-/// `DecodeFromReadPrefix::decode_from_read_prefix_with_first_byte` fn.
+/// Proxies the implementation of the `DecodeFromRead` trait for the `target_type` by using
+/// the `DecodeFromRead::decode_from_read_prefix_with_first_byte` function.
 #[macro_export]
 macro_rules! impl_decode_from_read_by_prefix {
     ($target_type:ty) => {

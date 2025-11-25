@@ -100,6 +100,7 @@ mod tests {
             ("ABCDEF", false, true),
         ];
 
+        // todo -- validator testing
         for (input, lower_only, upper_only) in test_cases {
             let result: bool = HexValidator::LOWER_ONLY.is_valid(input.as_bytes())?;
             assert_eq!(result, *lower_only, "input={}", *input);

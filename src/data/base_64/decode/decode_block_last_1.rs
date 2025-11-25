@@ -3,6 +3,10 @@
 /// Decoding 1 byte produces 6 bits, which is expanded to 1 byte.
 /// The last 2 bits of output are set to 0.
 /// Returns the number of decoded bytes. (1)
+///
+/// # Safety
+/// The `last_block` length must be exactly 1.
+/// The `target` length must be exactly 1.
 pub unsafe fn decode_block_last_1(
     table: &[u8; 256],
     last_block: &[u8],
@@ -13,9 +17,7 @@ pub unsafe fn decode_block_last_1(
 
     unsafe {
         let a: u32 = *table.get_unchecked(*last_block.get_unchecked(0) as usize) as u32;
-
         let bits: u32 = a << 2;
-
         *target.get_unchecked_mut(0) = bits as u8;
     }
 
