@@ -1,5 +1,5 @@
 use crate::var_int::impl_var_int::{VarInt128, VarInt16, VarInt32, VarInt64, VarIntSize};
-use crate::Error;
+use crate::{impl_encode_to_write_stack_buf, Error};
 
 macro_rules! impl_var_int_encode {
     ($target_type:ty, $unsigned_type:ty, $bit_size:expr) => {
@@ -30,6 +30,8 @@ macro_rules! impl_var_int_encode {
                 Ok(t + 1)
             }
         }
+
+        impl_encode_to_write_stack_buf!($target_type, ($bit_size / 8) as usize);
     };
 }
 
