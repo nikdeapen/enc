@@ -9,3 +9,6 @@ mod string_encoder;
 mod validator;
 
 pub(in crate::data) mod util;
+
+#[cfg(feature = "hex")]
+pub mod hex;
