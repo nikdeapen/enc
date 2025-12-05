@@ -8,3 +8,9 @@ homepage = "https://github.com/nikdeapen/enc"
 authors = ["Nik Deapen <nik@deapen.com>"]
 edition = "2021"
 license = "MIT"
+
+[features]
+value = []
+
+full-value = ["value"]
+full = ["full-value"]
