@@ -10,8 +10,11 @@ edition = "2021"
 license = "MIT"
 
 [features]
+data = []
+
 value = []
 var-int = ["value"]
 
+full-data = ["data"]
 full-value = ["value", "var-int"]
-full = ["full-value"]
+full = ["full-data", "full-value"]
