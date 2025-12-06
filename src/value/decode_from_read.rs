@@ -34,6 +34,7 @@ pub trait DecodeFromRead: Sized {
         use crate::DecodeFromReadPrefix;
 
         let prefix: usize = VarIntSize::decode_from_read_prefix_with_first_byte(r, first)?.value();
+        const _: () = assert!(usize::BITS <= 64);
         Self::decode_from_read(&mut r.take(prefix as u64))
     }
 }

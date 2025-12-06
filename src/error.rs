@@ -11,7 +11,7 @@ pub enum Error {
     /// An integer overflowed.
     IntegerOverflow,
 
-    /// The target buffer had insufficient space for the operation.
+    /// The target buffer had insufficient space.
     InsufficientTargetSpace,
 
     /// The encoded data was invalid.

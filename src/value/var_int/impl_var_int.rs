@@ -133,7 +133,7 @@ mod tests {
     }
 
     #[test]
-    fn zig_zag() {
+    fn to_zig_zag() {
         for i in -100i32..100i32 {
             let result: i16 = VarInt16::from_zig_zag(i as i16).to_zig_zag();
             assert_eq!(result, i as i16);
