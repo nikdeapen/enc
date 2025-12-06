@@ -21,17 +21,19 @@ where
         .checked_add(encoded_len)
         .ok_or(IntegerOverflow)?;
 
-    target.reserve(encoded_len);
-    let slice: *mut u8 = unsafe { target.as_mut_ptr().add(original_len) };
-    let slice: &mut [u8] = unsafe { std::slice::from_raw_parts_mut(slice, encoded_len) };
+    unsafe {
+        target.reserve(encoded_len);
+        let slice: *mut u8 = target.as_mut_ptr().add(original_len);
+        let slice: &mut [u8] = std::slice::from_raw_parts_mut(slice, encoded_len);
 
-    match slice_fn(data, slice) {
-        Ok(also_encoded_len) => {
-            debug_assert_eq!(encoded_len, also_encoded_len);
-            unsafe { target.set_len(expanded_len) };
-            Ok(encoded_len)
+        match slice_fn(data, slice) {
+            Ok(also_encoded_len) => {
+                debug_assert_eq!(encoded_len, also_encoded_len);
+                target.set_len(expanded_len);
+                Ok(encoded_len)
+            }
+            Err(error) => Err(error),
         }
-        Err(error) => Err(error),
     }
 }
 

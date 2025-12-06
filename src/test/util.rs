@@ -34,7 +34,7 @@ mod tests {
         ];
 
         for (input, expected) in test_cases {
-            let result: String = hex(*input);
+            let result: String = hex(input);
             assert_eq!(result.as_str(), *expected);
         }
     }

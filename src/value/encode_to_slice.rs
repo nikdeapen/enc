@@ -49,9 +49,10 @@ pub trait EncodeToSlice: EncodedLen {
         let expanded_len: usize = original_len
             .checked_add(encoded_len)
             .ok_or(IntegerOverflow)?;
-        target.reserve(encoded_len);
 
+        #[allow(clippy::uninit_vec)]
         unsafe {
+            target.reserve(encoded_len);
             target.set_len(expanded_len);
             let t: &mut [u8] = &mut target[original_len..];
             match self.encode_to_slice_unchecked(t) {
