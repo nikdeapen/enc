@@ -30,10 +30,16 @@ impl Base64Decoder {
     //! Construction
 
     /// Creates a new base-64 decoder.
-    pub fn new(v63: u8, v64: u8, padding: Option<u8>) -> Self {
-        Self {
-            table: DecodingTable::get_decoding_table(v63, v64),
-            padding,
+    ///
+    /// Returns `None` if the decoding config is invalid.
+    pub fn new(v63: u8, v64: u8, padding: Option<u8>) -> Option<Self> {
+        if Base64Encoder::is_valid_config(v63, v64, padding) {
+            Some(Self {
+                table: DecodingTable::get_decoding_table(v63, v64),
+                padding,
+            })
+        } else {
+            None
         }
     }
 }
@@ -45,6 +51,7 @@ impl Default for Base64Decoder {
             Base64Encoder::DEFAULT_V64,
             Base64Encoder::DEFAULT_PADDING,
         )
+        .unwrap()
     }
 }
 

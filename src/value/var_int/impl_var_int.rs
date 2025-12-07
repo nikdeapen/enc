@@ -1,7 +1,7 @@
 use std::fmt::{Display, Formatter};
 
 macro_rules! impl_var_int {
-    ($target_type:ident, $unsigned_type:ty, $signed_type:ty, $bit_len:expr) => {
+    ($target_type:ident, $unsigned_type:ty, $signed_type:ty, $bit_size:expr) => {
         /// A variable-length encoded `$unsigned_type` value.
         #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
         pub struct $target_type {
@@ -36,10 +36,10 @@ macro_rules! impl_var_int {
             //! Constants
 
             /// The maximum length of a var-int encoded `$unsigned_type` value.
-            pub const MAX_ENCODED_LEN: usize = $bit_len.div_ceil(7) as usize;
+            pub const MAX_ENCODED_LEN: usize = $bit_size.div_ceil(7) as usize;
 
             /// The last decoded byte mask. (used to detect integer overflow while decoding)
-            pub(in crate::value::var_int) const LAST_BYTE_MASK: u8 = 0xFF << ($bit_len % 7);
+            pub(in crate::value::var_int) const LAST_BYTE_MASK: u8 = 0xFF << ($bit_size % 7);
         }
 
         impl $target_type {
@@ -56,7 +56,7 @@ macro_rules! impl_var_int {
 
             /// Creates a `$target_type` from the `$signed_type` value using zig-zag encoding.
             pub fn from_zig_zag(value: $signed_type) -> Self {
-                Self::from(((value << 1) ^ (value >> ($bit_len - 1))) as $unsigned_type)
+                Self::from(((value << 1) ^ (value >> ($bit_size - 1))) as $unsigned_type)
             }
 
             /// Converts the `$target_type` to an `$signed_type` value using zig-zag encoding.

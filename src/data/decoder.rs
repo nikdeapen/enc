@@ -17,8 +17,8 @@ pub trait Decoder {
         data::util::default_append_to_vec(
             data,
             target,
-            |data| self.decoded_len(data),
-            |data, target| self.decode_to_slice(data, target),
+            |d| self.decoded_len(d),
+            |d, t| self.decode_to_slice(d, t),
         )
     }
 

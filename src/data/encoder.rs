@@ -17,8 +17,8 @@ pub trait Encoder {
         data::util::default_append_to_vec(
             data,
             target,
-            |data| self.encoded_len(data),
-            |data, target| self.encode_to_slice(data, target),
+            |d| self.encoded_len(d),
+            |d, t| self.encode_to_slice(d, t),
         )
     }
 

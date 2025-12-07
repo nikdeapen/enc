@@ -50,12 +50,12 @@ mod tests {
     #[test]
     fn var_int_16() {
         let test_cases: &[(u16, &[u8])] = &[
-            (0x00, b"\x00"),             // 0 bits
-            (0x01, b"\x01"),             // 1 bit
-            (0x7F, b"\x7F"),             // highest one byte value
-            (0x80, b"\x80\x01"),         // lowest two-byte value
-            (0x3FFF, b"\xFF\x7F"),       // highest two-byte value
-            (u16::MAX, b"\xFF\xFF\x03"), // max
+            (0x00, b"\x00"),       // 0 bits
+            (0x01, b"\x01"),       // 1 bit
+            (0x7F, b"\x7F"),       // highest one byte value
+            (0x80, b"\x80\x01"),   // lowest two-byte value
+            (0x3FFF, b"\xFF\x7F"), // highest two-byte value
+            (u16::MAX, b"\xFF\xFF\x03"),
         ];
 
         for (value, encoded) in test_cases {
@@ -68,12 +68,12 @@ mod tests {
     #[test]
     fn var_int_32() {
         let test_cases: &[(u32, &[u8])] = &[
-            (0x00, b"\x00"),                     // 0 bits
-            (0x01, b"\x01"),                     // 1 bit
-            (0x7F, b"\x7F"),                     // highest one byte value
-            (0x80, b"\x80\x01"),                 // lowest two-byte value
-            (0x3FFF, b"\xFF\x7F"),               // highest two-byte value
-            (u32::MAX, b"\xFF\xFF\xFF\xFF\x0F"), // max
+            (0x00, b"\x00"),       // 0 bits
+            (0x01, b"\x01"),       // 1 bit
+            (0x7F, b"\x7F"),       // highest one byte value
+            (0x80, b"\x80\x01"),   // lowest two-byte value
+            (0x3FFF, b"\xFF\x7F"), // highest two-byte value
+            (u32::MAX, b"\xFF\xFF\xFF\xFF\x0F"),
         ];
 
         for (value, encoded) in test_cases {
