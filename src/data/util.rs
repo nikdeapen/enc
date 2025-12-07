@@ -21,6 +21,8 @@ where
         .checked_add(encoded_len)
         .ok_or(IntegerOverflow)?;
 
+    // todo -- this may expose uninitialized memory if `slice_fn` panics, this is also different
+    // todo -- than the unsafe code in `EncodeToSlice` and it may be better to use the same code
     unsafe {
         target.reserve(encoded_len);
         let slice: *mut u8 = target.as_mut_ptr().add(original_len);
