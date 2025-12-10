@@ -1,3 +1,5 @@
+/// Implements the `DecodeFromRead` trait for the `target_type` by delegating it to the
+/// `DecodeFromReadPrefix::decode_from_read_prefix` function on the same `target_type`.
 #[macro_export]
 macro_rules! impl_decode_from_read_by_prefix {
     ($target_type:ty) => {
