@@ -35,6 +35,8 @@ macro_rules! impl_var_int_decode {
                 }
             }
         }
+
+        $crate::impl_decode_from_read_by_prefix!($target_type);
     };
 }
 

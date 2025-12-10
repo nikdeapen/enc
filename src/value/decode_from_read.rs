@@ -6,7 +6,7 @@ pub trait DecodeFromRead: Sized {
     /// Decodes a value from the `Read`.
     ///
     /// # Note
-    /// The implementation must fully drain the `Read`.
+    /// The implementation should fully drain the `Read` but this is not guaranteed.
     fn decode_from_read<R>(r: &mut R) -> Result<Self, Error>
     where
         R: Read;
