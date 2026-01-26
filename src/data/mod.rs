@@ -12,3 +12,5 @@ pub(in crate::data) mod util;
 
 #[cfg(feature = "hex")]
 pub mod hex;
+#[cfg(feature = "percent")]
+pub mod percent;
