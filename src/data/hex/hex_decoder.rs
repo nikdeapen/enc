@@ -83,10 +83,10 @@ impl Decoder for HexDecoder {
 #[cfg(test)]
 mod tests {
     use crate::hex::HexDecoder;
-    use crate::{Decoder, Error};
+    use crate::test::test_decoder;
 
     #[test]
-    fn decode() -> Result<(), Error> {
+    fn decode() {
         let test_cases: &[(&str, &[u8])] = &[
             ("", b""),
             ("0123456789", b"\x01\x23\x45\x67\x89"),
@@ -100,13 +100,6 @@ mod tests {
             ("BaDcFe", b"\xBA\xDC\xFE"),
             ("bAdCfE", b"\xBA\xDC\xFE"),
         ];
-
-        // todo -- decoder testing
-        for (input, expected) in test_cases {
-            let result: Vec<u8> = HexDecoder::default().decode_as_vec(input.as_bytes())?;
-            assert_eq!(result, *expected, "input={}", *input);
-        }
-
-        Ok(())
+        test_decoder(&HexDecoder::default(), test_cases);
     }
 }

@@ -73,11 +73,10 @@ impl Validator for HexValidator {
 #[cfg(test)]
 mod tests {
     use crate::hex::HexValidator;
-    use crate::Validator;
-    use std::error::Error;
+    use crate::test::test_validator;
 
     #[test]
-    fn is_valid() -> Result<(), Box<dyn Error>> {
+    fn is_valid() {
         let test_cases: &[(&str, bool, bool)] = &[
             ("", true, true),
             ("0", false, false),
@@ -100,18 +99,22 @@ mod tests {
             ("ABCDEF", false, true),
         ];
 
-        // todo -- validator testing
-        for (input, lower_only, upper_only) in test_cases {
-            let result: bool = HexValidator::LOWER_ONLY.is_valid(input.as_bytes())?;
-            assert_eq!(result, *lower_only, "input={}", *input);
+        let lower_test_cases: Vec<(&str, bool)> = test_cases
+            .iter()
+            .map(|(input, expected, _)| (*input, *expected))
+            .collect();
+        test_validator(&HexValidator::LOWER_ONLY, lower_test_cases.as_slice());
 
-            let result: bool = HexValidator::UPPER_ONLY.is_valid(input.as_bytes())?;
-            assert_eq!(result, *upper_only, "input={}", *input);
+        let upper_test_cases: Vec<(&str, bool)> = test_cases
+            .iter()
+            .map(|(input, _, expected)| (*input, *expected))
+            .collect();
+        test_validator(&HexValidator::UPPER_ONLY, upper_test_cases.as_slice());
 
-            let result: bool = HexValidator::CASELESS.is_valid(input.as_bytes())?;
-            assert_eq!(result, *upper_only || *lower_only, "input={}", *input);
-        }
-
-        Ok(())
+        let caseless_test_cases: Vec<(&[u8], bool)> = test_cases
+            .iter()
+            .map(|(input, a, b)| (input.as_bytes(), *a | *b))
+            .collect();
+        test_validator(&HexValidator::CASELESS, caseless_test_cases.as_slice());
     }
 }

@@ -15,3 +15,5 @@ hex = ["data"]
 
 full-data = ["data", "hex"]
 full = ["full-data"]
+
+test = ["full"]

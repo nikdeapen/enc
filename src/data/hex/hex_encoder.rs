@@ -96,7 +96,7 @@ impl StringEncoder for HexEncoder {
 #[cfg(test)]
 mod tests {
     use crate::hex::HexEncoder;
-    use crate::{Error, StringEncoder};
+    use crate::test::test_string_encoder;
 
     #[test]
     fn compare() {
@@ -107,7 +107,7 @@ mod tests {
     }
 
     #[test]
-    fn encode() -> Result<(), Error> {
+    fn encode() {
         let test_cases: &[(&[u8], &str)] = &[
             (b"", ""),
             (b"\x01\x23\x45\x67\x89", "0123456789"),
@@ -115,16 +115,12 @@ mod tests {
             (b"\xAB\xCD\xEF", "abcdef"),
             (b"\xBA\xDC\xFE", "badcfe"),
         ];
+        test_string_encoder(&HexEncoder::LOWER, test_cases);
 
-        // todo -- encoder testing
-        for (data, expected) in test_cases {
-            let result: String = HexEncoder::LOWER.encode_as_string(data)?;
-            assert_eq!(result, *expected);
-
-            let result: String = HexEncoder::UPPER.encode_as_string(data)?;
-            assert_eq!(result, expected.to_ascii_uppercase());
-        }
-
-        Ok(())
+        let test_cases: Vec<(&[u8], String)> = test_cases
+            .iter()
+            .map(|t| (t.0, t.1.to_ascii_uppercase()))
+            .collect();
+        test_string_encoder(&HexEncoder::UPPER, test_cases.as_slice());
     }
 }
