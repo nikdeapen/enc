@@ -71,6 +71,7 @@ impl Decoder for PercentDecoder {
 }
 
 #[cfg(test)]
+#[cfg(feature = "test")]
 mod tests {
     use crate::percent::PercentDecoder;
     use crate::test::test_decoder;

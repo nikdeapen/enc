@@ -79,6 +79,7 @@ impl StringEncoder for PercentEncoder {
 }
 
 #[cfg(test)]
+#[cfg(feature = "test")]
 mod tests {
     use crate::percent::percent_encoder::PercentEncoder;
     use crate::test::test_string_encoder;
