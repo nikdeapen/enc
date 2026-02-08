@@ -71,6 +71,7 @@ impl Validator for HexValidator {
 }
 
 #[cfg(test)]
+#[cfg(feature = "test")]
 mod tests {
     use crate::hex::HexValidator;
     use crate::test::test_validator;
