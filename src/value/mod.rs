@@ -11,5 +11,6 @@ mod encode_to_write;
 mod encoded_len;
 
 mod macros;
+
 #[cfg(feature = "var-int")]
 pub mod var_int;

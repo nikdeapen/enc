@@ -48,6 +48,7 @@ impl Validator for PercentValidator {
 }
 
 #[cfg(test)]
+#[cfg(feature = "test")]
 mod tests {
     use crate::percent::PercentValidator;
     use crate::test::test_validator;

@@ -28,15 +28,15 @@ pub fn test_coder<I, O, LF, SF, AF, VF>(
         );
 
         let mut output: Vec<u8> = vec![0; expected.len() + 1];
-        let mut output: &mut [u8] = output.as_mut_slice();
-        slice_fn(input, &mut output).unwrap();
+        let output: &mut [u8] = output.as_mut_slice();
+        slice_fn(input, output).unwrap();
         assert_eq!(expected, &output[..expected.len()], "input={}", hex(input));
 
         let mut output: Vec<u8> = Vec::default();
         append_fn(input, &mut output).unwrap();
-        assert_eq!(expected, output.as_slice(), "input={}", hex(&input));
+        assert_eq!(expected, output.as_slice(), "input={}", hex(input));
 
         let output: Vec<u8> = vec_fn(input).unwrap();
-        assert_eq!(expected, output.as_slice(), "input={}", hex(&input));
+        assert_eq!(expected, output.as_slice(), "input={}", hex(input));
     }
 }

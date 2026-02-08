@@ -81,6 +81,7 @@ impl Decoder for HexDecoder {
 }
 
 #[cfg(test)]
+#[cfg(feature = "test")]
 mod tests {
     use crate::hex::HexDecoder;
     use crate::test::test_decoder;
