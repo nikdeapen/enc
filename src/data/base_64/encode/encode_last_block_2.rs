@@ -43,8 +43,8 @@ mod tests {
     #[test]
     fn fn_encode_last_block_2() {
         let test_cases: &[(&[u8; 2], &str, &str)] = &[
-            (&[b'\x00', b'\x00'], "AAA", "AAA="),
-            (&[b'\xFF', b'\xFF'], "//8", "//8="),
+            (b"\x00\x00", "AAA", "AAA="),
+            (b"\xFF\xFF", "//8", "//8="),
         ];
 
         let table: EncodingTable = EncodingTable::default();
