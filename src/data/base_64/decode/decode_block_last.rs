@@ -18,31 +18,29 @@ pub unsafe fn decode_block_last(
 ) -> usize {
     debug_assert!(last_block.len() <= 4);
 
-    unsafe {
-        let last_block: &[u8] = remove_padding_last_block(last_block, padding);
-        match last_block.len() {
-            0 => {
-                debug_assert_eq!(target.len(), 0);
-                0
-            }
-            1 => {
-                debug_assert_eq!(target.len(), 1);
-                decode_block_last_1(table, last_block, target)
-            }
-            2 => {
-                debug_assert_eq!(target.len(), 1);
-                decode_block_last_2(table, last_block, target)
-            }
-            3 => {
-                debug_assert_eq!(target.len(), 2);
-                decode_block_last_3(table, last_block, target)
-            }
-            4 => {
-                debug_assert_eq!(target.len(), 3);
-                decode_block(table, last_block, target)
-            }
-            _ => unreachable!(),
+    let last_block: &[u8] = remove_padding_last_block(last_block, padding);
+    match last_block.len() {
+        0 => {
+            debug_assert_eq!(target.len(), 0);
+            0
         }
+        1 => {
+            debug_assert_eq!(target.len(), 1);
+            unsafe { decode_block_last_1(table, last_block, target) }
+        }
+        2 => {
+            debug_assert_eq!(target.len(), 1);
+            unsafe { decode_block_last_2(table, last_block, target) }
+        }
+        3 => {
+            debug_assert_eq!(target.len(), 2);
+            unsafe { decode_block_last_3(table, last_block, target) }
+        }
+        4 => {
+            debug_assert_eq!(target.len(), 3);
+            unsafe { decode_block(table, last_block, target) }
+        }
+        _ => unreachable!(),
     }
 }
 

@@ -16,7 +16,7 @@ impl Base64Validator {
     /// Creates a base-64 validator.
     ///
     /// Returns `None` if the encoding config is invalid.
-    pub fn from(v63: u8, v64: u8, padding: Option<u8>, require_padding: bool) -> Option<Self> {
+    pub fn new(v63: u8, v64: u8, padding: Option<u8>, require_padding: bool) -> Option<Self> {
         if Base64Encoder::is_valid_config(v63, v64, padding) {
             Some(Self {
                 decoding_table: DecodingTable::get_decoding_table(v63, v64),
@@ -50,16 +50,13 @@ impl Base64Validator {
     unsafe fn is_valid_2_not_padded(decoding_table: &[u8; 256], data: &[u8]) -> bool {
         debug_assert_eq!(data.len(), 2);
 
-        let bits: u32 = unsafe {
-            let a: usize = *data.get_unchecked(0) as usize;
-            let b: usize = *data.get_unchecked(1) as usize;
+        let a: usize = unsafe { *data.get_unchecked(0) } as usize;
+        let b: usize = unsafe { *data.get_unchecked(1) } as usize;
 
-            let a: u32 = *decoding_table.get_unchecked(a) as u32;
-            let b: u32 = *decoding_table.get_unchecked(b) as u32;
+        let a: u32 = unsafe { *decoding_table.get_unchecked(a) } as u32;
+        let b: u32 = unsafe { *decoding_table.get_unchecked(b) } as u32;
 
-            (a << 8) | b
-        };
-
+        let bits: u32 = (a << 8) | b;
         (bits & 0x808F) == 0
     }
 
@@ -71,18 +68,15 @@ impl Base64Validator {
     unsafe fn is_valid_3_not_padded(decoding_table: &[u8; 256], data: &[u8]) -> bool {
         debug_assert_eq!(data.len(), 3);
 
-        let bits: u32 = unsafe {
-            let a: usize = *data.get_unchecked(0) as usize;
-            let b: usize = *data.get_unchecked(1) as usize;
-            let c: usize = *data.get_unchecked(2) as usize;
+        let a: usize = unsafe { *data.get_unchecked(0) } as usize;
+        let b: usize = unsafe { *data.get_unchecked(1) } as usize;
+        let c: usize = unsafe { *data.get_unchecked(2) } as usize;
 
-            let a: u32 = *decoding_table.get_unchecked(a) as u32;
-            let b: u32 = *decoding_table.get_unchecked(b) as u32;
-            let c: u32 = *decoding_table.get_unchecked(c) as u32;
+        let a: u32 = unsafe { *decoding_table.get_unchecked(a) } as u32;
+        let b: u32 = unsafe { *decoding_table.get_unchecked(b) } as u32;
+        let c: u32 = unsafe { *decoding_table.get_unchecked(c) } as u32;
 
-            (a << 16) | (b << 8) | c
-        };
-
+        let bits: u32 = (a << 16) | (b << 8) | c;
         (bits & 0x808083) == 0
     }
 
@@ -94,20 +88,17 @@ impl Base64Validator {
     unsafe fn is_valid_4_not_padded(decoding_table: &[u8; 256], data: &[u8]) -> bool {
         debug_assert_eq!(data.len(), 4);
 
-        let bits: u32 = unsafe {
-            let a: usize = *data.get_unchecked(0) as usize;
-            let b: usize = *data.get_unchecked(1) as usize;
-            let c: usize = *data.get_unchecked(2) as usize;
-            let d: usize = *data.get_unchecked(3) as usize;
+        let a: usize = unsafe { *data.get_unchecked(0) } as usize;
+        let b: usize = unsafe { *data.get_unchecked(1) } as usize;
+        let c: usize = unsafe { *data.get_unchecked(2) } as usize;
+        let d: usize = unsafe { *data.get_unchecked(3) } as usize;
 
-            let a: u32 = *decoding_table.get_unchecked(a) as u32;
-            let b: u32 = *decoding_table.get_unchecked(b) as u32;
-            let c: u32 = *decoding_table.get_unchecked(c) as u32;
-            let d: u32 = *decoding_table.get_unchecked(d) as u32;
+        let a: u32 = unsafe { *decoding_table.get_unchecked(a) } as u32;
+        let b: u32 = unsafe { *decoding_table.get_unchecked(b) } as u32;
+        let c: u32 = unsafe { *decoding_table.get_unchecked(c) } as u32;
+        let d: u32 = unsafe { *decoding_table.get_unchecked(d) } as u32;
 
-            (a << 24) | (b << 16) | (c << 8) | d
-        };
-
+        let bits: u32 = (a << 24) | (b << 16) | (c << 8) | d;
         (bits & 0x80808080) == 0
     }
 
@@ -124,30 +115,31 @@ impl Base64Validator {
     ) -> bool {
         debug_assert!(data.len() <= 4);
 
-        unsafe {
-            match data.len() {
-                1 => false,
-                2 => !require_padding && Self::is_valid_2_not_padded(decoding_table, data),
-                3 => !require_padding && Self::is_valid_3_not_padded(decoding_table, &data[..3]),
-                4 => {
-                    if let Some(padding) = padding {
-                        let d: u8 = *data.get_unchecked(3);
-                        if d == padding {
-                            let c: u8 = *data.get_unchecked(2);
-                            if c == padding {
-                                Self::is_valid_2_not_padded(decoding_table, &data[..2])
-                            } else {
-                                Self::is_valid_3_not_padded(decoding_table, &data[..3])
-                            }
+        match data.len() {
+            1 => false,
+            2 => !require_padding && unsafe { Self::is_valid_2_not_padded(decoding_table, data) },
+            3 => {
+                !require_padding
+                    && unsafe { Self::is_valid_3_not_padded(decoding_table, &data[..3]) }
+            }
+            4 => {
+                if let Some(padding) = padding {
+                    let d: u8 = unsafe { *data.get_unchecked(3) };
+                    if d == padding {
+                        let c: u8 = unsafe { *data.get_unchecked(2) };
+                        if c == padding {
+                            unsafe { Self::is_valid_2_not_padded(decoding_table, &data[..2]) }
                         } else {
-                            Self::is_valid_4_not_padded(decoding_table, data)
+                            unsafe { Self::is_valid_3_not_padded(decoding_table, &data[..3]) }
                         }
                     } else {
-                        Self::is_valid_4_not_padded(decoding_table, data)
+                        unsafe { Self::is_valid_4_not_padded(decoding_table, data) }
                     }
+                } else {
+                    unsafe { Self::is_valid_4_not_padded(decoding_table, data) }
                 }
-                _ => unreachable!(),
             }
+            _ => unreachable!(),
         }
     }
 }

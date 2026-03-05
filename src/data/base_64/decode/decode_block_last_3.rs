@@ -15,11 +15,11 @@ pub unsafe fn decode_block_last_3(
     debug_assert_eq!(last_block.len(), 3);
     debug_assert_eq!(target.len(), 2);
 
+    let a: u32 = unsafe { *table.get_unchecked(*last_block.get_unchecked(0) as usize) } as u32;
+    let b: u32 = unsafe { *table.get_unchecked(*last_block.get_unchecked(1) as usize) } as u32;
+    let c: u32 = unsafe { *table.get_unchecked(*last_block.get_unchecked(2) as usize) } as u32;
+    let bits: u32 = (a << 10) | (b << 4) | (c >> 2);
     unsafe {
-        let a: u32 = *table.get_unchecked(*last_block.get_unchecked(0) as usize) as u32;
-        let b: u32 = *table.get_unchecked(*last_block.get_unchecked(1) as usize) as u32;
-        let c: u32 = *table.get_unchecked(*last_block.get_unchecked(2) as usize) as u32;
-        let bits: u32 = (a << 10) | (b << 4) | (c >> 2);
         *target.get_unchecked_mut(0) = (bits >> 8) as u8;
         *target.get_unchecked_mut(1) = bits as u8;
     }

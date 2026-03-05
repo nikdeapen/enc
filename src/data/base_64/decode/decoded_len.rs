@@ -5,7 +5,7 @@ use crate::base_64::decode::split_last_block::split_last_block;
 pub fn decoded_len(data: &[u8], padding: Option<u8>) -> usize {
     let (full_chunks, last_block) = split_last_block(data);
     let full: usize = (full_chunks.len() / 4) * 3;
-    let last: usize = unsafe { decoded_length_last_block(last_block, padding) };
+    let last: usize = decoded_length_last_block(last_block, padding);
     full + last
 }
 
