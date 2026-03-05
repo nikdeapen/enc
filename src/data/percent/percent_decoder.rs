@@ -20,11 +20,10 @@ impl PercentDecoder {
 
     /// Checks if the prefix of `data` is a valid, encoded byte.
     ///
-    /// # Safety
-    /// The `data` must not be empty.
-    /// The first byte in `data` must be the `%` symbol.
+    /// # Note
+    /// The `data` must not be empty and the first byte must be the `%` symbol.
     #[inline(always)]
-    unsafe fn prefix_is_encoded(data: &[u8]) -> bool {
+    fn prefix_is_encoded(data: &[u8]) -> bool {
         debug_assert!(!data.is_empty());
         debug_assert_eq!(data[0], b'%');
 
@@ -40,7 +39,7 @@ impl Decoder for PercentDecoder {
             .iter()
             .enumerate()
             .filter(|(_, c)| **c == b'%')
-            .filter(|(i, _)| unsafe { Self::prefix_is_encoded(&data[*i..]) })
+            .filter(|(i, _)| Self::prefix_is_encoded(&data[*i..]))
             .count();
         Ok(data.len() - (encoded * 2))
     }
@@ -54,7 +53,7 @@ impl Decoder for PercentDecoder {
             let mut t: usize = 0;
             while d < data.len() {
                 let c: u8 = data[d];
-                if c == b'%' && unsafe { Self::prefix_is_encoded(&data[d..]) } {
+                if c == b'%' && Self::prefix_is_encoded(&data[d..]) {
                     target[t] = HexDecoder::decode_bytes(data[d + 1], data[d + 2]);
                     t += 1;
                     d += 3;
@@ -75,6 +74,7 @@ impl Decoder for PercentDecoder {
 mod tests {
     use crate::percent::PercentDecoder;
     use crate::test::test_decoder;
+    use crate::Decoder;
 
     #[test]
     fn decode() {
@@ -88,8 +88,20 @@ mod tests {
             ("%0x", "%0x"),
             ("%x0", "%x0"),
             ("%%00", "%\x00"),
+            ("%GG", "%GG"),
+            ("a%GG", "a%GG"),
         ];
         let decoder: PercentDecoder = PercentDecoder::default();
         test_decoder(&decoder, test_cases);
+    }
+
+    #[test]
+    fn decode_insufficient_space() {
+        let decoder: PercentDecoder = PercentDecoder::default();
+        let mut target: Vec<u8> = vec![];
+        assert!(matches!(
+            decoder.decode_to_slice(b"%FF", &mut target),
+            Err(crate::Error::InsufficientTargetSpace)
+        ));
     }
 }

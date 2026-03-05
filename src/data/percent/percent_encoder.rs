@@ -4,7 +4,7 @@ use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
 use crate::{data, Encoder, Error, StringEncoder};
 
 /// Responsible for encoding data in the URL percent encoded format.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct PercentEncoder {
     hex_encoder: HexEncoder,
     do_not_encode: SpecialSet,
@@ -83,6 +83,18 @@ impl StringEncoder for PercentEncoder {
 mod tests {
     use crate::percent::percent_encoder::PercentEncoder;
     use crate::test::test_string_encoder;
+    use crate::Encoder;
+
+    #[test]
+    fn encode_insufficient_space() {
+        let encoder: PercentEncoder = "+-.".into();
+        let mut target: Vec<u8> = vec![0u8; 2];
+        // b"\xFF" needs "%FF" = 3 bytes
+        assert!(matches!(
+            encoder.encode_to_slice(b"\xFF", &mut target),
+            Err(crate::Error::InsufficientTargetSpace)
+        ));
+    }
 
     #[test]
     fn encode() {

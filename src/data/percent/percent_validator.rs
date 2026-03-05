@@ -3,7 +3,7 @@ use crate::percent::SpecialSet;
 use crate::{Error, Validator};
 
 /// Responsible for validating percent encoded data.
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Default)]
 pub struct PercentValidator {
     hex_validator: HexValidator,
     encoding_not_needed: SpecialSet,
@@ -30,7 +30,7 @@ impl<S: Into<SpecialSet>> From<S> for PercentValidator {
 impl Validator for PercentValidator {
     fn is_valid(&self, data: &[u8]) -> Result<bool, Error> {
         for (i, c) in data.iter().enumerate() {
-            if !c.is_ascii_alphanumeric() && !c.is_ascii_digit() {
+            if !c.is_ascii_alphanumeric() {
                 if *c == b'%' {
                     if i + 2 >= data.len()
                         || !self.hex_validator.is_valid_byte(data[i + 1])

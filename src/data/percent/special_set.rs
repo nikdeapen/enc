@@ -92,7 +92,7 @@ impl SpecialSet {
         if c > 0x7F {
             32
         } else {
-            Self::INDEX_TABLE[(c as usize) & 0x7F] as usize
+            Self::INDEX_TABLE[c as usize] as usize
         }
     }
 }
@@ -102,12 +102,18 @@ impl SpecialSet {
 
     /// Adds `c`. If `c` is invalid or already present, this has no effect.
     pub fn add(&mut self, c: u8) {
-        self.bits |= 1u32.checked_shl(Self::index_of(c) as u32).unwrap_or(0)
+        let index: u32 = Self::index_of(c) as u32;
+        if index < 32 {
+            self.bits |= 1u32 << index;
+        }
     }
 
     /// Removes `c`. If `c` is invalid or not present, this has no effect.
     pub fn remove(&mut self, c: u8) {
-        self.bits &= !1u32.checked_shl(Self::index_of(c) as u32).unwrap_or(0);
+        let index: u32 = Self::index_of(c) as u32;
+        if index < 32 {
+            self.bits &= !(1u32 << index);
+        }
     }
 }
 
@@ -118,7 +124,8 @@ impl SpecialSet {
     ///
     /// If `c` is invalid, this will return false.
     pub fn contains(&self, c: u8) -> bool {
-        (self.bits & 1u32.checked_shl(Self::index_of(c) as u32).unwrap_or(0)) != 0
+        let index: u32 = Self::index_of(c) as u32;
+        index < 32 && (self.bits & (1u32 << index)) != 0
     }
 
     /// Gets the number of chars in the set.

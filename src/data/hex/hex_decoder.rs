@@ -85,6 +85,48 @@ impl Decoder for HexDecoder {
 mod tests {
     use crate::hex::HexDecoder;
     use crate::test::test_decoder;
+    use crate::Decoder;
+
+    #[test]
+    fn decode_bytes_decode_chars() {
+        let cases: &[(u8, u8, u8)] = &[
+            (b'0', b'0', 0x00),
+            (b'F', b'F', 0xFF),
+            (b'a', b'b', 0xAB),
+            (b'A', b'B', 0xAB),
+            (b'a', b'B', 0xAB),
+            (b'A', b'b', 0xAB),
+            (b'0', b'9', 0x09),
+            (b'f', b'f', 0xFF),
+        ];
+        for (high, low, expected) in cases {
+            assert_eq!(HexDecoder::decode_bytes(*high, *low), *expected);
+            assert_eq!(
+                HexDecoder::decode_chars(*high as char, *low as char),
+                *expected
+            );
+        }
+    }
+
+    #[test]
+    fn decode_odd_length() {
+        let decoder: HexDecoder = HexDecoder::default();
+        let mut target: Vec<u8> = vec![0u8; 4];
+        assert!(matches!(
+            decoder.decode_to_slice(b"FFF", &mut target),
+            Err(crate::Error::InvalidEncodedData { .. })
+        ));
+    }
+
+    #[test]
+    fn decode_insufficient_space() {
+        let decoder: HexDecoder = HexDecoder::default();
+        let mut target: Vec<u8> = vec![];
+        assert!(matches!(
+            decoder.decode_to_slice(b"FF", &mut target),
+            Err(crate::Error::InsufficientTargetSpace)
+        ));
+    }
 
     #[test]
     fn decode() {

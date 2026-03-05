@@ -21,19 +21,15 @@ where
         .checked_add(encoded_len)
         .ok_or(IntegerOverflow)?;
 
-    // todo -- this may expose uninitialized memory if `code_fn` panics or has a bad implementation
-    unsafe {
-        target.reserve(encoded_len);
-        let slice: *mut u8 = target.as_mut_ptr().add(original_len);
-        let slice: &mut [u8] = std::slice::from_raw_parts_mut(slice, encoded_len);
-
-        match code_fn(data, slice) {
-            Ok(also_encoded_len) => {
-                debug_assert_eq!(encoded_len, also_encoded_len);
-                target.set_len(expanded_len);
-                Ok(encoded_len)
-            }
-            Err(error) => Err(error),
+    target.resize(expanded_len, 0u8);
+    match code_fn(data, &mut target[original_len..]) {
+        Ok(also_encoded_len) => {
+            debug_assert_eq!(encoded_len, also_encoded_len);
+            Ok(encoded_len)
+        }
+        Err(error) => {
+            target.truncate(original_len);
+            Err(error)
         }
     }
 }
@@ -54,6 +50,6 @@ where
     E: Encoder,
 {
     let encoded_len: usize = encoder.append_to_vec(data, unsafe { target.as_mut_vec() })?;
-    debug_assert!(std::str::from_utf8(&target.as_bytes()[..(target.len() - encoded_len)]).is_ok());
+    debug_assert!(std::str::from_utf8(&target.as_bytes()[(target.len() - encoded_len)..]).is_ok());
     Ok(encoded_len)
 }
