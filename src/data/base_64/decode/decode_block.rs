@@ -10,14 +10,14 @@ pub unsafe fn decode_block(table: &[u8; 256], block: &[u8], target: &mut [u8]) -
     debug_assert!(block.len() >= 4);
     debug_assert!(target.len() >= 3);
 
+    let a: u32 = unsafe { *table.get_unchecked(*block.get_unchecked(0) as usize) } as u32;
+    let b: u32 = unsafe { *table.get_unchecked(*block.get_unchecked(1) as usize) } as u32;
+    let c: u32 = unsafe { *table.get_unchecked(*block.get_unchecked(2) as usize) } as u32;
+    let d: u32 = unsafe { *table.get_unchecked(*block.get_unchecked(3) as usize) } as u32;
+
+    let bits: u32 = (a << 18) | (b << 12) | (c << 6) | d;
+
     unsafe {
-        let a: u32 = *table.get_unchecked(*block.get_unchecked(0) as usize) as u32;
-        let b: u32 = *table.get_unchecked(*block.get_unchecked(1) as usize) as u32;
-        let c: u32 = *table.get_unchecked(*block.get_unchecked(2) as usize) as u32;
-        let d: u32 = *table.get_unchecked(*block.get_unchecked(3) as usize) as u32;
-
-        let bits: u32 = (a << 18) | (b << 12) | (c << 6) | d;
-
         *target.get_unchecked_mut(0) = (bits >> 16) as u8;
         *target.get_unchecked_mut(1) = (bits >> 8) as u8;
         *target.get_unchecked_mut(2) = bits as u8;

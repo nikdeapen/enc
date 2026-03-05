@@ -83,31 +83,27 @@ impl Encoder for Base64Encoder {
             let mut d: usize = 0;
             let mut t: usize = 0;
             for _ in 0..div {
-                unsafe { encode::encode_block(table, &data[d..], &mut target[t..]) };
+                encode::encode_block(table, &data[d..], &mut target[t..]);
                 d += 3;
                 t += 4;
             }
             match rem {
                 0 => {}
                 1 => {
-                    t += unsafe {
-                        encode::encode_last_block_1(
-                            table,
-                            self.padding,
-                            &data[d..],
-                            &mut target[t..],
-                        )
-                    }
+                    t += encode::encode_last_block_1(
+                        table,
+                        self.padding,
+                        &data[d..],
+                        &mut target[t..],
+                    )
                 }
                 2 => {
-                    t += unsafe {
-                        encode::encode_last_block_2(
-                            table,
-                            self.padding,
-                            &data[d..],
-                            &mut target[t..],
-                        )
-                    }
+                    t += encode::encode_last_block_2(
+                        table,
+                        self.padding,
+                        &data[d..],
+                        &mut target[t..],
+                    )
                 }
                 _ => unreachable!(),
             }

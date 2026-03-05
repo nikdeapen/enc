@@ -9,7 +9,7 @@ impl Base64Encoder {
     /// The default 64th value.
     pub const DEFAULT_V64: u8 = b'/';
 
-    // The default padding.
+    /// The default padding.
     pub const DEFAULT_PADDING: Option<u8> = Some(b'=');
 
     /// The URL-safe 63rd value.

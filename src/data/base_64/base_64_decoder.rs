@@ -46,12 +46,10 @@ impl Base64Decoder {
 
 impl Default for Base64Decoder {
     fn default() -> Self {
-        Self::new(
-            Base64Encoder::DEFAULT_V63,
-            Base64Encoder::DEFAULT_V64,
-            Base64Encoder::DEFAULT_PADDING,
-        )
-        .unwrap()
+        Self {
+            table: DecodingTable::default(),
+            padding: Base64Encoder::DEFAULT_PADDING,
+        }
     }
 }
 
@@ -91,15 +89,26 @@ mod tests {
     fn decode() {
         let test_cases: &[(&str, &[u8])] = &[
             ("", b""),
-            // ("AAAA", b"\x00\x00\x00"),
-            // ("////", b"\xFF\xFF\xFF"),
-            // ("/////", b"\xFF\xFF\xFF\xFC"),
-            // ("//////", b"\xFF\xFF\xFF\xFF"),
-            // ("//////=", b"\xFF\xFF\xFF\xFF"),
-            // ("//////==", b"\xFF\xFF\xFF\xFF"),
-            // ("///////", b"\xFF\xFF\xFF\xFF\xFF"),
-            // ("///////=", b"\xFF\xFF\xFF\xFF\xFF"),
-            // ("////////", b"\xFF\xFF\xFF\xFF\xFF\xFF"),
+            // full blocks
+            ("AAAA", b"\x00\x00\x00"),
+            ("89+/", b"\xF3\xDF\xBF"),
+            ("////", b"\xFF\xFF\xFF"),
+            ("AAAAAAAA", b"\x00\x00\x00\x00\x00\x00"),
+            ("////////", b"\xFF\xFF\xFF\xFF\xFF\xFF"),
+            // last blocks with padding
+            ("AA==", b"\x00"),
+            ("Ag==", b"\x02"),
+            ("/w==", b"\xFF"),
+            ("AAA=", b"\x00\x00"),
+            ("AAE=", b"\x00\x01"),
+            ("//8=", b"\xFF\xFF"),
+            // multi-block with trailing partial
+            ("/////", b"\xFF\xFF\xFF\xFC"),
+            ("//////", b"\xFF\xFF\xFF\xFF"),
+            ("//////=", b"\xFF\xFF\xFF\xFF"),
+            ("//////==", b"\xFF\xFF\xFF\xFF"),
+            ("///////", b"\xFF\xFF\xFF\xFF\xFF"),
+            ("///////=", b"\xFF\xFF\xFF\xFF\xFF"),
         ];
         let decoder: Base64Decoder = Base64Decoder::default();
         test_decoder(&decoder, test_cases);

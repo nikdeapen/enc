@@ -86,4 +86,38 @@ impl EncodingTable {
     }
 }
 
-// todo -- test cases
+#[cfg(test)]
+mod tests {
+    use crate::base_64::encode::encoding_table::EncodingTable;
+    use crate::base_64::Base64Encoder;
+
+    #[test]
+    fn fn_get_encoding_table() {
+        let standard: EncodingTable =
+            EncodingTable::get_encoding_table(Base64Encoder::DEFAULT_V63, Base64Encoder::DEFAULT_V64);
+        assert!(matches!(standard, EncodingTable::Static(_)));
+
+        let url_safe: EncodingTable = EncodingTable::get_encoding_table(
+            Base64Encoder::URL_SAFE_V63,
+            Base64Encoder::URL_SAFE_V64,
+        );
+        assert!(matches!(url_safe, EncodingTable::Static(_)));
+
+        let custom: EncodingTable = EncodingTable::get_encoding_table(b'!', b'@');
+        assert!(matches!(custom, EncodingTable::Reference(_)));
+    }
+
+    #[test]
+    fn fn_encoding_table() {
+        let table: EncodingTable = EncodingTable::default();
+        let t: &[u8; 64] = table.encoding_table();
+        assert_eq!(t[0], b'A');
+        assert_eq!(t[25], b'Z');
+        assert_eq!(t[26], b'a');
+        assert_eq!(t[51], b'z');
+        assert_eq!(t[52], b'0');
+        assert_eq!(t[61], b'9');
+        assert_eq!(t[62], Base64Encoder::DEFAULT_V63);
+        assert_eq!(t[63], Base64Encoder::DEFAULT_V64);
+    }
+}
