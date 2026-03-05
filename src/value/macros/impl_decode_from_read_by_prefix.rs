@@ -11,7 +11,7 @@ macro_rules! impl_decode_from_read_by_prefix {
                 use $crate::DecodeFromReadPrefix;
 
                 let value: Self = Self::decode_from_read_prefix(r)?;
-                debug_assert!($crate::read_optional_byte(r)?.is_none());
+                debug_assert!(matches!($crate::read_optional_byte(r), Ok(None)));
                 Ok(value)
             }
         }

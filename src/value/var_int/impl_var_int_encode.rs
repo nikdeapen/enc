@@ -13,20 +13,18 @@ macro_rules! impl_var_int_encode {
             unsafe fn encode_to_slice_unchecked(&self, target: &mut [u8]) -> Result<usize, Error> {
                 let mut t: usize = 0;
                 let mut v: $unsigned_type = self.value;
-                unsafe {
-                    for _ in 0..(Self::MAX_ENCODED_LEN - 1) {
-                        let last_seven: u8 = (v & 0x7F) as u8;
-                        v >>= 7;
-                        if v == 0 {
-                            *target.get_unchecked_mut(t) = last_seven;
-                            return Ok(t + 1);
-                        } else {
-                            *target.get_unchecked_mut(t) = last_seven | 0x80;
-                            t += 1;
-                        }
+                for _ in 0..(Self::MAX_ENCODED_LEN - 1) {
+                    let last_seven: u8 = (v & 0x7F) as u8;
+                    v >>= 7;
+                    if v == 0 {
+                        *target.get_unchecked_mut(t) = last_seven;
+                        return Ok(t + 1);
+                    } else {
+                        *target.get_unchecked_mut(t) = last_seven | 0x80;
+                        t += 1;
                     }
-                    *target.get_unchecked_mut(t) = v as u8;
                 }
+                *target.get_unchecked_mut(t) = v as u8;
                 Ok(t + 1)
             }
         }

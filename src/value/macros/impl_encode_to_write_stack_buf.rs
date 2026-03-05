@@ -13,7 +13,6 @@ macro_rules! impl_encode_to_write_stack_buf {
             {
                 use $crate::EncodeToSlice;
 
-                // todo -- can improve performance with uninitialized memory
                 let mut buffer: [u8; $max_encoded_len] = [0u8; $max_encoded_len];
                 let encoded_len: usize = unsafe { self.encode_to_slice_unchecked(&mut buffer)? };
                 w.write_all(&buffer[..encoded_len])?;

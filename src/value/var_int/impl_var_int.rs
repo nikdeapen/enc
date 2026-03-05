@@ -22,7 +22,7 @@ macro_rules! impl_var_int {
 
         impl From<$signed_type> for $target_type {
             fn from(value: $signed_type) -> Self {
-                Self::from_zig_zag(value)
+                Self::from_zigzag(value)
             }
         }
 
@@ -52,15 +52,15 @@ macro_rules! impl_var_int {
         }
 
         impl $target_type {
-            //! Zig-Zag
+            //! Zigzag
 
-            /// Creates a `$target_type` from the `$signed_type` value using zig-zag encoding.
-            pub fn from_zig_zag(value: $signed_type) -> Self {
-                Self::from(((value << 1) ^ (value >> ($bit_size - 1))) as $unsigned_type)
+            /// Creates a `$target_type` from the `$signed_type` value using zigzag encoding.
+            pub fn from_zigzag(value: $signed_type) -> Self {
+                Self::from((value.wrapping_shl(1) ^ (value >> ($bit_size - 1))) as $unsigned_type)
             }
 
-            /// Converts the `$target_type` to an `$signed_type` value using zig-zag encoding.
-            pub fn to_zig_zag(&self) -> $signed_type {
+            /// Converts the `$target_type` to an `$signed_type` value using zigzag encoding.
+            pub fn to_zigzag(&self) -> $signed_type {
                 ((self.value >> 1) as $signed_type) ^ (-((self.value & 1) as $signed_type))
             }
         }
@@ -112,7 +112,7 @@ mod tests {
     }
 
     #[test]
-    fn from_zig_zag() {
+    fn from_zigzag() {
         let test_cases: &[(i32, u32)] = &[
             (0, 0),
             (-1, 1),
@@ -128,46 +128,64 @@ mod tests {
         ];
 
         for (value, expected) in test_cases {
-            let result: u32 = VarInt32::from_zig_zag(*value).value;
+            let result: u32 = VarInt32::from_zigzag(*value).value;
             assert_eq!(result, *expected);
         }
     }
 
     #[test]
-    fn to_zig_zag() {
+    fn to_zigzag() {
         for i in -100i32..100i32 {
-            let result: i16 = VarInt16::from_zig_zag(i as i16).to_zig_zag();
+            let result: i16 = VarInt16::from_zigzag(i as i16).to_zigzag();
             assert_eq!(result, i as i16);
 
-            let result: i32 = VarInt32::from_zig_zag(i).to_zig_zag();
+            let result: i32 = VarInt32::from_zigzag(i).to_zigzag();
             assert_eq!(result, i);
 
-            let result: i64 = VarInt64::from_zig_zag(i as i64).to_zig_zag();
+            let result: i64 = VarInt64::from_zigzag(i as i64).to_zigzag();
             assert_eq!(result, i as i64);
 
-            let result: i128 = VarInt128::from_zig_zag(i as i128).to_zig_zag();
+            let result: i128 = VarInt128::from_zigzag(i as i128).to_zigzag();
             assert_eq!(result, i as i128);
 
-            let result: isize = VarIntSize::from_zig_zag(i as isize).to_zig_zag();
+            let result: isize = VarIntSize::from_zigzag(i as isize).to_zigzag();
             assert_eq!(result, i as isize);
         }
     }
 
     #[test]
-    fn zig_zag_max() {
-        let result: i16 = VarInt16::from_zig_zag(i16::MAX).to_zig_zag();
+    fn zigzag_max() {
+        let result: i16 = VarInt16::from_zigzag(i16::MAX).to_zigzag();
         assert_eq!(result, i16::MAX);
 
-        let result: i32 = VarInt32::from_zig_zag(i32::MAX).to_zig_zag();
+        let result: i32 = VarInt32::from_zigzag(i32::MAX).to_zigzag();
         assert_eq!(result, i32::MAX);
 
-        let result: i64 = VarInt64::from_zig_zag(i64::MAX).to_zig_zag();
+        let result: i64 = VarInt64::from_zigzag(i64::MAX).to_zigzag();
         assert_eq!(result, i64::MAX);
 
-        let result: i128 = VarInt128::from_zig_zag(i128::MAX).to_zig_zag();
+        let result: i128 = VarInt128::from_zigzag(i128::MAX).to_zigzag();
         assert_eq!(result, i128::MAX);
 
-        let result: isize = VarIntSize::from_zig_zag(isize::MAX).to_zig_zag();
+        let result: isize = VarIntSize::from_zigzag(isize::MAX).to_zigzag();
         assert_eq!(result, isize::MAX);
+    }
+
+    #[test]
+    fn zigzag_min() {
+        let result: i16 = VarInt16::from_zigzag(i16::MIN).to_zigzag();
+        assert_eq!(result, i16::MIN);
+
+        let result: i32 = VarInt32::from_zigzag(i32::MIN).to_zigzag();
+        assert_eq!(result, i32::MIN);
+
+        let result: i64 = VarInt64::from_zigzag(i64::MIN).to_zigzag();
+        assert_eq!(result, i64::MIN);
+
+        let result: i128 = VarInt128::from_zigzag(i128::MIN).to_zigzag();
+        assert_eq!(result, i128::MIN);
+
+        let result: isize = VarIntSize::from_zigzag(isize::MIN).to_zigzag();
+        assert_eq!(result, isize::MIN);
     }
 }

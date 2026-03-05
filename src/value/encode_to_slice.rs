@@ -50,21 +50,15 @@ pub trait EncodeToSlice: EncodedLen {
             .checked_add(encoded_len)
             .ok_or(IntegerOverflow)?;
 
-        // todo -- this may expose uninitialized memory if `encode_to_slice_unchecked` panics
-        #[allow(clippy::uninit_vec)]
-        unsafe {
-            target.reserve(encoded_len);
-            target.set_len(expanded_len);
-            let t: &mut [u8] = &mut target[original_len..];
-            match self.encode_to_slice_unchecked(t) {
-                Ok(also_encoded_len) => {
-                    debug_assert_eq!(encoded_len, also_encoded_len);
-                    Ok(encoded_len)
-                }
-                Err(error) => {
-                    target.set_len(original_len);
-                    Err(error)
-                }
+        target.resize(expanded_len, 0u8);
+        match unsafe { self.encode_to_slice_unchecked(&mut target[original_len..]) } {
+            Ok(also_encoded_len) => {
+                debug_assert_eq!(encoded_len, also_encoded_len);
+                Ok(encoded_len)
+            }
+            Err(error) => {
+                target.truncate(original_len);
+                Err(error)
             }
         }
     }
