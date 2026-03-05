@@ -113,6 +113,7 @@ mod tests {
 
     #[test]
     fn encode_bytes_encode_chars() {
+        #[allow(clippy::type_complexity)]
         let cases: &[(u8, (u8, u8), (u8, u8))] = &[
             (0x00, (b'0', b'0'), (b'0', b'0')),
             (0xFF, (b'f', b'f'), (b'F', b'F')),
