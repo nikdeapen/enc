@@ -2,6 +2,7 @@
 /// `DecodeFromRead::decode_from_read_length_prefixed_with_first_byte` function on the same
 /// `target_type`.
 #[macro_export]
+#[cfg(feature = "var-int")]
 macro_rules! impl_decode_from_read_prefix_length_prefixed {
     ($target_type:ty) => {
         impl $crate::DecodeFromReadPrefix for $target_type {

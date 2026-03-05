@@ -27,7 +27,7 @@ macro_rules! impl_var_int_decode {
                     }
                     let b: u8 = $crate::read_single_byte(r)?;
                     if b & Self::LAST_BYTE_MASK != 0 {
-                        Err($crate::Error::InvalidEncodedData { reason: None }.into())
+                        Err($crate::Error::InvalidEncodedData { reason: None })
                     } else {
                         result |= (b as $unsigned_type) << (7 * (Self::MAX_ENCODED_LEN - 1));
                         Ok(result.into())
@@ -45,3 +45,72 @@ impl_var_int_decode!(VarInt32, u32);
 impl_var_int_decode!(VarInt64, u64);
 impl_var_int_decode!(VarInt128, u128);
 impl_var_int_decode!(VarIntSize, usize);
+
+#[cfg(test)]
+#[cfg(feature = "test")]
+mod tests {
+    use crate::var_int::{VarInt128, VarInt16, VarInt32, VarInt64, VarIntSize};
+    use crate::DecodeFromReadPrefix;
+    use std::io::Cursor;
+
+    fn decodes_as_overflow<T: DecodeFromReadPrefix>(encoded: &[u8]) -> bool {
+        T::decode_from_read_prefix(&mut Cursor::new(encoded)).is_err()
+    }
+
+    #[test]
+    fn var_int_16_overflow() {
+        // last byte mask = 0xFC; last byte must only use bits 0-1
+        assert!(decodes_as_overflow::<VarInt16>(b"\xFF\xFF\x04")); // 0x04 & 0xFC != 0
+        assert!(decodes_as_overflow::<VarInt16>(b"\xFF\xFF\xFF")); // 0xFF & 0xFC != 0
+    }
+
+    #[test]
+    fn var_int_32_overflow() {
+        // last byte mask = 0xF0; last byte must only use bits 0-3
+        assert!(decodes_as_overflow::<VarInt32>(b"\xFF\xFF\xFF\xFF\x10")); // 0x10 & 0xF0 != 0
+        assert!(decodes_as_overflow::<VarInt32>(b"\xFF\xFF\xFF\xFF\xFF")); // 0xFF & 0xF0 != 0
+    }
+
+    #[test]
+    fn var_int_64_overflow() {
+        // last byte mask = 0xFE; last byte must only use bit 0
+        assert!(decodes_as_overflow::<VarInt64>(
+            b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x02"
+        )); // 0x02 & 0xFE != 0
+        assert!(decodes_as_overflow::<VarInt64>(
+            b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
+        )); // 0xFF & 0xFE != 0
+    }
+
+    #[test]
+    fn var_int_128_overflow() {
+        // last byte mask = 0xFC; last byte must only use bits 0-1
+        let mut encoded: Vec<u8> = vec![0xFF; 18];
+        encoded.push(0x04); // 0x04 & 0xFC != 0
+        assert!(decodes_as_overflow::<VarInt128>(&encoded));
+
+        let mut encoded: Vec<u8> = vec![0xFF; 18];
+        encoded.push(0xFF);
+        assert!(decodes_as_overflow::<VarInt128>(&encoded));
+    }
+
+    #[test]
+    fn var_int_size_overflow() {
+        #[cfg(target_pointer_width = "32")]
+        {
+            // last byte mask = 0xF0; last byte must only use bits 0-3
+            assert!(decodes_as_overflow::<VarIntSize>(b"\xFF\xFF\xFF\xFF\x10"));
+            assert!(decodes_as_overflow::<VarIntSize>(b"\xFF\xFF\xFF\xFF\xFF"));
+        }
+        #[cfg(target_pointer_width = "64")]
+        {
+            // last byte mask = 0xFE; last byte must only use bit 0
+            assert!(decodes_as_overflow::<VarIntSize>(
+                b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x02"
+            ));
+            assert!(decodes_as_overflow::<VarIntSize>(
+                b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
+            ));
+        }
+    }
+}
