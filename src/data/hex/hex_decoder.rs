@@ -16,15 +16,6 @@ pub struct HexDecoder {
 }
 
 impl HexDecoder {
-    //! Construction
-
-    /// Creates a new hex decoder.
-    pub const fn new() -> Self {
-        Self { _nothing: () }
-    }
-}
-
-impl HexDecoder {
     //! Constants
 
     /// The case-insensitive decoding table.
@@ -119,7 +110,7 @@ mod tests {
 
     #[test]
     fn decode_odd_length() {
-        let decoder: HexDecoder = HexDecoder::new();
+        let decoder: HexDecoder = HexDecoder::default();
         let mut target: Vec<u8> = vec![0u8; 4];
         assert!(matches!(
             decoder.decode_to_slice(b"FFF", &mut target),
@@ -129,7 +120,7 @@ mod tests {
 
     #[test]
     fn decode_insufficient_space() {
-        let decoder: HexDecoder = HexDecoder::new();
+        let decoder: HexDecoder = HexDecoder::default();
         let mut target: Vec<u8> = vec![];
         assert!(matches!(
             decoder.decode_to_slice(b"FF", &mut target),

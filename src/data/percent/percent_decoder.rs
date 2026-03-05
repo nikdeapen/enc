@@ -16,15 +16,6 @@ pub struct PercentDecoder {
 }
 
 impl PercentDecoder {
-    //! Construction
-
-    /// Creates a new percent decoder.
-    pub const fn new() -> Self {
-        Self { _nothing: () }
-    }
-}
-
-impl PercentDecoder {
     //! Decoding
 
     /// Checks if the prefix of `data` is a valid, encoded byte.
@@ -106,7 +97,7 @@ mod tests {
 
     #[test]
     fn decode_insufficient_space() {
-        let decoder: PercentDecoder = PercentDecoder::new();
+        let decoder: PercentDecoder = PercentDecoder::default();
         let mut target: Vec<u8> = vec![];
         assert!(matches!(
             decoder.decode_to_slice(b"%FF", &mut target),
