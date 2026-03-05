@@ -114,7 +114,7 @@ mod tests {
 
         let caseless_test_cases: Vec<(&[u8], bool)> = test_cases
             .iter()
-            .map(|(input, a, b)| (input.as_bytes(), *a | *b))
+            .map(|(input, a, b)| (input.as_bytes(), *a || *b))
             .collect();
         test_validator(&HexValidator::CASELESS, caseless_test_cases.as_slice());
     }
