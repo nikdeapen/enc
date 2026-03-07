@@ -1,4 +1,4 @@
-use crate::var_int::impl_var_int::{VarInt128, VarInt16, VarInt32, VarInt64, VarIntSize};
+use crate::var_int::impl_var_int::{VarInt16, VarInt32, VarInt64, VarInt128, VarIntSize};
 
 macro_rules! impl_var_int_decode {
     ($target_type:ident, $unsigned_type:ty) => {
@@ -49,8 +49,8 @@ impl_var_int_decode!(VarIntSize, usize);
 #[cfg(test)]
 #[cfg(feature = "dev")]
 mod tests {
-    use crate::var_int::{VarInt128, VarInt16, VarInt32, VarInt64, VarIntSize};
     use crate::DecodeFromReadPrefix;
+    use crate::var_int::{VarInt16, VarInt32, VarInt64, VarInt128, VarIntSize};
     use std::io::Cursor;
 
     fn decodes_as_overflow<T: DecodeFromReadPrefix>(encoded: &[u8]) -> bool {

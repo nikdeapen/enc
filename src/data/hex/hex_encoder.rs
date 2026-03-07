@@ -1,5 +1,5 @@
 use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
-use crate::{data, Encoder, Error, StringEncoder};
+use crate::{Encoder, Error, StringEncoder, data};
 use std::cmp::Ordering;
 use std::hash::{Hash, Hasher};
 
@@ -99,9 +99,9 @@ impl StringEncoder for HexEncoder {
 #[cfg(test)]
 #[cfg(feature = "dev")]
 mod tests {
+    use crate::Encoder;
     use crate::hex::HexEncoder;
     use crate::test::test_string_encoder;
-    use crate::Encoder;
 
     #[test]
     fn compare() {
@@ -125,9 +125,15 @@ mod tests {
             assert_eq!(HexEncoder::LOWER.encode_bytes(*input), *lower_expected);
             assert_eq!(HexEncoder::UPPER.encode_bytes(*input), *upper_expected);
             let (lh, ll) = *lower_expected;
-            assert_eq!(HexEncoder::LOWER.encode_chars(*input), (lh as char, ll as char));
+            assert_eq!(
+                HexEncoder::LOWER.encode_chars(*input),
+                (lh as char, ll as char)
+            );
             let (uh, ul) = *upper_expected;
-            assert_eq!(HexEncoder::UPPER.encode_chars(*input), (uh as char, ul as char));
+            assert_eq!(
+                HexEncoder::UPPER.encode_chars(*input),
+                (uh as char, ul as char)
+            );
         }
     }
 

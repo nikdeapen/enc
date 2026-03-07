@@ -1,5 +1,5 @@
-use crate::base_64::decode::decoding_table::DecodingTable;
 use crate::base_64::Base64Encoder;
+use crate::base_64::decode::decoding_table::DecodingTable;
 use crate::{Error, Validator};
 
 /// Responsible for validating base-64 encoded data.

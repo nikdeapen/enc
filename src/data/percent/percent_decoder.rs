@@ -1,5 +1,5 @@
-use crate::hex::{HexDecoder, HexValidator};
 use crate::Error::InsufficientTargetSpace;
+use crate::hex::{HexDecoder, HexValidator};
 use crate::{Decoder, Error};
 
 /// Responsible for decoding data in the URL percent encoded format.
@@ -72,9 +72,9 @@ impl Decoder for PercentDecoder {
 #[cfg(test)]
 #[cfg(feature = "dev")]
 mod tests {
+    use crate::Decoder;
     use crate::percent::PercentDecoder;
     use crate::test::test_decoder;
-    use crate::Decoder;
 
     #[test]
     fn decode() {

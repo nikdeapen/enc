@@ -54,7 +54,11 @@ mod tests {
         ];
         for (data_len, padded, expected) in test_cases {
             let result: usize = encoded_len(*data_len, *padded).unwrap();
-            assert_eq!(result, *expected, "data_len={} padded={}", *data_len, *padded);
+            assert_eq!(
+                result, *expected,
+                "data_len={} padded={}",
+                *data_len, *padded
+            );
         }
     }
 }

@@ -1,7 +1,7 @@
+use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
 use crate::hex::HexEncoder;
 use crate::percent::SpecialSet;
-use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
-use crate::{data, Encoder, Error, StringEncoder};
+use crate::{Encoder, Error, StringEncoder, data};
 
 /// Responsible for encoding data in the URL percent encoded format.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
@@ -81,9 +81,9 @@ impl StringEncoder for PercentEncoder {
 #[cfg(test)]
 #[cfg(feature = "dev")]
 mod tests {
+    use crate::Encoder;
     use crate::percent::percent_encoder::PercentEncoder;
     use crate::test::test_string_encoder;
-    use crate::Encoder;
 
     #[test]
     fn encode_insufficient_space() {

@@ -1,7 +1,7 @@
+use crate::Error::InsufficientTargetSpace;
 use crate::base_64::encode;
 use crate::base_64::encode::EncodingTable;
-use crate::Error::InsufficientTargetSpace;
-use crate::{data, Encoder, Error, StringEncoder};
+use crate::{Encoder, Error, StringEncoder, data};
 
 /// Responsible for encoding data in the base-64 format.
 #[derive(Clone, Debug)]

@@ -88,13 +88,15 @@ impl EncodingTable {
 
 #[cfg(test)]
 mod tests {
-    use crate::base_64::encode::encoding_table::EncodingTable;
     use crate::base_64::Base64Encoder;
+    use crate::base_64::encode::encoding_table::EncodingTable;
 
     #[test]
     fn fn_get_encoding_table() {
-        let standard: EncodingTable =
-            EncodingTable::get_encoding_table(Base64Encoder::DEFAULT_V63, Base64Encoder::DEFAULT_V64);
+        let standard: EncodingTable = EncodingTable::get_encoding_table(
+            Base64Encoder::DEFAULT_V63,
+            Base64Encoder::DEFAULT_V64,
+        );
         assert!(matches!(standard, EncodingTable::Static(_)));
 
         let url_safe: EncodingTable = EncodingTable::get_encoding_table(
