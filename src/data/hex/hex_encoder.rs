@@ -97,7 +97,7 @@ impl StringEncoder for HexEncoder {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
+#[cfg(feature = "dev")]
 mod tests {
     use crate::hex::HexEncoder;
     use crate::test::test_string_encoder;

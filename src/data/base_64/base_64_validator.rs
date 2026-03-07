@@ -180,7 +180,7 @@ impl Validator for Base64Validator {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
+#[cfg(feature = "dev")]
 mod tests {
     use crate::base_64::base_64_validator::Base64Validator;
     use crate::test::test_validator;

@@ -120,7 +120,7 @@ impl StringEncoder for Base64Encoder {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
+#[cfg(feature = "dev")]
 mod tests {
     use crate::base_64::Base64Encoder;
     use crate::test::test_string_encoder;

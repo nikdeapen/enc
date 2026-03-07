@@ -47,7 +47,7 @@ impl_var_int_decode!(VarInt128, u128);
 impl_var_int_decode!(VarIntSize, usize);
 
 #[cfg(test)]
-#[cfg(feature = "test")]
+#[cfg(feature = "dev")]
 mod tests {
     use crate::var_int::{VarInt128, VarInt16, VarInt32, VarInt64, VarIntSize};
     use crate::DecodeFromReadPrefix;

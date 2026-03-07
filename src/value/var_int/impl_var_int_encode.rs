@@ -17,14 +17,14 @@ macro_rules! impl_var_int_encode {
                     let last_seven: u8 = (v & 0x7F) as u8;
                     v >>= 7;
                     if v == 0 {
-                        *target.get_unchecked_mut(t) = last_seven;
+                        unsafe { *target.get_unchecked_mut(t) = last_seven };
                         return Ok(t + 1);
                     } else {
-                        *target.get_unchecked_mut(t) = last_seven | 0x80;
+                        unsafe { *target.get_unchecked_mut(t) = last_seven | 0x80 };
                         t += 1;
                     }
                 }
-                *target.get_unchecked_mut(t) = v as u8;
+                unsafe { *target.get_unchecked_mut(t) = v as u8 };
                 Ok(t + 1)
             }
         }
@@ -40,7 +40,7 @@ impl_var_int_encode!(VarInt128, u128, u128::BITS);
 impl_var_int_encode!(VarIntSize, usize, usize::BITS);
 
 #[cfg(test)]
-#[cfg(feature = "test")]
+#[cfg(feature = "dev")]
 mod tests {
     use crate::test::{test_decode_from_read_prefix, test_encode};
     use crate::var_int::{VarInt128, VarInt16, VarInt32, VarInt64, VarIntSize};

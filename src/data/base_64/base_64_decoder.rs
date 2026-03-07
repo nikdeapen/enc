@@ -80,7 +80,7 @@ impl Decoder for Base64Decoder {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
+#[cfg(feature = "dev")]
 mod tests {
     use crate::base_64::Base64Decoder;
     use crate::test::test_decoder;
