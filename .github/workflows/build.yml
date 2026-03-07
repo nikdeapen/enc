@@ -57,3 +57,9 @@ jobs:
         run: cargo fmt --check
       - name: Lint
         run: cargo clippy --all-targets --all-features -- -D warnings
+  status:
+    name: Build
+    needs: [ build, build-default, lint-all ]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All checks passed."
