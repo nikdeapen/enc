@@ -11,11 +11,7 @@ pub fn split_last_block(data: &[u8]) -> (&[u8], &[u8]) {
         0
     } else {
         let rem: usize = len % 4;
-        if rem == 0 {
-            len - 4
-        } else {
-            len & !0x03
-        }
+        if rem == 0 { len - 4 } else { len & !0x03 }
     };
     data.split_at(last_block_index)
 }

@@ -1,4 +1,4 @@
-use crate::{read_optional_byte, read_single_byte, Error};
+use crate::{Error, read_optional_byte, read_single_byte};
 use std::io::Read;
 
 /// A value that can decode itself from a `Read` prefix.

@@ -1,5 +1,5 @@
-use crate::test::data::util::test_coder;
 use crate::Decoder;
+use crate::test::data::util::test_coder;
 
 /// Tests the `decoder`.
 pub fn test_decoder<E, I, O>(decoder: &E, test_cases: &[(I, O)])

@@ -2,7 +2,8 @@
 .DS_Store
 
 # JetBrains
-.idea/
+.idea/*
+!.idea/dictionaries/
 *.iml
 
 # Rust

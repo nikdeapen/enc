@@ -1,5 +1,5 @@
-use crate::test::hex;
 use crate::Validator;
+use crate::test::hex;
 
 /// Tests the `validator`.
 pub fn test_validator<V, I>(validator: &V, test_cases: &[(I, bool)])

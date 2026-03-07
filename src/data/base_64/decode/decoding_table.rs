@@ -140,13 +140,15 @@ impl DecodingTable {
 
 #[cfg(test)]
 mod tests {
-    use crate::base_64::decode::decoding_table::DecodingTable;
     use crate::base_64::Base64Encoder;
+    use crate::base_64::decode::decoding_table::DecodingTable;
 
     #[test]
     fn fn_get_decoding_table() {
-        let standard: DecodingTable =
-            DecodingTable::get_decoding_table(Base64Encoder::DEFAULT_V63, Base64Encoder::DEFAULT_V64);
+        let standard: DecodingTable = DecodingTable::get_decoding_table(
+            Base64Encoder::DEFAULT_V63,
+            Base64Encoder::DEFAULT_V64,
+        );
         assert!(matches!(standard, DecodingTable::Static(_)));
 
         let url_safe: DecodingTable = DecodingTable::get_decoding_table(

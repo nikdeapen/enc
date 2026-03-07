@@ -6,7 +6,7 @@ readme = "README.md"
 repository = "https://github.com/nikdeapen/enc"
 homepage = "https://github.com/nikdeapen/enc"
 authors = ["Nik Deapen <nik@deapen.com>"]
-edition = "2021"
+edition = "2024"
 license = "MIT"
 
 [package.metadata.docs.rs]
@@ -39,6 +39,11 @@ value = []
 ## Provides support for variable-length encoded integers.
 var-int = ["value"]
 
+#! ## Default
+
+## All features are included by default.
+default = ["full"]
+
 #! ## Full
 
 ## Includes all the data encoding features.
@@ -53,4 +58,4 @@ full = ["full-data", "full-value"]
 #! ## Dev
 
 ## Provides utilities for testing encoding implementations.
-test = ["full"]
+dev = ["full"]

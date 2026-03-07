@@ -17,5 +17,5 @@ mod util;
 #[cfg(feature = "value")]
 mod value;
 
-#[cfg(feature = "test")]
+#[cfg(feature = "dev")]
 pub mod test;

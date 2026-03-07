@@ -1,10 +1,10 @@
+use crate::Error::InsufficientTargetSpace;
+use crate::base_64::Base64Encoder;
 use crate::base_64::decode::decode_block::decode_block;
 use crate::base_64::decode::decode_block_last::decode_block_last;
 use crate::base_64::decode::decoded_len::decoded_len;
 use crate::base_64::decode::decoding_table::DecodingTable;
 use crate::base_64::decode::split_last_block::split_last_block;
-use crate::base_64::Base64Encoder;
-use crate::Error::InsufficientTargetSpace;
 use crate::{Decoder, Error};
 
 /// Responsible for decoding base-64 encoded data.
@@ -80,7 +80,7 @@ impl Decoder for Base64Decoder {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
+#[cfg(feature = "dev")]
 mod tests {
     use crate::base_64::Base64Decoder;
     use crate::test::test_decoder;

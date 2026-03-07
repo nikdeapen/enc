@@ -1,4 +1,4 @@
-use crate::{data, Error};
+use crate::{Error, data};
 
 /// Responsible for encoding binary data.
 pub trait Encoder {

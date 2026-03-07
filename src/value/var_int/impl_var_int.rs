@@ -80,10 +80,10 @@ impl_var_int!(VarInt128, u128, i128, u128::BITS);
 impl_var_int!(VarIntSize, usize, isize, usize::BITS);
 
 #[cfg(test)]
-#[cfg(feature = "test")]
+#[cfg(feature = "dev")]
 mod tests {
-    use crate::var_int::{VarInt128, VarInt16, VarInt32, VarInt64, VarIntSize};
     use crate::EncodedLen;
+    use crate::var_int::{VarInt16, VarInt32, VarInt64, VarInt128, VarIntSize};
     use std::error::Error;
 
     #[test]

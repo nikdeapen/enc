@@ -81,11 +81,11 @@ impl Decoder for HexDecoder {
 }
 
 #[cfg(test)]
-#[cfg(feature = "test")]
+#[cfg(feature = "dev")]
 mod tests {
+    use crate::Decoder;
     use crate::hex::HexDecoder;
     use crate::test::test_decoder;
-    use crate::Decoder;
 
     #[test]
     fn decode_bytes_decode_chars() {

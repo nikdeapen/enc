@@ -1,6 +1,6 @@
 use crate::test::hex;
 use crate::var_int::VarIntSize;
-use crate::{read_optional_byte, DecodeFromRead, DecodeFromReadPrefix, EncodeToWrite};
+use crate::{DecodeFromRead, DecodeFromReadPrefix, EncodeToWrite, read_optional_byte};
 use std::fmt::Debug;
 use std::io::{Cursor, Write};
 

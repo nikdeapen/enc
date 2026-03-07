@@ -31,8 +31,8 @@ pub trait DecodeFromRead: Sized {
     where
         R: Read,
     {
-        use crate::var_int::VarIntSize;
         use crate::DecodeFromReadPrefix;
+        use crate::var_int::VarIntSize;
 
         let prefix: usize = VarIntSize::decode_from_read_prefix_with_first_byte(r, first)?.value();
         const _: () = assert!(usize::BITS <= 64);

@@ -1,5 +1,5 @@
-use crate::test::hex;
 use crate::Error;
+use crate::test::hex;
 
 /// Tests the `Encoder` or `Decoder` functions.
 pub fn test_coder<I, O, LF, SF, AF, VF>(
