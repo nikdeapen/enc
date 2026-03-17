@@ -44,6 +44,20 @@ impl Base64Decoder {
     }
 }
 
+impl Base64Decoder {
+    //! Special Decoders
+
+    /// Gets the URL-safe decoder.
+    pub fn url_safe_decoder() -> Self {
+        Self::new(
+            Base64Encoder::URL_SAFE_V63,
+            Base64Encoder::URL_SAFE_V64,
+            Base64Encoder::URL_SAFE_PADDING,
+        )
+        .unwrap()
+    }
+}
+
 impl Default for Base64Decoder {
     fn default() -> Self {
         Self {
