@@ -4,6 +4,7 @@ use std::io::ErrorKind;
 
 /// An error processing encoded data.
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum Error {
     /// A data streaming error.
     Stream(io::Error),
