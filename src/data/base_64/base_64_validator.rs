@@ -3,7 +3,7 @@ use crate::base_64::decode::decoding_table::DecodingTable;
 use crate::{Error, Validator};
 
 /// Responsible for validating base-64 encoded data.
-#[derive(Clone, Debug)]
+#[derive(Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct Base64Validator {
     decoding_table: DecodingTable,
     padding: Option<u8>,

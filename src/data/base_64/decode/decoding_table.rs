@@ -1,4 +1,6 @@
 use crate::base_64::Base64Encoder;
+use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 use std::sync::Arc;
 
 /// A base-64 decoding table.
@@ -14,6 +16,32 @@ pub enum DecodingTable {
 
     /// An atomic reference counted decoding table.
     Reference(Arc<[u8; 256]>),
+}
+
+impl PartialEq for DecodingTable {
+    fn eq(&self, other: &Self) -> bool {
+        self.decoding_table() == other.decoding_table()
+    }
+}
+
+impl Eq for DecodingTable {}
+
+impl Hash for DecodingTable {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.decoding_table().hash(state)
+    }
+}
+
+impl Ord for DecodingTable {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.decoding_table().cmp(other.decoding_table())
+    }
+}
+
+impl PartialOrd for DecodingTable {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl DecodingTable {

@@ -1,4 +1,6 @@
 use crate::base_64::Base64Encoder;
+use std::cmp::Ordering;
+use std::hash::{Hash, Hasher};
 use std::sync::Arc;
 
 /// A base-64 encoding table.
@@ -14,6 +16,32 @@ pub enum EncodingTable {
 
     /// An atomic reference counted encoding table.
     Reference(Arc<[u8; 64]>),
+}
+
+impl PartialEq for EncodingTable {
+    fn eq(&self, other: &Self) -> bool {
+        self.encoding_table() == other.encoding_table()
+    }
+}
+
+impl Eq for EncodingTable {}
+
+impl Hash for EncodingTable {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.encoding_table().hash(state)
+    }
+}
+
+impl Ord for EncodingTable {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.encoding_table().cmp(other.encoding_table())
+    }
+}
+
+impl PartialOrd for EncodingTable {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl EncodingTable {

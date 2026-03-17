@@ -4,7 +4,7 @@ use crate::base_64::encode::EncodingTable;
 use crate::{Encoder, Error, StringEncoder, data};
 
 /// Responsible for encoding data in the base-64 format.
-#[derive(Clone, Debug)]
+#[derive(Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct Base64Encoder {
     table: EncodingTable,
     padding: Option<u8>,

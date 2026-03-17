@@ -13,7 +13,7 @@ use crate::{Decoder, Error};
 /// This decoder implementation does nothing to validate the encoded data. If invalid input data is
 /// given, the output bytes are undefined. The decoded length calculation will still be accurate,
 /// and decoding data will not cause a panic.
-#[derive(Clone, Debug)]
+#[derive(Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct Base64Decoder {
     table: DecodingTable,
     padding: Option<u8>,
