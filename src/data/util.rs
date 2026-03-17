@@ -1,5 +1,7 @@
+use crate::Error;
 use crate::Error::IntegerOverflow;
-use crate::{Encoder, Error};
+#[cfg(any(feature = "hex", feature = "base-64", feature = "percent"))]
+use crate::Encoder;
 
 /// The default implementation of the `append_to_vec` function for `Encoder`s and `Decoder`s.
 ///

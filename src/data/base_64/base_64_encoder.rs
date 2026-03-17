@@ -161,4 +161,27 @@ mod tests {
         let encoder: Base64Encoder = Base64Encoder::url_safe_encoder();
         test_string_encoder(&encoder, test_cases);
     }
+
+    #[test]
+    fn encode_default() {
+        let test_cases: &[(&[u8], &str)] = &[
+            (b"", ""),
+            (b"\x00\x10\x83", "ABCD"),
+            (b"\xF3\xDF\xBF", "89+/"),
+            (b"\x00", "AA=="),
+            (b"\xFF", "/w=="),
+            (b"\x00\x00", "AAA="),
+            (b"\xFF\xFF", "//8="),
+            (b"\x00\x00\x00", "AAAA"),
+            (b"\xFF\xFF\xFF", "////"),
+            (b"\x00\x00\x00\x00", "AAAAAA=="),
+            (b"\xFF\xFF\xFF\xFF", "/////w=="),
+            (b"\x00\x00\x00\x00\x00", "AAAAAAA="),
+            (b"\xFF\xFF\xFF\xFF\xFF", "//////8="),
+            (b"\x00\x00\x00\x00\x00\x00", "AAAAAAAA"),
+            (b"\xFF\xFF\xFF\xFF\xFF\xFF", "////////"),
+        ];
+        let encoder: Base64Encoder = Base64Encoder::default();
+        test_string_encoder(&encoder, test_cases);
+    }
 }
