@@ -3,7 +3,7 @@ use crate::base_64::decode::remove_padding_last_block::remove_padding_last_block
 /// Gets the length of the decoded `last_block`.
 ///
 /// The `last_block` length must be at most 4.
-pub fn decoded_length_last_block(last_block: &[u8], padding: Option<u8>) -> usize {
+pub fn decoded_len_last_block(last_block: &[u8], padding: Option<u8>) -> usize {
     debug_assert!(last_block.len() <= 4);
 
     let data: &[u8] = remove_padding_last_block(last_block, padding);
@@ -19,7 +19,7 @@ pub fn decoded_length_last_block(last_block: &[u8], padding: Option<u8>) -> usiz
 
 #[cfg(test)]
 mod tests {
-    use crate::base_64::decode::decoded_len_last_block::decoded_length_last_block;
+    use crate::base_64::decode::decoded_len_last_block::decoded_len_last_block;
 
     #[test]
     fn fn_decoded_len_last_block() {
@@ -42,7 +42,7 @@ mod tests {
         ];
 
         for (padding, data, expected) in test_cases {
-            let result: usize = decoded_length_last_block(data.as_bytes(), *padding);
+            let result: usize = decoded_len_last_block(data.as_bytes(), *padding);
             assert_eq!(result, *expected, "pad={:?} data={}", *padding, *data);
         }
     }
