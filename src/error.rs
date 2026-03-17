@@ -54,4 +54,12 @@ impl Display for Error {
     }
 }
 
-impl std::error::Error for Error {}
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Stream(error) => Some(error),
+            Self::InvalidEncodedData { reason } => reason.as_deref().map(|r| r as &dyn std::error::Error),
+            _ => None,
+        }
+    }
+}
