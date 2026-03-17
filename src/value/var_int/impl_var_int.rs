@@ -46,7 +46,7 @@ macro_rules! impl_var_int {
             //! Properties
 
             /// Gets the value.
-            pub fn value(&self) -> $unsigned_type {
+            pub fn value(self) -> $unsigned_type {
                 self.value
             }
         }
@@ -60,7 +60,7 @@ macro_rules! impl_var_int {
             }
 
             /// Converts the `$target_type` to an `$signed_type` value using zigzag encoding.
-            pub fn to_zigzag(&self) -> $signed_type {
+            pub fn to_zigzag(self) -> $signed_type {
                 ((self.value >> 1) as $signed_type) ^ (-((self.value & 1) as $signed_type))
             }
         }

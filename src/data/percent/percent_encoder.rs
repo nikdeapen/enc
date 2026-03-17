@@ -33,7 +33,7 @@ impl PercentEncoder {
 
     /// Checks if `c` needs encoding.
     #[inline(always)]
-    pub fn needs_encoding(&self, c: u8) -> bool {
+    pub fn needs_encoding(self, c: u8) -> bool {
         !c.is_ascii_alphanumeric() && !self.do_not_encode.contains(c)
     }
 }
