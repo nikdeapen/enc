@@ -11,9 +11,8 @@ use crate::{Decoder, Error};
 /// number of encoded bytes. If invalid input data is given, the output bytes are undefined. The
 /// decoded length calculation will still be accurate, and decoding data will not cause a panic.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Default)]
-pub struct HexDecoder {
-    _nothing: (),
-}
+#[non_exhaustive]
+pub struct HexDecoder {}
 
 impl HexDecoder {
     //! Constants

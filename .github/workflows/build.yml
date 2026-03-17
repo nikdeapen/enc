@@ -57,9 +57,31 @@ jobs:
         run: cargo fmt --check
       - name: Lint
         run: cargo clippy --all-targets --all-features -- -D warnings
+  cross-platform:
+    name: Build ${{ matrix.target }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [ i686-unknown-linux-gnu, x86_64-unknown-linux-gnu ]
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+      - name: Install 32-bit support
+        if: matrix.target == 'i686-unknown-linux-gnu'
+        run: sudo apt-get update && sudo apt-get install -y gcc-multilib
+      - name: Build
+        run: cargo build --all-features --target ${{ matrix.target }} --verbose
+      - name: Test
+        run: cargo test --all-features --target ${{ matrix.target }} --verbose
   status:
     name: Build
-    needs: [ build, build-default, lint-all ]
+    needs: [ build, build-default, lint-all, cross-platform ]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All checks passed."

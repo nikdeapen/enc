@@ -57,13 +57,13 @@ impl HexEncoder {
 
     /// Encodes `b` as two hex bytes.
     #[inline(always)]
-    pub const fn encode_bytes(&self, b: u8) -> (u8, u8) {
+    pub const fn encode_bytes(self, b: u8) -> (u8, u8) {
         (self.hex[(b as usize) >> 4], self.hex[(b as usize) & 0xF])
     }
 
     /// Encodes `b` as two hex chars.
     #[inline(always)]
-    pub const fn encode_chars(&self, b: u8) -> (char, char) {
+    pub const fn encode_chars(self, b: u8) -> (char, char) {
         let (a, b) = self.encode_bytes(b);
         (a as char, b as char)
     }

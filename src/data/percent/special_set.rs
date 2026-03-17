@@ -123,13 +123,13 @@ impl SpecialSet {
     /// Checks if the set contains `c`.
     ///
     /// If `c` is invalid, this will return false.
-    pub fn contains(&self, c: u8) -> bool {
+    pub fn contains(self, c: u8) -> bool {
         let index: u32 = Self::index_of(c) as u32;
         index < 32 && (self.bits & (1u32 << index)) != 0
     }
 
     /// Gets the number of chars in the set.
-    pub fn size(&self) -> usize {
+    pub fn size(self) -> usize {
         self.bits.count_ones() as usize
     }
 }
@@ -138,7 +138,7 @@ impl SpecialSet {
     //! Iteration
 
     /// Creates a new iterator for the chars.
-    pub fn iter(&self) -> impl Iterator<Item = u8> {
+    pub fn iter(self) -> impl Iterator<Item = u8> {
         SpecialSetIterator { bits: self.bits }
     }
 }

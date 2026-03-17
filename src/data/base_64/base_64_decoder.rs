@@ -13,7 +13,7 @@ use crate::{Decoder, Error};
 /// This decoder implementation does nothing to validate the encoded data. If invalid input data is
 /// given, the output bytes are undefined. The decoded length calculation will still be accurate,
 /// and decoding data will not cause a panic.
-#[derive(Clone, Debug)]
+#[derive(Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct Base64Decoder {
     table: DecodingTable,
     padding: Option<u8>,
@@ -41,6 +41,20 @@ impl Base64Decoder {
         } else {
             None
         }
+    }
+}
+
+impl Base64Decoder {
+    //! Special Decoders
+
+    /// Gets the URL-safe decoder.
+    pub fn url_safe_decoder() -> Self {
+        Self::new(
+            Base64Encoder::URL_SAFE_V63,
+            Base64Encoder::URL_SAFE_V64,
+            Base64Encoder::URL_SAFE_PADDING,
+        )
+        .unwrap()
     }
 }
 

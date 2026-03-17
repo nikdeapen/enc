@@ -29,19 +29,24 @@ impl<S: Into<SpecialSet>> From<S> for PercentValidator {
 
 impl Validator for PercentValidator {
     fn is_valid(&self, data: &[u8]) -> Result<bool, Error> {
-        for (i, c) in data.iter().enumerate() {
+        let mut i: usize = 0;
+        while i < data.len() {
+            let c: u8 = data[i];
             if !c.is_ascii_alphanumeric() {
-                if *c == b'%' {
+                if c == b'%' {
                     if i + 2 >= data.len()
                         || !self.hex_validator.is_valid_byte(data[i + 1])
                         || !self.hex_validator.is_valid_byte(data[i + 2])
                     {
                         return Ok(false);
                     }
-                } else if !self.encoding_not_needed.contains(*c) {
+                    i += 3;
+                    continue;
+                } else if !self.encoding_not_needed.contains(c) {
                     return Ok(false);
                 }
             }
+            i += 1;
         }
         Ok(true)
     }

@@ -4,6 +4,7 @@ use std::io::ErrorKind;
 
 /// An error processing encoded data.
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum Error {
     /// A data streaming error.
     Stream(io::Error),
@@ -54,4 +55,14 @@ impl Display for Error {
     }
 }
 
-impl std::error::Error for Error {}
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Stream(error) => Some(error),
+            Self::InvalidEncodedData { reason } => {
+                reason.as_deref().map(|r| r as &dyn std::error::Error)
+            }
+            _ => None,
+        }
+    }
+}

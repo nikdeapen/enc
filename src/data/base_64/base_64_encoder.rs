@@ -4,7 +4,7 @@ use crate::base_64::encode::EncodingTable;
 use crate::{Encoder, Error, StringEncoder, data};
 
 /// Responsible for encoding data in the base-64 format.
-#[derive(Clone, Debug)]
+#[derive(Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct Base64Encoder {
     table: EncodingTable,
     padding: Option<u8>,
@@ -145,20 +145,43 @@ mod tests {
             (b"\xE3\x9E\xBB", "4567"),
             (b"\xF3\xDF\xBF", "89-_"),
             (b"", ""),
-            (b"\x00", "AA=="),
-            (b"\xFF", "_w=="),
-            (b"\x00\x00", "AAA="),
-            (b"\xFF\xFF", "__8="),
+            (b"\x00", "AA"),
+            (b"\xFF", "_w"),
+            (b"\x00\x00", "AAA"),
+            (b"\xFF\xFF", "__8"),
             (b"\x00\x00\x00", "AAAA"),
             (b"\xFF\xFF\xFF", "____"),
-            (b"\x00\x00\x00\x00", "AAAAAA=="),
-            (b"\xFF\xFF\xFF\xFF", "_____w=="),
-            (b"\x00\x00\x00\x00\x00", "AAAAAAA="),
-            (b"\xFF\xFF\xFF\xFF\xFF", "______8="),
+            (b"\x00\x00\x00\x00", "AAAAAA"),
+            (b"\xFF\xFF\xFF\xFF", "_____w"),
+            (b"\x00\x00\x00\x00\x00", "AAAAAAA"),
+            (b"\xFF\xFF\xFF\xFF\xFF", "______8"),
             (b"\x00\x00\x00\x00\x00\x00", "AAAAAAAA"),
             (b"\xFF\xFF\xFF\xFF\xFF\xFF", "________"),
         ];
         let encoder: Base64Encoder = Base64Encoder::url_safe_encoder();
+        test_string_encoder(&encoder, test_cases);
+    }
+
+    #[test]
+    fn encode_default() {
+        let test_cases: &[(&[u8], &str)] = &[
+            (b"", ""),
+            (b"\x00\x10\x83", "ABCD"),
+            (b"\xF3\xDF\xBF", "89+/"),
+            (b"\x00", "AA=="),
+            (b"\xFF", "/w=="),
+            (b"\x00\x00", "AAA="),
+            (b"\xFF\xFF", "//8="),
+            (b"\x00\x00\x00", "AAAA"),
+            (b"\xFF\xFF\xFF", "////"),
+            (b"\x00\x00\x00\x00", "AAAAAA=="),
+            (b"\xFF\xFF\xFF\xFF", "/////w=="),
+            (b"\x00\x00\x00\x00\x00", "AAAAAAA="),
+            (b"\xFF\xFF\xFF\xFF\xFF", "//////8="),
+            (b"\x00\x00\x00\x00\x00\x00", "AAAAAAAA"),
+            (b"\xFF\xFF\xFF\xFF\xFF\xFF", "////////"),
+        ];
+        let encoder: Base64Encoder = Base64Encoder::default();
         test_string_encoder(&encoder, test_cases);
     }
 }

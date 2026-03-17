@@ -19,5 +19,5 @@ impl Base64Encoder {
     pub const URL_SAFE_V64: u8 = b'_';
 
     /// The URL-safe padding.
-    pub const URL_SAFE_PADDING: Option<u8> = Self::DEFAULT_PADDING;
+    pub const URL_SAFE_PADDING: Option<u8> = None;
 }

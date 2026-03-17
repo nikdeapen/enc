@@ -1,5 +1,7 @@
+#[cfg(any(feature = "hex", feature = "base-64", feature = "percent"))]
+use crate::Encoder;
+use crate::Error;
 use crate::Error::IntegerOverflow;
-use crate::{Encoder, Error};
 
 /// The default implementation of the `append_to_vec` function for `Encoder`s and `Decoder`s.
 ///
@@ -40,7 +42,7 @@ where
 ///
 /// # Safety
 /// The encoded `data` must be a valid UTF-8 byte sequence.
-#[allow(dead_code)]
+#[cfg(any(feature = "hex", feature = "base-64", feature = "percent"))]
 pub(crate) unsafe fn append_to_string_unchecked<E>(
     encoder: &E,
     data: &[u8],

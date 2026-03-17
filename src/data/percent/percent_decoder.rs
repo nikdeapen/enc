@@ -11,9 +11,8 @@ use crate::{Decoder, Error};
 /// No validation is done on the encoded data. All properly encoded chars will be decoded, and
 /// improperly encoded chars will pass through the decoder unchanged.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug, Default)]
-pub struct PercentDecoder {
-    _nothing: (),
-}
+#[non_exhaustive]
+pub struct PercentDecoder {}
 
 impl PercentDecoder {
     //! Decoding
