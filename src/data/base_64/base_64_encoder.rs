@@ -95,7 +95,7 @@ impl Encoder for Base64Encoder {
                         self.padding,
                         &data[d..],
                         &mut target[t..],
-                    )
+                    );
                 }
                 2 => {
                     t += encode::encode_last_block_2(
@@ -103,7 +103,7 @@ impl Encoder for Base64Encoder {
                         self.padding,
                         &data[d..],
                         &mut target[t..],
-                    )
+                    );
                 }
                 _ => unreachable!(),
             }
