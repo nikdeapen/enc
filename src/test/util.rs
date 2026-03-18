@@ -8,7 +8,7 @@ pub fn hex(data: &[u8]) -> String {
     let mut s: String = String::with_capacity(data.len() * 3);
 
     for (i, b) in data.iter().enumerate() {
-        if i != 0  && i % 2 == 0 {
+        if i != 0 && i % 2 == 0 {
             s.push(':');
         }
         let (a, b) = HexEncoder::UPPER.encode_chars(*b);
