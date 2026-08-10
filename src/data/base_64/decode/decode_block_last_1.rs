@@ -38,7 +38,7 @@ mod tests {
         ];
 
         let table: DecodingTable = DecodingTable::default();
-        let table: &[u8; 256] = table.decoding_table();
+        let table: &[u8; 256] = table.table();
         for (data, expected) in test_cases {
             let mut target: [u8; 1] = [0u8; 1];
             let result: usize = unsafe { decode_block_last_1(table, data.as_bytes(), &mut target) };

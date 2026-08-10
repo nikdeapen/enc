@@ -3,7 +3,7 @@
 /// Returns the number of encoded bytes: (2 or 4).
 ///
 /// # Panics
-/// Panics if `block` is not 1 byte or `target` is less than 2 bytes.
+/// Panics if `block` is not 1 byte or `target` is not exactly 2 bytes (4 with `padding`).
 #[inline(always)]
 pub fn encode_last_block_1(
     table: &[u8; 64],
@@ -46,7 +46,7 @@ mod tests {
         ];
 
         let table: EncodingTable = EncodingTable::default();
-        let table: &[u8; 64] = table.encoding_table();
+        let table: &[u8; 64] = table.table();
         for (input, no_pad, with_pad) in test_cases {
             let mut target: [u8; 4] = [0u8; 4];
             let result: usize = encode_last_block_1(table, None, &[*input], &mut target[..2]);

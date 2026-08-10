@@ -3,6 +3,10 @@
 /// The `target_type` must also implement `EncodeToSlice` and have a relatively small maximum
 /// encoded length (that will fit on the stack). The `encode_to_slice_unchecked` function is used
 /// to encode the value to a stack buffer before it is flushed to the `Write`.
+///
+/// # Safety
+/// The `max_encoded_len` must be at least the `encoded_len()` of every possible `target_type` value, otherwise the
+/// generated impl writes past the end of its stack buffer, which is undefined behavior.
 #[macro_export]
 macro_rules! impl_encode_to_write_stack_buf {
     ($target_type:ty, $max_encoded_len:expr) => {

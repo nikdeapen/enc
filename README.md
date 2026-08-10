@@ -6,7 +6,7 @@
 
 This library aids in processing encoded data. No dependencies.
 
-    enc = "0.19.0"
+    enc = "0.20.0-rc.1"
 
 ## Features
 

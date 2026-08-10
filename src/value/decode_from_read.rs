@@ -36,6 +36,11 @@ pub trait DecodeFromRead: Sized {
 
         let prefix: usize = VarIntSize::decode_from_read_prefix_with_first_byte(r, first)?.value();
         const _: () = assert!(usize::BITS <= 64);
-        Self::decode_from_read(&mut r.take(prefix as u64))
+        let mut take: std::io::Take<&mut R> = r.take(prefix as u64);
+        let value: Self = Self::decode_from_read(&mut take)?;
+        if take.limit() != 0 {
+            return Err(Error::InvalidEncodedData { reason: None });
+        }
+        Ok(value)
     }
 }

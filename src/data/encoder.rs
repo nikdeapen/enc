@@ -1,8 +1,10 @@
-use crate::{Error, data};
+use crate::{Error, append_to_vec_with};
 
 /// Responsible for encoding binary data.
 pub trait Encoder {
     /// Gets the length of the encoded `data`.
+    ///
+    /// The result must exactly equal the number of bytes `encode_to_slice` will write for the same `data`.
     fn encoded_len(&self, data: &[u8]) -> Result<usize, Error>;
 
     /// Encodes the `data` into the `target` slice.
@@ -14,11 +16,10 @@ pub trait Encoder {
     ///
     /// Returns the length of the encoded `data`.
     fn append_to_vec(&self, data: &[u8], target: &mut Vec<u8>) -> Result<usize, Error> {
-        data::util::default_append_to_vec(
-            data,
+        append_to_vec_with(
             target,
-            |d| self.encoded_len(d),
-            |d, t| self.encode_to_slice(d, t),
+            || self.encoded_len(data),
+            |t| self.encode_to_slice(data, t),
         )
     }
 

@@ -77,7 +77,7 @@ impl Encoder for Base64Encoder {
             Err(InsufficientTargetSpace)
         } else {
             let target: &mut [u8] = &mut target[..encoded_len];
-            let table: &[u8; 64] = self.table.encoding_table();
+            let table: &[u8; 64] = self.table.table();
             let div: usize = data.len() / 3;
             let rem: usize = data.len() % 3;
             let mut d: usize = 0;

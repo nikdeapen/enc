@@ -78,7 +78,7 @@ impl Decoder for Base64Decoder {
             Err(InsufficientTargetSpace)
         } else {
             let target: &mut [u8] = &mut target[..decoded_len];
-            let table: &[u8; 256] = self.table.decoding_table();
+            let table: &[u8; 256] = self.table.table();
             let (full_blocks, last_block) = split_last_block(data);
             let mut d: usize = 0;
             let mut t: usize = 0;

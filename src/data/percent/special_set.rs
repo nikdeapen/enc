@@ -44,38 +44,11 @@ impl SpecialSet {
     const fn create_index_table() -> [u8; 128] {
         let mut index_table: [u8; 128] = [32; 128];
 
-        index_table[b' ' as usize] = 0;
-        index_table[b'!' as usize] = 1;
-        index_table[b'"' as usize] = 2;
-        index_table[b'#' as usize] = 3;
-        index_table[b'$' as usize] = 4;
-        index_table[b'&' as usize] = 5;
-        index_table[b'\'' as usize] = 6;
-        index_table[b'(' as usize] = 7;
-        index_table[b')' as usize] = 8;
-        index_table[b'*' as usize] = 9;
-        index_table[b'+' as usize] = 10;
-        index_table[b',' as usize] = 11;
-        index_table[b'-' as usize] = 12;
-        index_table[b'.' as usize] = 13;
-        index_table[b'/' as usize] = 14;
-        index_table[b':' as usize] = 15;
-        index_table[b';' as usize] = 16;
-        index_table[b'<' as usize] = 17;
-        index_table[b'=' as usize] = 18;
-        index_table[b'>' as usize] = 19;
-        index_table[b'?' as usize] = 20;
-        index_table[b'@' as usize] = 21;
-        index_table[b'[' as usize] = 22;
-        index_table[b'\\' as usize] = 23;
-        index_table[b']' as usize] = 24;
-        index_table[b'^' as usize] = 25;
-        index_table[b'_' as usize] = 26;
-        index_table[b'`' as usize] = 27;
-        index_table[b'{' as usize] = 28;
-        index_table[b'|' as usize] = 29;
-        index_table[b'}' as usize] = 30;
-        index_table[b'~' as usize] = 31;
+        let mut i: usize = 0;
+        while i < Self::CHARS.len() {
+            index_table[Self::CHARS[i] as usize] = i as u8;
+            i += 1;
+        }
 
         index_table
     }

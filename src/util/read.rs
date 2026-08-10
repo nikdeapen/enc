@@ -1,5 +1,5 @@
 use std::io;
-use std::io::ErrorKind::UnexpectedEof;
+use std::io::ErrorKind::{Interrupted, UnexpectedEof};
 
 /// Reads a single byte from the `Read`.
 #[inline(always)]
@@ -23,13 +23,19 @@ where
     R: io::Read,
 {
     let mut buffer: [u8; 1] = [0];
-    match r.read(&mut buffer)? {
-        0 => Ok(None),
-        1 => Ok(Some(buffer[0])),
-        c => Err(io::Error::other(format!(
-            "invalid std::io::Read::read bytes read: {c} (buffer_len={})",
-            buffer.len()
-        ))),
+    loop {
+        match r.read(&mut buffer) {
+            Ok(0) => return Ok(None),
+            Ok(1) => return Ok(Some(buffer[0])),
+            Ok(c) => {
+                return Err(io::Error::other(format!(
+                    "invalid std::io::Read::read bytes read: {c} (buffer_len={})",
+                    buffer.len()
+                )));
+            }
+            Err(error) if error.kind() == Interrupted => {}
+            Err(error) => return Err(error),
+        }
     }
 }
 
