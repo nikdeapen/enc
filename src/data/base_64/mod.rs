@@ -10,3 +10,4 @@ mod constants;
 
 pub(in crate::data::base_64) mod decode;
 pub(in crate::data::base_64) mod encode;
+pub(in crate::data::base_64) mod table;

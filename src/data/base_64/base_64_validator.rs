@@ -1,5 +1,6 @@
 use crate::base_64::Base64Encoder;
 use crate::base_64::decode::decoding_table::DecodingTable;
+use crate::base_64::decode::split_last_block::split_last_block;
 use crate::{Error, Validator};
 
 /// Responsible for validating base-64 encoded data.
@@ -146,27 +147,24 @@ impl Base64Validator {
 
 impl Validator for Base64Validator {
     fn is_valid(&self, data: &[u8]) -> Result<bool, Error> {
-        let len: usize = data.len();
-        if len == 0 {
+        if data.is_empty() {
             Ok(true)
         } else {
-            let rem: usize = len % 4;
-            let last_chunk_index: usize = data.len() - if rem == 0 { 4 } else { rem };
-            let decoding_table: &[u8; 256] = self.decoding_table.decoding_table();
+            let (full_blocks, last_block): (&[u8], &[u8]) = split_last_block(data);
+            let decoding_table: &[u8; 256] = self.decoding_table.table();
 
             let last_block_valid: bool = unsafe {
                 Self::is_valid_block_last(
                     decoding_table,
                     self.padding,
                     self.require_padding,
-                    &data[last_chunk_index..],
+                    last_block,
                 )
             };
             if last_block_valid {
-                for d in 0..(last_chunk_index / 4) {
-                    let block_valid: bool = unsafe {
-                        Self::is_valid_4_not_padded(decoding_table, &data[d * 4..(d * 4 + 4)])
-                    };
+                for block in full_blocks.chunks_exact(4) {
+                    let block_valid: bool =
+                        unsafe { Self::is_valid_4_not_padded(decoding_table, block) };
                     if !block_valid {
                         return Ok(false);
                     }

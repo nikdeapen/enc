@@ -27,13 +27,30 @@ where
 {
     test_encoder(encoder, test_cases);
 
+    const PREFIX: &str = "guard:";
+
     for (input, expected) in test_cases {
         let input: &[u8] = input.as_ref();
         let expected: &str = expected.as_ref();
 
         let mut output: String = String::default();
-        encoder.append_to_string(input, &mut output).unwrap();
+        assert_eq!(
+            encoder.append_to_string(input, &mut output).unwrap(),
+            expected.len(),
+            "input={}",
+            hex(input)
+        );
         assert_eq!(expected, output, "input={}", hex(input));
+
+        let mut output: String = String::from(PREFIX);
+        assert_eq!(
+            encoder.append_to_string(input, &mut output).unwrap(),
+            expected.len(),
+            "input={}",
+            hex(input)
+        );
+        assert_eq!(&output[..PREFIX.len()], PREFIX, "input={}", hex(input));
+        assert_eq!(&output[PREFIX.len()..], expected, "input={}", hex(input));
 
         let output: String = encoder.encode_as_string(input).unwrap();
         assert_eq!(expected, output, "input={}", hex(input));

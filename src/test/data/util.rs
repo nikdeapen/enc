@@ -16,6 +16,8 @@ pub fn test_coder<I, O, LF, SF, AF, VF>(
     AF: Fn(&[u8], &mut Vec<u8>) -> Result<usize, Error>,
     VF: Fn(&[u8]) -> Result<Vec<u8>, Error>,
 {
+    const GUARD: u8 = 0xA5;
+
     for (input, expected) in test_cases {
         let input: &[u8] = input.as_ref();
         let expected: &[u8] = expected.as_ref();
@@ -27,14 +29,35 @@ pub fn test_coder<I, O, LF, SF, AF, VF>(
             hex(input)
         );
 
-        let mut output: Vec<u8> = vec![0; expected.len() + 1];
+        let mut output: Vec<u8> = vec![GUARD; expected.len() + 1];
         let output: &mut [u8] = output.as_mut_slice();
-        slice_fn(input, output).unwrap();
+        assert_eq!(
+            slice_fn(input, output).unwrap(),
+            expected.len(),
+            "input={}",
+            hex(input)
+        );
         assert_eq!(expected, &output[..expected.len()], "input={}", hex(input));
+        assert_eq!(output[expected.len()], GUARD, "input={}", hex(input));
 
         let mut output: Vec<u8> = Vec::default();
-        append_fn(input, &mut output).unwrap();
+        assert_eq!(
+            append_fn(input, &mut output).unwrap(),
+            expected.len(),
+            "input={}",
+            hex(input)
+        );
         assert_eq!(expected, output.as_slice(), "input={}", hex(input));
+
+        let mut output: Vec<u8> = vec![GUARD; 2];
+        assert_eq!(
+            append_fn(input, &mut output).unwrap(),
+            expected.len(),
+            "input={}",
+            hex(input)
+        );
+        assert_eq!(&output[..2], &[GUARD; 2], "input={}", hex(input));
+        assert_eq!(expected, &output[2..], "input={}", hex(input));
 
         let output: Vec<u8> = vec_fn(input).unwrap();
         assert_eq!(expected, output.as_slice(), "input={}", hex(input));

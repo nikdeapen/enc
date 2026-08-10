@@ -1,50 +1,11 @@
 use crate::base_64::Base64Encoder;
-use std::cmp::Ordering;
-use std::hash::{Hash, Hasher};
+use crate::base_64::table::Table;
 use std::sync::Arc;
 
 /// A base-64 encoding table.
-///
-/// This implementation supports static and atomic reference counted tables. This strategy avoids
-/// all allocation for the standard encoding table configurations and also avoids allocation when
-/// cloning reference counted tables. The only allocation needed is when creating a new,
-/// non-standard encoding table.
-#[derive(Clone, Debug)]
-pub enum EncodingTable {
-    /// A static encoding table.
-    Static(&'static [u8; 64]),
+pub type EncodingTable = Table<64>;
 
-    /// An atomic reference counted encoding table.
-    Reference(Arc<[u8; 64]>),
-}
-
-impl PartialEq for EncodingTable {
-    fn eq(&self, other: &Self) -> bool {
-        self.encoding_table() == other.encoding_table()
-    }
-}
-
-impl Eq for EncodingTable {}
-
-impl Hash for EncodingTable {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.encoding_table().hash(state)
-    }
-}
-
-impl Ord for EncodingTable {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.encoding_table().cmp(other.encoding_table())
-    }
-}
-
-impl PartialOrd for EncodingTable {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl EncodingTable {
+impl Table<64> {
     //! Special Tables
 
     /// The standard encoding table.
@@ -60,7 +21,7 @@ impl EncodingTable {
     ));
 }
 
-impl EncodingTable {
+impl Table<64> {
     //! Construction
 
     /// Creates a custom encoding table. Returns the static table if available.
@@ -73,7 +34,10 @@ impl EncodingTable {
     }
 
     /// Creates a custom encoding table.
-    const fn create_custom_encoding_table(v63: u8, v64: u8) -> [u8; 64] {
+    pub(in crate::data::base_64) const fn create_custom_encoding_table(
+        v63: u8,
+        v64: u8,
+    ) -> [u8; 64] {
         let mut t: [u8; 64] = [0xFF; 64];
 
         let mut i: usize = 0;
@@ -96,21 +60,9 @@ impl EncodingTable {
     }
 }
 
-impl Default for EncodingTable {
+impl Default for Table<64> {
     fn default() -> Self {
         Self::STANDARD
-    }
-}
-
-impl EncodingTable {
-    //! Properties
-
-    /// Gets the raw encoding table.
-    pub fn encoding_table(&self) -> &[u8; 64] {
-        match self {
-            Self::Static(table) => table,
-            Self::Reference(table) => table.as_ref(),
-        }
     }
 }
 
@@ -140,7 +92,7 @@ mod tests {
     #[test]
     fn fn_encoding_table() {
         let table: EncodingTable = EncodingTable::default();
-        let t: &[u8; 64] = table.encoding_table();
+        let t: &[u8; 64] = table.table();
         assert_eq!(t[0], b'A');
         assert_eq!(t[25], b'Z');
         assert_eq!(t[26], b'a');

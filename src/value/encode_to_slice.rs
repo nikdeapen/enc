@@ -1,5 +1,5 @@
-use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
-use crate::{EncodedLen, Error};
+use crate::Error::InsufficientTargetSpace;
+use crate::{EncodedLen, Error, append_to_vec_with};
 
 /// A value that can encode itself to a slice.
 pub trait EncodeToSlice: EncodedLen {
@@ -44,23 +44,11 @@ pub trait EncodeToSlice: EncodedLen {
     ///
     /// Returns the length of the encoded value.
     fn append_to_vec(&self, target: &mut Vec<u8>) -> Result<usize, Error> {
-        let original_len: usize = target.len();
-        let encoded_len: usize = self.encoded_len()?;
-        let expanded_len: usize = original_len
-            .checked_add(encoded_len)
-            .ok_or(IntegerOverflow)?;
-
-        target.resize(expanded_len, 0u8);
-        match unsafe { self.encode_to_slice_unchecked(&mut target[original_len..]) } {
-            Ok(also_encoded_len) => {
-                debug_assert_eq!(encoded_len, also_encoded_len);
-                Ok(encoded_len)
-            }
-            Err(error) => {
-                target.truncate(original_len);
-                Err(error)
-            }
-        }
+        append_to_vec_with(
+            target,
+            || self.encoded_len(),
+            |t| unsafe { self.encode_to_slice_unchecked(t) },
+        )
     }
 
     /// Encodes the value as a vec. Returns the vec.

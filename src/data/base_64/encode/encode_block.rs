@@ -52,7 +52,7 @@ mod tests {
         ];
 
         let table: EncodingTable = EncodingTable::default();
-        let table: &[u8; 64] = table.encoding_table();
+        let table: &[u8; 64] = table.table();
         for (data, expected) in test_cases {
             let mut target: [u8; 4] = [0u8; 4];
             encode_block(table, data, &mut target);

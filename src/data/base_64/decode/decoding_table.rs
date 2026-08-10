@@ -1,50 +1,12 @@
 use crate::base_64::Base64Encoder;
-use std::cmp::Ordering;
-use std::hash::{Hash, Hasher};
+use crate::base_64::encode::EncodingTable;
+use crate::base_64::table::Table;
 use std::sync::Arc;
 
 /// A base-64 decoding table.
-///
-/// This implementation supports static and atomic reference counted tables. This strategy avoids
-/// all allocation for the standard decoding table configurations and also avoids allocation when
-/// cloning reference counted tables. The only allocation needed is when creating a new,
-/// non-standard decoding table.
-#[derive(Clone, Debug)]
-pub enum DecodingTable {
-    /// A static decoding table.
-    Static(&'static [u8; 256]),
+pub type DecodingTable = Table<256>;
 
-    /// An atomic reference counted decoding table.
-    Reference(Arc<[u8; 256]>),
-}
-
-impl PartialEq for DecodingTable {
-    fn eq(&self, other: &Self) -> bool {
-        self.decoding_table() == other.decoding_table()
-    }
-}
-
-impl Eq for DecodingTable {}
-
-impl Hash for DecodingTable {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.decoding_table().hash(state)
-    }
-}
-
-impl Ord for DecodingTable {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.decoding_table().cmp(other.decoding_table())
-    }
-}
-
-impl PartialOrd for DecodingTable {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl DecodingTable {
+impl Table<256> {
     //! Special Tables
 
     /// The standard decoding table.
@@ -60,7 +22,7 @@ impl DecodingTable {
     ));
 }
 
-impl DecodingTable {
+impl Table<256> {
     //! Construction
 
     /// Creates a custom decoding table. Returns the static table if available.
@@ -72,97 +34,24 @@ impl DecodingTable {
         }
     }
 
-    /// Creates a custom decoding table.
+    /// Creates a custom decoding table. (the inverse of the matching encoding table)
     const fn create_custom_decoding_table(v63: u8, v64: u8) -> [u8; 256] {
+        let encoding: [u8; 64] = EncodingTable::create_custom_encoding_table(v63, v64);
         let mut t: [u8; 256] = [0xFF; 256];
 
-        t[b'A' as usize] = 0;
-        t[b'B' as usize] = 1;
-        t[b'C' as usize] = 2;
-        t[b'D' as usize] = 3;
-        t[b'E' as usize] = 4;
-        t[b'F' as usize] = 5;
-        t[b'G' as usize] = 6;
-        t[b'H' as usize] = 7;
-        t[b'I' as usize] = 8;
-        t[b'J' as usize] = 9;
-        t[b'K' as usize] = 10;
-        t[b'L' as usize] = 11;
-        t[b'M' as usize] = 12;
-        t[b'N' as usize] = 13;
-        t[b'O' as usize] = 14;
-        t[b'P' as usize] = 15;
-        t[b'Q' as usize] = 16;
-        t[b'R' as usize] = 17;
-        t[b'S' as usize] = 18;
-        t[b'T' as usize] = 19;
-        t[b'U' as usize] = 20;
-        t[b'V' as usize] = 21;
-        t[b'W' as usize] = 22;
-        t[b'X' as usize] = 23;
-        t[b'Y' as usize] = 24;
-        t[b'Z' as usize] = 25;
-
-        t[b'a' as usize] = 26;
-        t[b'b' as usize] = 27;
-        t[b'c' as usize] = 28;
-        t[b'd' as usize] = 29;
-        t[b'e' as usize] = 30;
-        t[b'f' as usize] = 31;
-        t[b'g' as usize] = 32;
-        t[b'h' as usize] = 33;
-        t[b'i' as usize] = 34;
-        t[b'j' as usize] = 35;
-        t[b'k' as usize] = 36;
-        t[b'l' as usize] = 37;
-        t[b'm' as usize] = 38;
-        t[b'n' as usize] = 39;
-        t[b'o' as usize] = 40;
-        t[b'p' as usize] = 41;
-        t[b'q' as usize] = 42;
-        t[b'r' as usize] = 43;
-        t[b's' as usize] = 44;
-        t[b't' as usize] = 45;
-        t[b'u' as usize] = 46;
-        t[b'v' as usize] = 47;
-        t[b'w' as usize] = 48;
-        t[b'x' as usize] = 49;
-        t[b'y' as usize] = 50;
-        t[b'z' as usize] = 51;
-
-        t[b'0' as usize] = 52;
-        t[b'1' as usize] = 53;
-        t[b'2' as usize] = 54;
-        t[b'3' as usize] = 55;
-        t[b'4' as usize] = 56;
-        t[b'5' as usize] = 57;
-        t[b'6' as usize] = 58;
-        t[b'7' as usize] = 59;
-        t[b'8' as usize] = 60;
-        t[b'9' as usize] = 61;
-
-        t[v63 as usize] = 62;
-        t[v64 as usize] = 63;
+        let mut i: usize = 0;
+        while i < encoding.len() {
+            t[encoding[i] as usize] = i as u8;
+            i += 1;
+        }
 
         t
     }
 }
 
-impl Default for DecodingTable {
+impl Default for Table<256> {
     fn default() -> Self {
         Self::STANDARD
-    }
-}
-
-impl DecodingTable {
-    //! Properties
-
-    /// Gets the raw decoding table.
-    pub fn decoding_table(&self) -> &[u8; 256] {
-        match self {
-            Self::Static(table) => table,
-            Self::Reference(table) => table.as_ref(),
-        }
     }
 }
 
@@ -192,7 +81,7 @@ mod tests {
     #[test]
     fn fn_decoding_table() {
         let table: DecodingTable = DecodingTable::default();
-        let t: &[u8; 256] = table.decoding_table();
+        let t: &[u8; 256] = table.table();
         assert_eq!(t[b'A' as usize], 0);
         assert_eq!(t[b'Z' as usize], 25);
         assert_eq!(t[b'a' as usize], 26);

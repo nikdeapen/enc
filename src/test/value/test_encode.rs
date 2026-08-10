@@ -1,5 +1,5 @@
 use crate::test::hex;
-use crate::{EncodeToSlice, EncodeToWrite, EncodedLen};
+use crate::{EncodeToSlice, EncodeToWrite, EncodedLen, Error};
 use std::fmt::Debug;
 use std::io::Cursor;
 
@@ -50,6 +50,32 @@ where
         }
         Err(error) => {
             panic!("value={value:?} error={error:?}");
+        }
+    }
+
+    let mut buffer: Vec<u8> = vec![0u8; expected.len()];
+    match value.encode_to_slice(&mut buffer) {
+        Ok(encoded_len) => {
+            assert_eq!(encoded_len, expected.len(), "value={value:?}");
+            assert_eq!(
+                buffer.as_slice(),
+                expected,
+                "value={value:?} encoded={} expected={}",
+                hex(buffer.as_slice()),
+                hex(expected)
+            );
+        }
+        Err(error) => {
+            panic!("value={value:?} error={error:?}");
+        }
+    }
+
+    if !expected.is_empty() {
+        let mut buffer: Vec<u8> = vec![0u8; expected.len() - 1];
+        match value.encode_to_slice(&mut buffer) {
+            Ok(encoded_len) => panic!("value={value:?} encoded_len={encoded_len}"),
+            Err(Error::InsufficientTargetSpace) => {}
+            Err(error) => panic!("value={value:?} error={error:?}"),
         }
     }
 }
