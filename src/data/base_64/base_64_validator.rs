@@ -162,7 +162,7 @@ impl Validator for Base64Validator {
                 )
             };
             if last_block_valid {
-                for block in full_blocks.chunks_exact(4) {
+                for block in full_blocks.as_chunks::<4>().0 {
                     let block_valid: bool =
                         unsafe { Self::is_valid_4_not_padded(decoding_table, block) };
                     if !block_valid {
