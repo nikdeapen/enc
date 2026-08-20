@@ -1,3 +1,5 @@
+//! URL percent encoded data.
+
 pub use percent_decoder::*;
 pub use percent_encoder::*;
 pub use percent_validator::*;

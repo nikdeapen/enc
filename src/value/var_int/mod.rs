@@ -1,3 +1,5 @@
+//! Variable-length encoded integers.
+
 pub use impl_var_int::*;
 
 mod impl_var_int;

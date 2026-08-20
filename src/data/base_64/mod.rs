@@ -1,3 +1,5 @@
+//! Base-64 encoded data.
+
 pub use base_64_decoder::*;
 pub use base_64_encoder::*;
 pub use base_64_validator::*;
