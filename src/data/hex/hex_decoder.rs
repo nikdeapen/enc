@@ -71,7 +71,7 @@ impl Decoder for HexDecoder {
             Err(InsufficientTargetSpace)
         } else {
             let target: &mut [u8] = &mut target[..decoded_len];
-            for (d, t) in data.chunks_exact(2).zip(target.iter_mut()) {
+            for (d, t) in data.as_chunks::<2>().0.iter().zip(target.iter_mut()) {
                 *t = Self::decode_bytes(d[0], d[1])
             }
             Ok(decoded_len)

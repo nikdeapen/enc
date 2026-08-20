@@ -1,7 +1,4 @@
-#![cfg_attr(
-    feature = "document-features",
-    cfg_attr(doc, doc = ::document_features::document_features!())
-)]
+#![doc = include_str!("../README.md")]
 
 #[cfg(feature = "data")]
 pub use data::*;

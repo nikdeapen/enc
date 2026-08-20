@@ -80,7 +80,7 @@ impl Encoder for HexEncoder {
             Err(InsufficientTargetSpace)
         } else {
             let target: &mut [u8] = &mut target[..encoded_len];
-            for (d, t) in data.iter().zip(target.chunks_exact_mut(2)) {
+            for (d, t) in data.iter().zip(target.as_chunks_mut::<2>().0.iter_mut()) {
                 let (a, b) = self.encode_bytes(*d);
                 t[0] = a;
                 t[1] = b;

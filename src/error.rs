@@ -17,6 +17,7 @@ pub enum Error {
 
     /// The encoded data was invalid.
     InvalidEncodedData {
+        /// The underlying cause, when one is available.
         reason: Option<Box<dyn std::error::Error + Sync + Send>>,
     },
 }
