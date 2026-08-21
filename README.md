@@ -7,7 +7,7 @@
 This library aids in processing encoded data. No dependencies.
 
 ```text
-enc = "0.20.0-rc.1"
+enc = "0.20.0"
 ```
 
 ## Features
@@ -95,5 +95,5 @@ assert_eq!(decoded.value(), 123_456u32);
 
 ## Issues & Contributing
 
-See [ISSUES.md](https://github.com/nikdeapen/enc/blob/master/ISSUES.md) for future work and
+See [ISSUES.md](https://github.com/nikdeapen/enc/blob/master/ISSUES.md) for known issues & future work and
 [CONTRIBUTING.md](https://github.com/nikdeapen/enc/blob/master/CONTRIBUTING.md) for guidelines.

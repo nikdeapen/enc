@@ -22,6 +22,8 @@ pub trait EncodeToSlice: EncodedLen {
     ///     `EncodedLen::encoded_len` implementation.
     ///  2. Implementations must ensure the length above matches the actual number of bytes written
     ///     to the `target` buffer when encoding the value.
+    ///
+    /// `EncodedLen` is an `unsafe trait` so the length in requirement 1 can be trusted without checking it.
     unsafe fn encode_to_slice_unchecked(&self, target: &mut [u8]) -> Result<usize, Error>;
 
     /// Encodes the value to the `target` slice.

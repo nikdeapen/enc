@@ -3,7 +3,9 @@ use crate::{Error, impl_encode_to_write_stack_buf};
 
 macro_rules! impl_var_int_encode {
     ($target_type:ty, $unsigned_type:ty, $bit_size:expr) => {
-        impl $crate::EncodedLen for $target_type {
+        // SAFETY: `encoded_len` counts one byte per 7 significant bits and `encode_to_slice_unchecked` writes one
+        // byte per 7 bits, so the two agree exactly for every value.
+        unsafe impl $crate::EncodedLen for $target_type {
             fn encoded_len(&self) -> Result<usize, Error> {
                 Ok(($bit_size - (self.value | 1).leading_zeros()).div_ceil(7) as usize)
             }

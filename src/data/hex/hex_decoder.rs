@@ -1,4 +1,4 @@
-use crate::Error::{InsufficientTargetSpace, InvalidEncodedData};
+use crate::Error::InsufficientTargetSpace;
 use crate::hex::HexEncoder;
 use crate::{Decoder, Error};
 
@@ -61,9 +61,10 @@ impl Decoder for HexDecoder {
         if data.len().is_multiple_of(2) {
             Ok(data.len() / 2)
         } else {
-            Err(InvalidEncodedData {
-                reason: Some(format!("odd number of bytes: {}", data.len()).into()),
-            })
+            Err(Error::invalid_encoded_data_with(format!(
+                "odd number of bytes: {}",
+                data.len()
+            )))
         }
     }
 

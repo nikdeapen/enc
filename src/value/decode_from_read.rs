@@ -39,7 +39,7 @@ pub trait DecodeFromRead: Sized {
         let mut take: std::io::Take<&mut R> = r.take(prefix as u64);
         let value: Self = Self::decode_from_read(&mut take)?;
         if take.limit() != 0 {
-            return Err(Error::InvalidEncodedData { reason: None });
+            return Err(Error::invalid_encoded_data());
         }
         Ok(value)
     }
