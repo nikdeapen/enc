@@ -1,45 +1,32 @@
-use crate::base_64::decode::decode_block::decode_block;
-use crate::base_64::decode::decode_block_last_1::decode_block_last_1;
-use crate::base_64::decode::decode_block_last_2::decode_block_last_2;
-use crate::base_64::decode::decode_block_last_3::decode_block_last_3;
-use crate::base_64::decode::remove_padding_last_block::remove_padding_last_block;
+use crate::base_64::as_array::{as_array, as_array_mut};
+use crate::base_64::decode::{
+    decode_block, decode_block_last_1, decode_block_last_2, decode_block_last_3,
+    remove_padding_last_block,
+};
 
 /// Decodes the `last_block` of up to 4 bytes into the `target`.
 ///
 /// Returns the number of decoded bytes. ([0, 3])
 ///
-/// # Safety
-/// The `last_block` length must be at most 4.
-pub unsafe fn decode_block_last(
+/// # Panics
+/// Panics if the `last_block` is more than 4 bytes or if the `target` length is not exactly
+/// `decoded_len_last_block(last_block, padding)`.
+pub fn decode_block_last(
     table: &[u8; 256],
     padding: Option<u8>,
     last_block: &[u8],
     target: &mut [u8],
 ) -> usize {
-    debug_assert!(last_block.len() <= 4);
-
     let last_block: &[u8] = remove_padding_last_block(last_block, padding);
     match last_block.len() {
         0 => {
-            debug_assert_eq!(target.len(), 0);
+            assert!(target.is_empty());
             0
         }
-        1 => {
-            debug_assert_eq!(target.len(), 1);
-            unsafe { decode_block_last_1(table, last_block, target) }
-        }
-        2 => {
-            debug_assert_eq!(target.len(), 1);
-            unsafe { decode_block_last_2(table, last_block, target) }
-        }
-        3 => {
-            debug_assert_eq!(target.len(), 2);
-            unsafe { decode_block_last_3(table, last_block, target) }
-        }
-        4 => {
-            debug_assert_eq!(target.len(), 3);
-            unsafe { decode_block(table, last_block, target) }
-        }
+        1 => decode_block_last_1(table, as_array(last_block), as_array_mut(target)),
+        2 => decode_block_last_2(table, as_array(last_block), as_array_mut(target)),
+        3 => decode_block_last_3(table, as_array(last_block), as_array_mut(target)),
+        4 => decode_block(table, as_array(last_block), as_array_mut(target)),
         _ => unreachable!(),
     }
 }
@@ -66,14 +53,12 @@ mod tests {
         let table: &[u8; 256] = table.table();
         for (data, expected) in test_cases {
             let mut target: [u8; 3] = [0, 0, 0];
-            let result: usize = unsafe {
-                decode_block_last(
-                    table,
-                    Some(b'='),
-                    data.as_bytes(),
-                    &mut target[..expected.len()],
-                )
-            };
+            let result: usize = decode_block_last(
+                table,
+                Some(b'='),
+                data.as_bytes(),
+                &mut target[..expected.len()],
+            );
             assert_eq!(result, expected.len(), "data={}", *data);
             assert_eq!(&target[..expected.len()], *expected, "data={}", *data);
         }

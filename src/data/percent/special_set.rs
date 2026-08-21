@@ -21,13 +21,29 @@ pub struct SpecialSet {
     bits: u32,
 }
 
+impl SpecialSet {
+    //! Construction
+
+    /// The empty set.
+    pub const EMPTY: Self = Self { bits: 0 };
+
+    /// Creates a set with the valid `chars`. Invalid chars are ignored.
+    pub const fn from_chars(chars: &[u8]) -> Self {
+        let mut set: Self = Self::EMPTY;
+
+        let mut i: usize = 0;
+        while i < chars.len() {
+            set.add(chars[i]);
+            i += 1;
+        }
+
+        set
+    }
+}
+
 impl From<&str> for SpecialSet {
     fn from(chars: &str) -> Self {
-        let mut set: Self = Self::default();
-        for c in chars.as_bytes() {
-            set.add(*c);
-        }
-        set
+        Self::from_chars(chars.as_bytes())
     }
 }
 
@@ -74,7 +90,7 @@ impl SpecialSet {
     //! Mutations
 
     /// Adds `c`. If `c` is invalid or already present, this has no effect.
-    pub fn add(&mut self, c: u8) {
+    pub const fn add(&mut self, c: u8) {
         let index: u32 = Self::index_of(c) as u32;
         if index < 32 {
             self.bits |= 1u32 << index;
@@ -82,7 +98,7 @@ impl SpecialSet {
     }
 
     /// Removes `c`. If `c` is invalid or not present, this has no effect.
-    pub fn remove(&mut self, c: u8) {
+    pub const fn remove(&mut self, c: u8) {
         let index: u32 = Self::index_of(c) as u32;
         if index < 32 {
             self.bits &= !(1u32 << index);
@@ -146,6 +162,18 @@ impl Display for SpecialSet {
 #[cfg(test)]
 mod tests {
     use crate::data::percent::special_set::SpecialSet;
+
+    #[test]
+    fn from_chars() {
+        const SET: SpecialSet = SpecialSet::from_chars(b"+-.");
+
+        assert_eq!(SET, SpecialSet::from("+-."));
+        assert_eq!(SET.size(), 3);
+        assert_eq!(SpecialSet::EMPTY, SpecialSet::default());
+
+        // invalid chars are ignored
+        assert_eq!(SpecialSet::from_chars(b"+A-\x00.\xFF"), SET);
+    }
 
     #[test]
     fn add_contains_remove_size() {

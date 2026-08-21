@@ -1,6 +1,4 @@
-#[cfg(any(feature = "hex", feature = "base-64", feature = "percent"))]
 use crate::Encoder;
-#[cfg(any(feature = "hex", feature = "base-64", feature = "percent"))]
 use crate::Error;
 
 /// Appends the encoded `data` to the `target` string.
@@ -9,8 +7,7 @@ use crate::Error;
 ///
 /// # Safety
 /// The encoded `data` must be a valid UTF-8 byte sequence.
-#[cfg(any(feature = "hex", feature = "base-64", feature = "percent"))]
-pub(crate) unsafe fn append_to_string_unchecked<E>(
+pub(in crate::data) unsafe fn append_to_string_unchecked<E>(
     encoder: &E,
     data: &[u8],
     target: &mut String,

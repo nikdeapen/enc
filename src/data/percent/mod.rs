@@ -9,3 +9,5 @@ mod percent_decoder;
 mod percent_encoder;
 mod percent_validator;
 mod special_set;
+
+pub(in crate::data::percent) mod prefix_is_encoded;

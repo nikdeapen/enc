@@ -19,7 +19,7 @@ pub trait Decoder {
         append_to_vec_with(
             target,
             || self.decoded_len(data),
-            |t| self.decode_to_slice(data, t),
+            |_, t| self.decode_to_slice(data, t),
         )
     }
 

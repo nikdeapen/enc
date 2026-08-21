@@ -1,5 +1,11 @@
 use crate::base_64::Base64Encoder;
 
+/// The number of decoded bytes in a base-64 block.
+pub(in crate::data::base_64) const DECODED_BLOCK_SIZE: usize = 3;
+
+/// The number of encoded bytes in a base-64 block.
+pub(in crate::data::base_64) const ENCODED_BLOCK_SIZE: usize = 4;
+
 impl Base64Encoder {
     //! Constants
 

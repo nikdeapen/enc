@@ -1,10 +1,14 @@
 use crate::Error::InsufficientTargetSpace;
+use crate::base_64::as_array::as_array;
+use crate::base_64::constants::{DECODED_BLOCK_SIZE, ENCODED_BLOCK_SIZE};
 use crate::base_64::encode;
 use crate::base_64::encode::EncodingTable;
-use crate::{Encoder, Error, StringEncoder, data};
+use crate::data::util::append_to_string_unchecked;
+use crate::{Encoder, Error, StringEncoder};
+use std::fmt::{Debug, Formatter};
 
 /// Responsible for encoding data in the base-64 format.
-#[derive(Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
+#[derive(Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Base64Encoder {
     table: EncodingTable,
     padding: Option<u8>,
@@ -78,31 +82,36 @@ impl Encoder for Base64Encoder {
         } else {
             let target: &mut [u8] = &mut target[..encoded_len];
             let table: &[u8; 64] = self.table.table();
-            let div: usize = data.len() / 3;
-            let rem: usize = data.len() % 3;
-            let mut d: usize = 0;
-            let mut t: usize = 0;
-            for _ in 0..div {
-                encode::encode_block(table, &data[d..], &mut target[t..]);
-                d += 3;
-                t += 4;
+
+            let (blocks, last_block) = data.as_chunks::<DECODED_BLOCK_SIZE>();
+            let (block_targets, last_target) =
+                target.split_at_mut(blocks.len() * ENCODED_BLOCK_SIZE);
+            for (block, block_target) in blocks.iter().zip(
+                block_targets
+                    .as_chunks_mut::<ENCODED_BLOCK_SIZE>()
+                    .0
+                    .iter_mut(),
+            ) {
+                encode::encode_block(table, block, block_target);
             }
-            match rem {
+
+            let mut t: usize = blocks.len() * ENCODED_BLOCK_SIZE;
+            match last_block.len() {
                 0 => {}
                 1 => {
                     t += encode::encode_last_block_1(
                         table,
                         self.padding,
-                        &data[d..],
-                        &mut target[t..],
+                        as_array(last_block),
+                        last_target,
                     );
                 }
                 2 => {
                     t += encode::encode_last_block_2(
                         table,
                         self.padding,
-                        &data[d..],
-                        &mut target[t..],
+                        as_array(last_block),
+                        last_target,
                     );
                 }
                 _ => unreachable!(),
@@ -115,15 +124,62 @@ impl Encoder for Base64Encoder {
 
 impl StringEncoder for Base64Encoder {
     fn append_to_string(&self, data: &[u8], target: &mut String) -> Result<usize, Error> {
-        unsafe { data::util::append_to_string_unchecked(self, data, target) }
+        unsafe { append_to_string_unchecked(self, data, target) }
+    }
+}
+
+impl Debug for Base64Encoder {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let (v63, v64) = self.table.values();
+        f.debug_struct("Base64Encoder")
+            .field("v63", &(v63 as char))
+            .field("v64", &(v64 as char))
+            .field("padding", &self.padding.map(|p| p as char))
+            .finish()
     }
 }
 
 #[cfg(test)]
 #[cfg(feature = "dev")]
 mod tests {
+    use crate::StringEncoder;
     use crate::base_64::Base64Encoder;
     use crate::test::test_string_encoder;
+
+    #[test]
+    fn new() {
+        // valid configs
+        assert!(Base64Encoder::new(b'+', b'/', Some(b'=')).is_some());
+        assert!(Base64Encoder::new(b'-', b'_', None).is_some());
+        assert!(Base64Encoder::new(b'!', b'@', Some(b'#')).is_some());
+
+        // the 63rd & 64th values must be distinct ASCII punctuation
+        assert!(Base64Encoder::new(b'+', b'+', None).is_none());
+        assert!(Base64Encoder::new(b'a', b'/', None).is_none());
+        assert!(Base64Encoder::new(b'+', b'9', None).is_none());
+        assert!(Base64Encoder::new(0x80, b'/', None).is_none());
+
+        // the padding must differ from both
+        assert!(Base64Encoder::new(b'+', b'/', Some(b'+')).is_none());
+        assert!(Base64Encoder::new(b'+', b'/', Some(b'/')).is_none());
+        assert!(Base64Encoder::new(b'+', b'/', Some(b'A')).is_none());
+    }
+
+    /// Every config `new` accepts must encode to US-ASCII; `append_to_string` relies on it for its `unsafe`.
+    #[test]
+    fn every_valid_config_encodes_as_ascii() {
+        let data: Vec<u8> = (0u8..=255).collect();
+        for v63 in 0u8..=255 {
+            for v64 in 0u8..=255 {
+                for padding in [None, Some(b'=')] {
+                    if let Some(encoder) = Base64Encoder::new(v63, v64, padding) {
+                        let encoded: String = encoder.encode_as_string(&data).unwrap();
+                        assert!(encoded.is_ascii(), "v63={v63:#04X} v64={v64:#04X}");
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn encode() {

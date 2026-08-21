@@ -1,10 +1,10 @@
-use crate::base_64::decode::decoded_len_last_block::decoded_len_last_block;
-use crate::base_64::decode::split_last_block::split_last_block;
+use crate::base_64::constants::{DECODED_BLOCK_SIZE, ENCODED_BLOCK_SIZE};
+use crate::base_64::decode::{decoded_len_last_block, split_last_block};
 
 /// Gets the length of the decoded `data`.
 pub fn decoded_len(data: &[u8], padding: Option<u8>) -> usize {
-    let (full_chunks, last_block) = split_last_block(data);
-    let full: usize = (full_chunks.len() / 4) * 3;
+    let (full_blocks, last_block) = split_last_block(data);
+    let full: usize = (full_blocks.len() / ENCODED_BLOCK_SIZE) * DECODED_BLOCK_SIZE;
     let last: usize = decoded_len_last_block(last_block, padding);
     full + last
 }

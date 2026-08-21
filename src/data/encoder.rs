@@ -19,7 +19,7 @@ pub trait Encoder {
         append_to_vec_with(
             target,
             || self.encoded_len(data),
-            |t| self.encode_to_slice(data, t),
+            |_, t| self.encode_to_slice(data, t),
         )
     }
 

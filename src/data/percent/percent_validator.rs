@@ -1,5 +1,6 @@
 use crate::hex::HexValidator;
 use crate::percent::SpecialSet;
+use crate::percent::prefix_is_encoded::prefix_is_encoded;
 use crate::{Error, Validator};
 
 /// Responsible for validating percent encoded data.
@@ -21,6 +22,7 @@ impl PercentValidator {
     }
 }
 
+/// Creates a percent validator with the case-insensitive hex validator.
 impl<S: Into<SpecialSet>> From<S> for PercentValidator {
     fn from(encoding_not_needed: S) -> Self {
         Self::new(HexValidator::CASELESS, encoding_not_needed.into())
@@ -34,10 +36,7 @@ impl Validator for PercentValidator {
             let c: u8 = data[i];
             if !c.is_ascii_alphanumeric() {
                 if c == b'%' {
-                    if i + 2 >= data.len()
-                        || !self.hex_validator.is_valid_byte(data[i + 1])
-                        || !self.hex_validator.is_valid_byte(data[i + 2])
-                    {
+                    if !prefix_is_encoded(self.hex_validator, &data[i..]) {
                         return Ok(false);
                     }
                     i += 3;

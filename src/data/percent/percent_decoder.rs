@@ -1,6 +1,7 @@
 use crate::Error::InsufficientTargetSpace;
 use crate::hex::{HexDecoder, HexValidator};
-use crate::{Decoder, Error};
+use crate::percent::prefix_is_encoded::prefix_is_encoded;
+use crate::{Decoder, Error, append_to_vec_with};
 
 /// Responsible for decoding data in the URL percent encoded format.
 ///
@@ -17,34 +18,17 @@ pub struct PercentDecoder {}
 impl PercentDecoder {
     //! Decoding
 
-    /// Checks if the prefix of `data` is a valid, encoded byte.
+    /// Decodes the `data` into the `target` slice with the pre-computed `decoded_len`.
     ///
-    /// # Note
-    /// The `data` must not be empty and the first byte must be the `%` symbol.
-    #[inline(always)]
-    fn prefix_is_encoded(data: &[u8]) -> bool {
-        debug_assert!(!data.is_empty());
-        debug_assert_eq!(data[0], b'%');
-
-        data.len() >= 3
-            && HexValidator::CASELESS.is_valid_byte(data[1])
-            && HexValidator::CASELESS.is_valid_byte(data[2])
-    }
-}
-
-impl Decoder for PercentDecoder {
-    fn decoded_len(&self, data: &[u8]) -> Result<usize, Error> {
-        let encoded: usize = data
-            .iter()
-            .enumerate()
-            .filter(|(_, c)| **c == b'%')
-            .filter(|(i, _)| Self::prefix_is_encoded(&data[*i..]))
-            .count();
-        Ok(data.len() - (encoded * 2))
-    }
-
-    fn decode_to_slice(&self, data: &[u8], target: &mut [u8]) -> Result<usize, Error> {
-        let decoded_len: usize = self.decoded_len(data)?;
+    /// Returns the length of the decoded `data`.
+    ///
+    /// The `decoded_len` must be the result of `decoded_len(data)`. Computing it is a full scan of the `data`, so
+    /// callers that already have it pass it in rather than paying for a second scan.
+    fn decode_to_slice_with_len(
+        data: &[u8],
+        decoded_len: usize,
+        target: &mut [u8],
+    ) -> Result<usize, Error> {
         if decoded_len > target.len() {
             Err(InsufficientTargetSpace)
         } else {
@@ -52,7 +36,7 @@ impl Decoder for PercentDecoder {
             let mut t: usize = 0;
             while d < data.len() {
                 let c: u8 = data[d];
-                if c == b'%' && Self::prefix_is_encoded(&data[d..]) {
+                if c == b'%' && prefix_is_encoded(HexValidator::CASELESS, &data[d..]) {
                     target[t] = HexDecoder::decode_bytes(data[d + 1], data[d + 2]);
                     t += 1;
                     d += 3;
@@ -68,12 +52,43 @@ impl Decoder for PercentDecoder {
     }
 }
 
+impl Decoder for PercentDecoder {
+    fn decoded_len(&self, data: &[u8]) -> Result<usize, Error> {
+        let encoded: usize = data
+            .iter()
+            .enumerate()
+            .filter(|(_, c)| **c == b'%')
+            .filter(|(i, _)| prefix_is_encoded(HexValidator::CASELESS, &data[*i..]))
+            .count();
+        Ok(data.len() - (encoded * 2))
+    }
+
+    fn decode_to_slice(&self, data: &[u8], target: &mut [u8]) -> Result<usize, Error> {
+        let decoded_len: usize = self.decoded_len(data)?;
+        Self::decode_to_slice_with_len(data, decoded_len, target)
+    }
+
+    fn append_to_vec(&self, data: &[u8], target: &mut Vec<u8>) -> Result<usize, Error> {
+        append_to_vec_with(
+            target,
+            || self.decoded_len(data),
+            |decoded_len, t| Self::decode_to_slice_with_len(data, decoded_len, t),
+        )
+    }
+}
+
 #[cfg(test)]
 #[cfg(feature = "dev")]
 mod tests {
     use crate::Decoder;
-    use crate::percent::PercentDecoder;
-    use crate::test::test_decoder;
+    use crate::percent::{PercentDecoder, PercentEncoder};
+    use crate::test::{test_decoder, test_round_trip};
+
+    #[test]
+    fn round_trip() {
+        let encoder: PercentEncoder = "+-.".into();
+        test_round_trip(&encoder, &PercentDecoder::default(), 200);
+    }
 
     #[test]
     fn decode() {

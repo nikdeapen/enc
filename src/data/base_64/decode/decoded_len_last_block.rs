@@ -1,4 +1,4 @@
-use crate::base_64::decode::remove_padding_last_block::remove_padding_last_block;
+use crate::base_64::decode::remove_padding_last_block;
 
 /// Gets the length of the decoded `last_block`.
 ///
