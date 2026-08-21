@@ -21,8 +21,9 @@ jobs:
           components: clippy
       - name: Build
         run: cargo build --no-default-features --features ${{ matrix.feature }} --verbose
+      # `--lib` skips the doc-tests; the crate docs are the README, whose examples need all the codec features.
       - name: Test
-        run: cargo test --no-default-features --features ${{ matrix.feature }} --verbose
+        run: cargo test --no-default-features --features ${{ matrix.feature }} --lib --verbose
       - name: Lint
         run: cargo clippy --no-default-features --features ${{ matrix.feature }} --all-targets -- -D warnings
   build-default:

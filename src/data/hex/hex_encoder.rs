@@ -1,64 +1,51 @@
 use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
-use crate::{Encoder, Error, StringEncoder, data};
-use std::cmp::Ordering;
-use std::hash::{Hash, Hasher};
+use crate::data::util::append_to_string_unchecked;
+use crate::{Encoder, Error, StringEncoder};
 
 /// Responsible for encoding data in the hexadecimal format.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct HexEncoder {
-    hex: &'static [u8; 16],
+    upper: bool,
 }
 
-impl Ord for HexEncoder {
-    fn cmp(&self, other: &Self) -> Ordering {
-        // index 10 is b'a' for LOWER and b'A' for UPPER, distinguishing the two encoders
-        self.hex[10].cmp(&other.hex[10])
-    }
-}
+impl HexEncoder {
+    //! Constants
 
-impl PartialOrd for HexEncoder {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
+    /// The lowercase hex chars.
+    pub(in crate::data::hex) const LOWER_CHARS: &'static [u8; 16] = b"0123456789abcdef";
 
-impl Eq for HexEncoder {}
-
-impl PartialEq for HexEncoder {
-    fn eq(&self, other: &Self) -> bool {
-        // index 10 is b'a' for LOWER and b'A' for UPPER, distinguishing the two encoders
-        self.hex[10].eq(&other.hex[10])
-    }
-}
-
-impl Hash for HexEncoder {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        // index 10 is b'a' for LOWER and b'A' for UPPER, distinguishing the two encoders
-        self.hex[10].hash(state)
-    }
+    /// The uppercase hex chars.
+    pub(in crate::data::hex) const UPPER_CHARS: &'static [u8; 16] = b"0123456789ABCDEF";
 }
 
 impl HexEncoder {
     //! Special Encoders
 
     /// The lowercase hex encoder.
-    pub const LOWER: Self = Self {
-        hex: b"0123456789abcdef",
-    };
+    pub const LOWER: Self = Self { upper: false };
 
     /// The uppercase hex encoder.
-    pub const UPPER: Self = Self {
-        hex: b"0123456789ABCDEF",
-    };
+    pub const UPPER: Self = Self { upper: true };
 }
 
 impl HexEncoder {
     //! Encoding
 
+    /// Gets the hex chars.
+    #[inline(always)]
+    const fn chars(self) -> &'static [u8; 16] {
+        if self.upper {
+            Self::UPPER_CHARS
+        } else {
+            Self::LOWER_CHARS
+        }
+    }
+
     /// Encodes `b` as two hex bytes.
     #[inline(always)]
     pub const fn encode_bytes(self, b: u8) -> (u8, u8) {
-        (self.hex[(b as usize) >> 4], self.hex[(b as usize) & 0xF])
+        let hex: &[u8; 16] = self.chars();
+        (hex[(b as usize) >> 4], hex[(b as usize) & 0xF])
     }
 
     /// Encodes `b` as two hex chars.
@@ -80,7 +67,7 @@ impl Encoder for HexEncoder {
             Err(InsufficientTargetSpace)
         } else {
             let target: &mut [u8] = &mut target[..encoded_len];
-            for (d, t) in data.iter().zip(target.chunks_exact_mut(2)) {
+            for (d, t) in data.iter().zip(target.as_chunks_mut::<2>().0.iter_mut()) {
                 let (a, b) = self.encode_bytes(*d);
                 t[0] = a;
                 t[1] = b;
@@ -92,7 +79,7 @@ impl Encoder for HexEncoder {
 
 impl StringEncoder for HexEncoder {
     fn append_to_string(&self, data: &[u8], target: &mut String) -> Result<usize, Error> {
-        unsafe { data::util::append_to_string_unchecked(self, data, target) }
+        unsafe { append_to_string_unchecked(self, data, target) }
     }
 }
 
@@ -108,7 +95,7 @@ mod tests {
         assert_eq!(HexEncoder::LOWER, HexEncoder::LOWER);
         assert_eq!(HexEncoder::UPPER, HexEncoder::UPPER);
         assert_ne!(HexEncoder::LOWER, HexEncoder::UPPER);
-        assert!(HexEncoder::UPPER < HexEncoder::LOWER);
+        assert!(HexEncoder::LOWER < HexEncoder::UPPER);
     }
 
     #[test]

@@ -1,30 +1,32 @@
 use crate::Error::{InsufficientTargetSpace, IntegerOverflow};
+use crate::data::util::append_to_string_unchecked;
 use crate::hex::HexEncoder;
 use crate::percent::SpecialSet;
-use crate::{Encoder, Error, StringEncoder, data};
+use crate::{Encoder, Error, StringEncoder, append_to_vec_with};
 
 /// Responsible for encoding data in the URL percent encoded format.
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Debug)]
 pub struct PercentEncoder {
     hex_encoder: HexEncoder,
-    do_not_encode: SpecialSet,
+    encoding_not_needed: SpecialSet,
 }
 
 impl PercentEncoder {
     //! Construction
 
     /// Creates a new percent encoder.
-    pub const fn new(hex_encoder: HexEncoder, do_not_encode: SpecialSet) -> Self {
+    pub const fn new(hex_encoder: HexEncoder, encoding_not_needed: SpecialSet) -> Self {
         Self {
             hex_encoder,
-            do_not_encode,
+            encoding_not_needed,
         }
     }
 }
 
+/// Creates a percent encoder with the uppercase hex encoder.
 impl<S: Into<SpecialSet>> From<S> for PercentEncoder {
-    fn from(do_not_encode: S) -> Self {
-        Self::new(HexEncoder::UPPER, do_not_encode.into())
+    fn from(encoding_not_needed: S) -> Self {
+        Self::new(HexEncoder::UPPER, encoding_not_needed.into())
     }
 }
 
@@ -34,20 +36,21 @@ impl PercentEncoder {
     /// Checks if `c` needs encoding.
     #[inline(always)]
     pub fn needs_encoding(self, c: u8) -> bool {
-        !c.is_ascii_alphanumeric() && !self.do_not_encode.contains(c)
-    }
-}
-
-impl Encoder for PercentEncoder {
-    fn encoded_len(&self, data: &[u8]) -> Result<usize, Error> {
-        let need_encoding: usize = data.iter().filter(|c| self.needs_encoding(**c)).count();
-        data.len()
-            .checked_add(need_encoding.checked_mul(2).ok_or(IntegerOverflow)?)
-            .ok_or(IntegerOverflow)
+        !c.is_ascii_alphanumeric() && !self.encoding_not_needed.contains(c)
     }
 
-    fn encode_to_slice(&self, data: &[u8], target: &mut [u8]) -> Result<usize, Error> {
-        let encoded_len: usize = self.encoded_len(data)?;
+    /// Encodes the `data` into the `target` slice with the pre-computed `encoded_len`.
+    ///
+    /// Returns the length of the encoded `data`.
+    ///
+    /// The `encoded_len` must be the result of `encoded_len(data)`. Computing it is a full scan of the `data`, so
+    /// callers that already have it pass it in rather than paying for a second scan.
+    fn encode_to_slice_with_len(
+        self,
+        data: &[u8],
+        encoded_len: usize,
+        target: &mut [u8],
+    ) -> Result<usize, Error> {
         if encoded_len > target.len() {
             Err(InsufficientTargetSpace)
         } else {
@@ -72,9 +75,31 @@ impl Encoder for PercentEncoder {
     }
 }
 
+impl Encoder for PercentEncoder {
+    fn encoded_len(&self, data: &[u8]) -> Result<usize, Error> {
+        let need_encoding: usize = data.iter().filter(|c| self.needs_encoding(**c)).count();
+        data.len()
+            .checked_add(need_encoding.checked_mul(2).ok_or(IntegerOverflow)?)
+            .ok_or(IntegerOverflow)
+    }
+
+    fn encode_to_slice(&self, data: &[u8], target: &mut [u8]) -> Result<usize, Error> {
+        let encoded_len: usize = self.encoded_len(data)?;
+        self.encode_to_slice_with_len(data, encoded_len, target)
+    }
+
+    fn append_to_vec(&self, data: &[u8], target: &mut Vec<u8>) -> Result<usize, Error> {
+        append_to_vec_with(
+            target,
+            || self.encoded_len(data),
+            |encoded_len, t| self.encode_to_slice_with_len(data, encoded_len, t),
+        )
+    }
+}
+
 impl StringEncoder for PercentEncoder {
     fn append_to_string(&self, data: &[u8], target: &mut String) -> Result<usize, Error> {
-        unsafe { data::util::append_to_string_unchecked(self, data, target) }
+        unsafe { append_to_string_unchecked(self, data, target) }
     }
 }
 

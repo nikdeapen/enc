@@ -1,4 +1,5 @@
 use crate::Error::{InsufficientTargetSpace, InvalidEncodedData};
+use crate::hex::HexEncoder;
 use crate::{Decoder, Error};
 
 /// Responsible for decoding data in the hexadecimal format.
@@ -17,18 +18,22 @@ pub struct HexDecoder {}
 impl HexDecoder {
     //! Constants
 
-    /// The case-insensitive decoding table.
-    const DECODING_TABLE: [u8; 128] = [
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    ];
+    /// The case-insensitive decoding table. (indexed by the full byte range, so no masking is needed)
+    const DECODING_TABLE: [u8; 256] = Self::create_decoding_table();
+
+    /// Creates the case-insensitive decoding table. (the inverse of the hex encoding chars)
+    const fn create_decoding_table() -> [u8; 256] {
+        let mut t: [u8; 256] = [0x00; 256];
+
+        let mut i: usize = 0;
+        while i < 16 {
+            t[HexEncoder::LOWER_CHARS[i] as usize] = i as u8;
+            t[HexEncoder::UPPER_CHARS[i] as usize] = i as u8;
+            i += 1;
+        }
+
+        t
+    }
 }
 
 impl HexDecoder {
@@ -39,8 +44,7 @@ impl HexDecoder {
     /// If either input byte is invalid, the output byte is undefined.
     #[inline(always)]
     pub const fn decode_bytes(high: u8, low: u8) -> u8 {
-        (Self::DECODING_TABLE[(high & 0x7F) as usize] << 4)
-            | Self::DECODING_TABLE[(low & 0x7F) as usize]
+        (Self::DECODING_TABLE[high as usize] << 4) | Self::DECODING_TABLE[low as usize]
     }
 
     /// Decodes the `high` and `low` hex chars as a byte.
@@ -54,14 +58,12 @@ impl HexDecoder {
 
 impl Decoder for HexDecoder {
     fn decoded_len(&self, data: &[u8]) -> Result<usize, Error> {
-        let div: usize = data.len() / 2;
-        let rem: usize = data.len() % 2;
-        if rem == 1 {
+        if data.len().is_multiple_of(2) {
+            Ok(data.len() / 2)
+        } else {
             Err(InvalidEncodedData {
                 reason: Some(format!("odd number of bytes: {}", data.len()).into()),
             })
-        } else {
-            Ok(div)
         }
     }
 
@@ -71,7 +73,7 @@ impl Decoder for HexDecoder {
             Err(InsufficientTargetSpace)
         } else {
             let target: &mut [u8] = &mut target[..decoded_len];
-            for (d, t) in data.chunks_exact(2).zip(target.iter_mut()) {
+            for (d, t) in data.as_chunks::<2>().0.iter().zip(target.iter_mut()) {
                 *t = Self::decode_bytes(d[0], d[1])
             }
             Ok(decoded_len)
@@ -83,8 +85,35 @@ impl Decoder for HexDecoder {
 #[cfg(feature = "dev")]
 mod tests {
     use crate::Decoder;
-    use crate::hex::HexDecoder;
-    use crate::test::test_decoder;
+    use crate::hex::{HexDecoder, HexEncoder};
+    use crate::test::{test_decoder, test_round_trip};
+
+    /// Checks the generated decoding table against every hex char.
+    #[test]
+    fn decoding_table() {
+        for b in 0u8..=255 {
+            let expected: Option<u8> = match b {
+                b'0'..=b'9' => Some(b - b'0'),
+                b'a'..=b'f' => Some(b - b'a' + 10),
+                b'A'..=b'F' => Some(b - b'A' + 10),
+                _ => None,
+            };
+            if let Some(expected) = expected {
+                assert_eq!(HexDecoder::decode_bytes(b'0', b), expected, "b={b:#04X}");
+                assert_eq!(
+                    HexDecoder::decode_bytes(b, b'0'),
+                    expected << 4,
+                    "b={b:#04X}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn round_trip() {
+        test_round_trip(&HexEncoder::LOWER, &HexDecoder::default(), 200);
+        test_round_trip(&HexEncoder::UPPER, &HexDecoder::default(), 200);
+    }
 
     #[test]
     fn decode_bytes_decode_chars() {

@@ -1,14 +1,8 @@
 /// Encodes the full `block` of data.
 ///
 /// This will encode 3 `block` bytes into 4 `target` bytes.
-///
-/// # Panics
-/// Panics if `block` is less than 3 bytes or `target` is less than 4 bytes.
 #[inline(always)]
-pub fn encode_block(table: &[u8; 64], block: &[u8], target: &mut [u8]) {
-    debug_assert!(block.len() >= 3);
-    debug_assert!(target.len() >= 4);
-
+pub fn encode_block(table: &[u8; 64], block: &[u8; 3], target: &mut [u8; 4]) {
     let a: u32 = block[0] as u32;
     let b: u32 = block[1] as u32;
     let c: u32 = block[2] as u32;
@@ -32,7 +26,7 @@ mod tests {
 
     #[test]
     fn fn_encode_block() {
-        let test_cases: &[(&[u8], &str)] = &[
+        let test_cases: &[(&[u8; 3], &str)] = &[
             (b"\x00\x10\x83", "ABCD"),
             (b"\x10\x51\x87", "EFGH"),
             (b"\x20\x92\x8B", "IJKL"),

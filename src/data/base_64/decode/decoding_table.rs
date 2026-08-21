@@ -49,6 +49,20 @@ impl Table<256> {
     }
 }
 
+impl Table<256> {
+    //! Properties
+
+    /// Gets the 63rd & 64th values. `(v63, v64)`
+    ///
+    /// The table is the inverse of the encoding table, so the values are found by index. Tables built by
+    /// `get_decoding_table` always contain both, so the `0` fallbacks are unreachable.
+    pub fn values(&self) -> (u8, u8) {
+        let table: &[u8; 256] = self.table();
+        let index_of = |value: u8| table.iter().position(|v| *v == value).unwrap_or(0) as u8;
+        (index_of(62), index_of(63))
+    }
+}
+
 impl Default for Table<256> {
     fn default() -> Self {
         Self::STANDARD

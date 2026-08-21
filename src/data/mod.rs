@@ -8,6 +8,7 @@ mod encoder;
 mod string_encoder;
 mod validator;
 
+#[cfg(any(feature = "hex", feature = "base-64"))]
 pub(in crate::data) mod util;
 
 #[cfg(feature = "base-64")]

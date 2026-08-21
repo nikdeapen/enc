@@ -1,3 +1,5 @@
+//! Base-64 encoded data.
+
 pub use base_64_decoder::*;
 pub use base_64_encoder::*;
 pub use base_64_validator::*;
@@ -8,6 +10,7 @@ mod base_64_validator;
 
 mod constants;
 
+pub(in crate::data::base_64) mod as_array;
 pub(in crate::data::base_64) mod decode;
 pub(in crate::data::base_64) mod encode;
 pub(in crate::data::base_64) mod table;

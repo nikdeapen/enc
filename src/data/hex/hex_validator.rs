@@ -49,8 +49,7 @@ impl HexValidator {
     /// Checks if `c` is valid.
     #[inline(always)]
     pub const fn is_valid_char(self, c: char) -> bool {
-        let c: u32 = c as u32;
-        c <= (b'f' as u32) && self.is_valid_byte((c & 0xFF) as u8)
+        c.is_ascii() && self.is_valid_byte(c as u8)
     }
 }
 

@@ -47,7 +47,7 @@ pub trait EncodeToSlice: EncodedLen {
         append_to_vec_with(
             target,
             || self.encoded_len(),
-            |t| unsafe { self.encode_to_slice_unchecked(t) },
+            |_, t| unsafe { self.encode_to_slice_unchecked(t) },
         )
     }
 

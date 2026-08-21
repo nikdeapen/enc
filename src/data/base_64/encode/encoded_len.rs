@@ -1,11 +1,12 @@
 use crate::Error;
 use crate::Error::IntegerOverflow;
+use crate::base_64::constants::{DECODED_BLOCK_SIZE, ENCODED_BLOCK_SIZE};
 
 /// Gets the encoded length of the optionally `padded` `data_len`.
 #[inline(always)]
 pub fn encoded_len(data_len: usize, padded: bool) -> Result<usize, Error> {
-    let div: usize = data_len / 3;
-    let rem: usize = data_len % 3;
+    let div: usize = data_len / DECODED_BLOCK_SIZE;
+    let rem: usize = data_len % DECODED_BLOCK_SIZE;
     let extra: usize = match rem {
         0 => 0,
         1 => {
@@ -24,7 +25,7 @@ pub fn encoded_len(data_len: usize, padded: bool) -> Result<usize, Error> {
         }
         _ => unreachable!(),
     };
-    div.checked_mul(4)
+    div.checked_mul(ENCODED_BLOCK_SIZE)
         .ok_or(IntegerOverflow)?
         .checked_add(extra)
         .ok_or(IntegerOverflow)

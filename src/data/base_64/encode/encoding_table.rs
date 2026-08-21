@@ -60,6 +60,16 @@ impl Table<64> {
     }
 }
 
+impl Table<64> {
+    //! Properties
+
+    /// Gets the 63rd & 64th values. `(v63, v64)`
+    pub fn values(&self) -> (u8, u8) {
+        let table: &[u8; 64] = self.table();
+        (table[62], table[63])
+    }
+}
+
 impl Default for Table<64> {
     fn default() -> Self {
         Self::STANDARD
