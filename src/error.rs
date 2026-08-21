@@ -16,10 +16,32 @@ pub enum Error {
     InsufficientTargetSpace,
 
     /// The encoded data was invalid.
+    ///
+    /// This variant is `#[non_exhaustive]` so more context can be added to it without a breaking change.
+    #[non_exhaustive]
     InvalidEncodedData {
         /// The underlying cause, when one is available.
         reason: Option<Box<dyn std::error::Error + Sync + Send>>,
     },
+}
+
+impl Error {
+    //! Construction
+
+    /// Creates an error for invalid encoded data.
+    pub fn invalid_encoded_data() -> Self {
+        Self::InvalidEncodedData { reason: None }
+    }
+
+    /// Creates an error for invalid encoded data with the underlying `reason`.
+    pub fn invalid_encoded_data_with<R>(reason: R) -> Self
+    where
+        R: Into<Box<dyn std::error::Error + Sync + Send>>,
+    {
+        Self::InvalidEncodedData {
+            reason: Some(reason.into()),
+        }
+    }
 }
 
 impl From<Error> for io::Error {
