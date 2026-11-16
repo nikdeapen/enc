@@ -1,6 +1,8 @@
 use crate::test::hex;
 use crate::var_int::VarIntSize;
-use crate::{DecodeFromRead, DecodeFromReadPrefix, EncodeToWrite, read_optional_byte};
+use crate::{
+    DecodeFromRead, DecodeFromReadPrefix, DecodeFromSlice, EncodeToWrite, read_optional_byte,
+};
 use std::fmt::Debug;
 use std::io::{Cursor, Write};
 
@@ -71,6 +73,26 @@ where
                 "encoded={}",
                 hex(encoded)
             );
+        }
+        Err(error) => {
+            panic!(
+                "encoded={} expected={:?}, error={:?}",
+                hex(encoded),
+                expected,
+                error
+            )
+        }
+    }
+}
+
+/// Tests the `DecodeFromSlice` trait.
+pub fn test_decode_from_slice<T>(encoded: &[u8], expected: &T)
+where
+    T: DecodeFromSlice + PartialEq + Debug,
+{
+    match T::decode_from_slice(encoded) {
+        Ok(decoded) => {
+            assert_eq!(&decoded, expected, "encoded={}", hex(encoded));
         }
         Err(error) => {
             panic!(

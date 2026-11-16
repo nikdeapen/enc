@@ -37,6 +37,7 @@ macro_rules! impl_var_int_decode {
         }
 
         $crate::impl_decode_from_read_by_prefix!($target_type);
+        $crate::impl_decode_from_slice_by_prefix!($target_type);
     };
 }
 
@@ -49,8 +50,9 @@ impl_var_int_decode!(VarIntSize, usize);
 #[cfg(test)]
 #[cfg(feature = "dev")]
 mod tests {
-    use crate::DecodeFromReadPrefix;
+    use crate::test::hex;
     use crate::var_int::{VarInt16, VarInt32, VarInt64, VarInt128, VarIntSize};
+    use crate::{DecodeFromReadPrefix, DecodeFromSlice};
     use std::io::Cursor;
 
     fn decodes_as_overflow<T: DecodeFromReadPrefix>(encoded: &[u8]) -> bool {
@@ -111,6 +113,132 @@ mod tests {
             assert!(decodes_as_overflow::<VarIntSize>(
                 b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
             ));
+        }
+    }
+
+    #[test]
+    fn var_int_16_decode_from_slice() {
+        let test_cases: &[(&[u8], Option<u16>)] = &[
+            (b"\x00", Some(0x00)),
+            (b"\x80\x01", Some(0x80)),
+            (b"\xFF\xFF\x03", Some(u16::MAX)),
+            (b"", None),                 // empty
+            (b"\x80", None),             // truncated
+            (b"\x00\x00", None),         // trailing byte
+            (b"\xFF\xFF\x03\x00", None), // trailing byte
+            (b"\xFF\xFF\x04", None),     // overflow
+        ];
+
+        for (encoded, expected) in test_cases {
+            let result: Option<u16> = VarInt16::decode_from_slice(encoded)
+                .ok()
+                .map(VarInt16::value);
+            assert_eq!(result, *expected, "encoded={}", hex(encoded));
+        }
+    }
+
+    #[test]
+    fn var_int_32_decode_from_slice() {
+        let test_cases: &[(&[u8], Option<u32>)] = &[
+            (b"\x00", Some(0x00)),
+            (b"\x80\x01", Some(0x80)),
+            (b"\xFF\xFF\xFF\xFF\x0F", Some(u32::MAX)),
+            (b"", None),                         // empty
+            (b"\x80", None),                     // truncated
+            (b"\x00\x00", None),                 // trailing byte
+            (b"\xFF\xFF\xFF\xFF\x0F\x00", None), // trailing byte
+            (b"\xFF\xFF\xFF\xFF\x10", None),     // overflow
+        ];
+
+        for (encoded, expected) in test_cases {
+            let result: Option<u32> = VarInt32::decode_from_slice(encoded)
+                .ok()
+                .map(VarInt32::value);
+            assert_eq!(result, *expected, "encoded={}", hex(encoded));
+        }
+    }
+
+    #[test]
+    fn var_int_64_decode_from_slice() {
+        let test_cases: &[(&[u8], Option<u64>)] = &[
+            (b"\x00", Some(0x00)),
+            (b"\x80\x01", Some(0x80)),
+            (b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01", Some(u64::MAX)),
+            (b"", None),                                             // empty
+            (b"\x80", None),                                         // truncated
+            (b"\x00\x00", None),                                     // trailing byte
+            (b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01\x00", None), // trailing byte
+            (b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x02", None),     // overflow
+        ];
+
+        for (encoded, expected) in test_cases {
+            let result: Option<u64> = VarInt64::decode_from_slice(encoded)
+                .ok()
+                .map(VarInt64::value);
+            assert_eq!(result, *expected, "encoded={}", hex(encoded));
+        }
+    }
+
+    #[test]
+    fn var_int_128_decode_from_slice() {
+        let test_cases: &[(&[u8], Option<u128>)] = &[
+            (b"\x00", Some(0x00)),
+            (b"\x80\x01", Some(0x80)),
+            (
+                b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x03",
+                Some(u128::MAX),
+            ),
+            (b"", None),         // empty
+            (b"\x80", None),     // truncated
+            (b"\x00\x00", None), // trailing byte
+            (
+                b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x03\x00",
+                None,
+            ), // trailing byte
+            (
+                b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x04",
+                None,
+            ), // overflow
+        ];
+
+        for (encoded, expected) in test_cases {
+            let result: Option<u128> = VarInt128::decode_from_slice(encoded)
+                .ok()
+                .map(VarInt128::value);
+            assert_eq!(result, *expected, "encoded={}", hex(encoded));
+        }
+    }
+
+    #[test]
+    fn var_int_size_decode_from_slice() {
+        let test_cases: &[(&[u8], Option<usize>)] = &[
+            (b"\x00", Some(0x00)),
+            (b"\x80\x01", Some(0x80)),
+            #[cfg(target_pointer_width = "32")]
+            (b"\xFF\xFF\xFF\xFF\x0F", Some(usize::MAX)),
+            #[cfg(target_pointer_width = "64")]
+            (
+                b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01",
+                Some(usize::MAX),
+            ),
+            (b"", None),         // empty
+            (b"\x80", None),     // truncated
+            (b"\x00\x00", None), // trailing byte
+            #[cfg(target_pointer_width = "32")]
+            (b"\xFF\xFF\xFF\xFF\x0F\x00", None), // trailing byte
+            #[cfg(target_pointer_width = "64")]
+            (b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x01\x00", None), // trailing byte
+            #[cfg(target_pointer_width = "32")]
+            (b"\xFF\xFF\xFF\xFF\x10", None), // overflow
+            #[cfg(target_pointer_width = "64")]
+            (b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\x02", None), // overflow
+        ];
+
+        for (encoded, expected) in test_cases {
+            let result: Option<usize> = VarIntSize::decode_from_slice(encoded)
+                .ok()
+                .map(VarIntSize::value);
+            assert_eq!(result, *expected, "encoded={}", hex(encoded));
         }
     }
 }
