@@ -10,6 +10,7 @@ where
 {
     test_encoded_len(value, expected.len());
     test_encode_to_slice(value, expected);
+    test_append_to_vec(value, expected);
     test_encode_to_write(value, expected);
 }
 
@@ -76,6 +77,76 @@ where
             Ok(encoded_len) => panic!("value={value:?} encoded_len={encoded_len}"),
             Err(Error::InsufficientTargetSpace) => {}
             Err(error) => panic!("value={value:?} error={error:?}"),
+        }
+    }
+}
+
+/// Tests the `append_to_vec` & `encode_as_vec` functions of the `EncodeToSlice` trait.
+///
+/// # Note
+/// - The value is appended to a vec whose spare capacity holds guard bytes, so a byte that the encoding skips
+///   shows up as a guard byte.
+pub fn test_append_to_vec<T>(value: &T, expected: &[u8])
+where
+    T: EncodeToSlice + Debug,
+{
+    const GUARD: u8 = 0xA5;
+    const PREFIX_LEN: usize = 2;
+
+    let mut buffer: Vec<u8> = Vec::default();
+    match value.append_to_vec(&mut buffer) {
+        Ok(encoded_len) => {
+            assert_eq!(encoded_len, expected.len(), "value={value:?}");
+            assert_eq!(
+                buffer.as_slice(),
+                expected,
+                "value={value:?} encoded={} expected={}",
+                hex(buffer.as_slice()),
+                hex(expected)
+            );
+        }
+        Err(error) => {
+            panic!("value={value:?} error={error:?}");
+        }
+    }
+
+    let mut buffer: Vec<u8> = vec![GUARD; PREFIX_LEN + expected.len() + 1];
+    buffer.truncate(PREFIX_LEN);
+    match value.append_to_vec(&mut buffer) {
+        Ok(encoded_len) => {
+            assert_eq!(encoded_len, expected.len(), "value={value:?}");
+            assert_eq!(
+                &buffer[..PREFIX_LEN],
+                &[GUARD; PREFIX_LEN],
+                "value={value:?}"
+            );
+
+            let encoded: &[u8] = &buffer[PREFIX_LEN..];
+            assert_eq!(
+                encoded,
+                expected,
+                "value={value:?} encoded={} expected={}",
+                hex(encoded),
+                hex(expected)
+            );
+        }
+        Err(error) => {
+            panic!("value={value:?} error={error:?}");
+        }
+    }
+
+    match value.encode_as_vec() {
+        Ok(encoded) => {
+            assert_eq!(
+                encoded.as_slice(),
+                expected,
+                "value={value:?} encoded={} expected={}",
+                hex(encoded.as_slice()),
+                hex(expected)
+            );
+        }
+        Err(error) => {
+            panic!("value={value:?} error={error:?}");
         }
     }
 }
