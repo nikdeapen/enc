@@ -65,8 +65,17 @@ pub trait EncodeToSlice: EncodedLen {
 
     /// Encodes the value as a vec. Returns the vec.
     fn encode_as_vec(&self) -> Result<Vec<u8>, Error> {
-        let mut vec: Vec<u8> = Vec::default();
-        self.append_to_vec(&mut vec)?;
+        let encoded_len: usize = self.encoded_len()?;
+        // The exact capacity skips the grow path of the vec, which costs more than encoding a small value does.
+        let mut vec: Vec<u8> = Vec::with_capacity(encoded_len);
+        // SAFETY: The same as `append_to_vec`.
+        unsafe {
+            append_to_vec_with_unchecked(
+                &mut vec,
+                || Ok(encoded_len),
+                |_, t| self.encode_to_slice_unchecked(t),
+            )?;
+        }
         Ok(vec)
     }
 }
