@@ -7,7 +7,7 @@
 This library aids in processing encoded data. No dependencies.
 
 ```text
-enc = "0.20.1"
+enc = "0.21.0"
 ```
 
 ## Features
