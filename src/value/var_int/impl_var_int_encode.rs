@@ -44,7 +44,10 @@ impl_var_int_encode!(VarIntSize, usize, usize::BITS);
 #[cfg(test)]
 #[cfg(feature = "dev")]
 mod tests {
-    use crate::test::{test_decode_from_read_prefix, test_decode_from_slice, test_encode};
+    use crate::test::{
+        test_decode_from_read_prefix, test_decode_from_slice, test_decode_from_slice_borrowed,
+        test_encode,
+    };
     use crate::var_int::{VarInt16, VarInt32, VarInt64, VarInt128, VarIntSize};
 
     #[test]
@@ -63,6 +66,7 @@ mod tests {
             test_encode(&value, encoded);
             test_decode_from_read_prefix(encoded, &value, false);
             test_decode_from_slice(encoded, &value);
+            test_decode_from_slice_borrowed(encoded, &value);
         }
     }
 
@@ -82,6 +86,7 @@ mod tests {
             test_encode(&value, encoded);
             test_decode_from_read_prefix(encoded, &value, false);
             test_decode_from_slice(encoded, &value);
+            test_decode_from_slice_borrowed(encoded, &value);
         }
     }
 
@@ -101,6 +106,7 @@ mod tests {
             test_encode(&value, encoded);
             test_decode_from_read_prefix(encoded, &value, false);
             test_decode_from_slice(encoded, &value);
+            test_decode_from_slice_borrowed(encoded, &value);
         }
     }
 
@@ -123,6 +129,7 @@ mod tests {
             test_encode(&value, encoded);
             test_decode_from_read_prefix(encoded, &value, false);
             test_decode_from_slice(encoded, &value);
+            test_decode_from_slice_borrowed(encoded, &value);
         }
     }
 
@@ -145,6 +152,7 @@ mod tests {
             test_encode(&value, encoded);
             test_decode_from_read_prefix(encoded, &value, false);
             test_decode_from_slice(encoded, &value);
+            test_decode_from_slice_borrowed(encoded, &value);
         }
     }
 }
